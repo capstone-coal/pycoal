@@ -1,0 +1,168 @@
+\documentclass[10pt,technote,draftclsnofoot,onecolumn]{IEEEtran}
+% for IEEEtran usage, see http://www.texdoc.net/texmf-dist/doc/latex/IEEEtran/IEEEtran_HOWTO.pdf
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pgfgantt}
+
+\renewcommand{\linespread}{1.0}
+
+\title{COAL: Coal and Open-pit surface mining impacts on American Lands}
+\author{
+  \IEEEauthorblockN{Taylor Alexander Brown, Heidi Ann Clayton, and Xiaomei Wang} \\
+  \IEEEauthorblockA{CS 461: Senior Capstone Fall 2016 \\ Oregon State University}
+}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Mountain-top Mining (MTM) is a method of open surface mining with the primary
+aim of exploring and exploiting coal seams present within the land and
+solid earth (LSE) on mountaintops. Amongst other surface mining activities,
+MTM is known to be an extremely destructive mining procedure predominantly
+limited to the spatial boundaries of the Southern Appalachians (Eastern Kentucky,
+West Virginia and very small sections of Virginia and Tennessee). MTM
+is known to have caused irreparable damage to mountain landscapes and signifi-
+cant immediate and longer-term damage to key streams and watersheds. Larger
+afield, the rest of the U.S.A has some extensive surface mining in various places
+for exploitation of resources such as gravel/sand, various metals, other minerals
+and even radioactive materials, etc. Several studies have provided important
+scientific understanding related to the local, regional and state-level impacts of
+such environmentally destructive practices, however a similar understanding on
+the national and continental levels are very much lacking.
+This project will deliver COAL - Coal and Open-pit surface mining impacts
+on American Lands - a suite of algorithms to identify, classify, characterize, and
+quantify (by reporting a number of key metrics) the direct and indirect impacts
+of MTM and related destructive surface mining activities across the continental
+U.S (and further afield).
+\end{abstract}
+
+\newpage
+
+\section*{Team Name}
+Our team name for this project is ``COAL'': Coal and Open-pit surface mining impacts on American Lands.
+
+\section*{Tasks}
+\begin{enumerate}
+\item Research background literature (Continuous)
+\item Research libraries (Continuous: New versions, new functionalities, improvements)
+\item Decide on workflow and collaboration tools
+  \begin{enumerate}
+  \item Communication
+  \item Project management
+  \item Version control
+  \end{enumerate}
+\item Define scope of software suite (Problem statement)
+\item Define milestones and timelines (Requirements document)
+\item Suite of imagery processing algorithms with tests
+  \begin{enumerate}
+  \item Mineral identification and classification
+    \begin{enumerate}
+    \item Preprocessing
+    \item Postprocessing: Plots, graphs
+    \end{enumerate}
+  \item Identify mining activities
+  \item Correlate mining and environmental impact
+  \item Rank and document changes over time
+  \end{enumerate}
+\item API documentation
+  \begin{enumerate}
+  \item Configure documentation (Sphinx)
+  \item Continously update with code
+  \end{enumerate}
+\item Wiki
+  \begin{enumerate}
+  \item User documentation
+  \item Development blog
+  \end{enumerate}
+\item Interactive, self-sustaining website with imagery
+  \begin{enumerate}
+  \item Single page
+  \item Host on GitHub
+  \end{enumerate}
+\item Release reusable components for cloud platforms
+\item Stretch goals
+  \begin{enumerate}
+  \item Analyze all AVIRIS data
+  \item Author research paper
+  \item Present at workshop (AGU)
+  \end{enumerate}
+\end{enumerate}
+
+% academic calendar: http://catalog.oregonstate.edu/ChapterDetail.aspx?key=148
+% engineering calendar: http://eecs.oregonstate.edu/industry-relations/calendar
+% course timeline: http://eecs.oregonstate.edu/capstone/cs/capstone.cgi?home=1
+
+\newcommand{\firstdayoffallterm}{2016-09-21}      % first day of fall term
+\newcommand{\startday}{2016-10-02}                % day groups assigned
+\newcommand{\fallprogressreportdue}{2016-12-05}   % finals week of fall term
+\newcommand{\alphareleasedue}{2017-02-13}         % week 6 of winter term
+\newcommand{\betareleasedue}{2017-03-20}          % finals week of winter term
+\newcommand{\winterprogressreportdue}{2017-03-20} % finals week of winter term
+\newcommand{\releasedue}{2017-05-15}              % monday prior to tentative expo date
+\newcommand{\expoday}{2017-05-19}                 % tentative expo date
+\newcommand{\finalreportdue}{2017-06-12}          % finals week of spring term
+\newcommand{\lastdayofspringterm}{2017-06-16}     % last day of spring term
+
+\begin{figure}
+
+  % gantt chart: http://mirrors.rit.edu/CTAN/graphics/pgf/contrib/pgfgantt/pgfgantt.pdf
+  \begin{ganttchart}[x unit=0.15em, time slot format=isodate]{\firstdayoffallterm}{\lastdayofspringterm}
+
+    % gantt chart title
+    \gantttitlecalendar{year, month=shortname} \\
+
+    % gantt chart bars
+    \ganttbar{Research literature}{\startday}{\expoday} \\
+    \ganttbar{Research libraries}{\startday}{\expoday} \\
+    \ganttbar{Decide Workflow}{\startday}{\fallprogressreportdue} \\
+    \ganttbar[name=problem]{Problem Statement}{\startday}{2016-10-26} \\
+    \ganttbar[name=requirements]{Requirements Document}{2016-10-26}{2016-11-04} \\
+    \ganttbar[name=mineralid]{Mineral Identification}{\fallprogressreportdue}{\alphareleasedue} \\
+    \ganttbar[name=miningid]{Identify Mining}{\alphareleasedue}{\betareleasedue} \\
+    \ganttbar[name=impact]{Correlate Impact}{\betareleasedue}{\releasedue} \\
+    \ganttbar[name=changes]{Document Changes}{\betareleasedue}{\releasedue} \\
+    \ganttbar{API Documentation}{\fallprogressreportdue}{\releasedue} \\
+    \ganttbar{User Documentation}{\fallprogressreportdue}{\releasedue} \\
+    \ganttbar{Website}{\betareleasedue}{\releasedue} \\
+    \ganttbar{Release components}{\releasedue}{\finalreportdue} \\
+    \ganttbar{Analyze AVIRIS}{\releasedue}{\finalreportdue} \\
+    \ganttbar{Workshop Presentation}{\finalreportdue}{\lastdayofspringterm}
+
+    % gantt chart links
+    \ganttlink{problem}{requirements}
+    \ganttlink{mineralid}{miningid}
+    \ganttlink{miningid}{impact}
+    \ganttlink{miningid}{changes}
+
+  \end{ganttchart}
+
+  \caption{Gantt Chart: Timeline of Project Tasks}
+
+\end{figure}
+
+% \newpage
+%
+% \captionsetup[figure]{labelformat=empty}
+% \begin{figure}
+%   \centering
+%   \includegraphics[scale=.5,trim=0 0 0 -5em]{signature-client.png}
+%   \caption{Lewis J. McGibbney (Client)}
+%
+%   \includegraphics[scale=1,trim=0 0 0 -5em]{signature-heidi.jpg}
+%   \caption{Heidi Clayton}
+%
+%   \includegraphics[scale=1,trim=0 0 0 -5em]{signature-taylor.png}
+%   \caption{Taylor Alexander Brown}
+%
+%   \includegraphics[scale=0.33,trim=0 0 0 -5em]{signature-xiaomei.png}
+%   \caption{Xiaomei Wang}
+% \end{figure}
+
+\end{document}

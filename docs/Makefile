@@ -5,3 +5,6 @@ report.pdf :
 
 problem-statement.pdf :
 	pdflatex problem-statement.ltx
+
+requirements.pdf :
+	pdflatex requirements.ltx
