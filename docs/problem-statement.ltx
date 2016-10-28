@@ -1,77 +1,115 @@
-\documentclass{article}
-
+\documentclass[10pt,technote,draftclsnofoot,onecolumn]{IEEEtran}
+\usepackage[margin=0.75in]{geometry}
+\usepackage[T1]{fontenc}
 \usepackage{graphicx}
 \usepackage{caption}
-
-\title{COAL - Coal and Open-Pit Surface Mining Impacts on American Lands}
-\date{}
-
+\renewcommand{\linespread}{1.0}
 \begin{document}
+\begin{titlepage}
+\centering
 
-\maketitle
+{\scshape\LARGE COAL - Coal and Open-Pit Surface Mining
+Impacts on American Lands \par}
+\vspace{1cm}
+{\scshape\Large CS 461 - Senior Capstone Fall 2016\par}
+\vspace{.25cm}
+{\scshape\Large Taylor Brown, Heidi Clayton, and Xiaomei Wang\par}
+\vspace{5cm}
 
-\section*{Introduction and Context}
+\section*{\bf{Abstrac}t}
+Mountain-top Mining (MTM) is a method of open surface mining with the primary
+aim of exploring and exploiting coal seams present within the land and
+solid earth (LSE) on mountaintops. Amongst other surface mining activities,
+MTM is known to be an extremely destructive mining procedure predominantly
+limited to the spatial boundaries of the Southern Appalachians (Eastern Kentucky,
+West Virginia and very small sections of Virginia and Tennessee). MTM
+is known to have caused irreparable damage to mountain landscapes and signifi-
+cant immediate and longer-term damage to key streams and watersheds. Larger
+afield, the rest of the U.S.A has some extensive surface mining in various places
+for exploitation of resources such as gravel/sand, various metals, other minerals
+and even radioactive materials, etc. Several studies have provided important
+scientific understanding related to the local, regional and state-level impacts of
+such environmentally destructive practices, however a similar understanding on
+the national and continental levels are very much lacking.
+This project will deliver COAL - Coal and Open-pit surface mining impacts
+on American Lands - a suite of algorithms to identify, classify, characterize, and
+quantify (by reporting a number of key metrics) the direct and indirect impacts
+of MTM and related destructive surface mining activities across the continental
+U.S (and further afield).
 
-Mountain-top Mining (MTM) is a method of open surface mining with the primary aim of exploring and exploiting coal seams present within the land and solid earth (LSE) on mountaintops. Amongst other surface mining activities, MTM is known to be an extremely destructive mining procedure predominantly limited to the spatial boundaries of the Southern Appalachians (Eastern Kentucky, West Virginia and very small sections of Virginia and Tennessee). MTM is known to have caused irreparable damage to mountain landscapes and significant immediate and longer-term damage to key streams and watersheds. Larger afield, the rest of the U.S.A has some extensive surface mining in various places for exploitation of resources such as gravel/sand, various metals, other minerals and even radioactive materials, etc. Several studies have provided important scientific understanding related to the local, regional and state-level impacts of such environmentally destructive practices, however a similar understanding on the national and continental levels are very much lacking.
+\end{titlepage}
 
-This project will deliver COAL - Coal and Open-pit surface mining impacts on American Lands - a suite of algorithms to identify, classify, characterize, and quantify (by reporting a number of key metrics) the direct and indirect impacts of MTM and related destructive surface mining activities across the continental U.S (and further afield).
-
-\section*{Project Objectives}
-
+\section*{\bf{Project Objectives}}
 \begin{enumerate}
+\item Work with the NASA JPL team to utilize imagery from satellites such as
+Landsat 5, 7 and 8 to build a suite of imagery processing algorithms that
+identify mining activity across the U.S. dating from 1980 to present. Examples
+of such activity are located within the central Appalachian regions
+of the eastern United States where the U.S. Environmental Protection
+Agency (EPA) estimated 2,200 square miles (5,700 km2) of Appalachian
+forests were cleared for MTM sites by the year 2012, with over 500 mountaintops
+being destroyed due to MTM activity;
 
-\item Work with the NASA JPL team to utilize imagery from satellites such as Landsat 5, 7 and 8 to build a suite of imagery processing algorithms that identify mining activity across the U.S. dating from ~1980 to present. Examples of such activity are located within the central Appalachian regions of the eastern United States where the U.S. Environmental Protection Agency (EPA) estimated 2,200 square miles (5,700 km\textsuperscript{2}) of Appalachian forests were cleared for MTM sites by the year 2012, with over 500 mountaintops being destroyed due to MTM activity;
+\item  Eventually, enable improved accuracy of correlations between proximity 
+of MTM activities to streams, rivers, estuaries, etc. through use of hydrology,
+dam and reservoir datasets such as the Global Reservoir and
+Dam Database (GRaND) and other water system datasets. EPA impact
+statements have found that streams in valley filling from MTM-affected
+watersheds contain higher levels of minerals in the water and decreased
+aquatic biodiversity. Mine-affected streams also have high selenium concentrations,
+which can bioaccumulate and produce toxic effects (e.g., reproductive
+failure, physical deformity, mortality), and affect reservoirs
+below such streams; and
 
-\item Eventually, enable improved accuracy of correlations between proximity of MTM activities to streams, rivers, estuaries, etc. through use of hydrology, dam and reservoir datasets such as the Global Reservoir and Dam Database (GRaND) and other water system datasets. EPA impact statements have found that streams in valley filling from MTM-affected watersheds contain higher levels of minerals in the water and decreased aquatic biodiversity. Mine-affected streams also have high selenium concentrations, which can bioaccumulate and produce toxic effects (e.g., reproductive failure, physical deformity, mortality), and affect reservoirs below such streams; and
-
-\item Provide a baseline suite of reporting metrics which will appropriately rank and document the changes within LSE areas and hydrological waterways as observed over time; finally (iv) extend COAL as a set of reusable components which can be used in cloud-based platforms such as Mapbox’s Landsat-live or NASA Ames Stereo pipeline, amongst others.
+\item Provide a baseline suite of reporting metrics which will appropriately rank
+and document the changes within LSE areas and hydrological waterways
+as observed over time; finally (iv) extend COAL as a set of reusable components
+which can be used in cloud-based platforms such as Mapboxs
+Landsat-live or NASA Ames Stereo pipeline, amongst others.
 
 \end{enumerate}
 
-\section*{Project Deliverables}
-
+\section*{\bf{Project Deliverables}}
 \begin{enumerate}
+\item Based on the development one or more appealing usage scenarios; develop
+and deliver a working architecture and systems engineering document that
+defines the scope of the COAL software suite.
 
-\item Based on the development one or more appealing usage scenarios; develop and deliver a working architecture and systems engineering document that defines the scope of the COAL software suite.
-
-\item Provide a schedule of works that defines milestones and timelines for achieving 1 above.
+\item  Provide a schedule of works that defines milestones and timelines for
+achieving 1 above.
 
 \item Deliver on subtasks which address parallel development of
+\begin{enumerate}
+\item A suite of imagery processing algorithms that identify, classify, characterize,
+and quantify mining activity across the U.S. dating from
+1980 to present.
 
-  \begin{enumerate}
+\item Tests for such algorithms
 
-  \item A suite of imagery processing algorithms that identify, classify, characterize, and quantify mining activity across the U.S. dating from ~1980 to present.
-
-  \item Tests for such algorithms
-
-  \item An interactive, self sustaining Website which will be updated with imagery exposing and highlighting the destructive nature of the mining activities detailed earlier within this document.
-
-  \end{enumerate}
+\item An interactive, self sustaining Website which will be updated with
+imagery exposing and highlighting the destructive nature of the mining
+activities detailed earlier within this document.
 
 \end{enumerate}
-
-\section*{Signatures}
-
-Agreed upon by the following Clients and Contractors:
+\end{enumerate}
+\newpage
 
 \captionsetup[figure]{labelformat=empty}
 \begin{figure}
+	
   \centering
-
-  \includegraphics[scale=1,trim=0 0 0 -5em]{}
-  \caption{Lewis J. McGibbney (Client)}
-
-  \includegraphics[scale=1,trim=0 0 0 -5em]{}
-  \caption{Kim D. Whitehall (Client)}
+  \includegraphics[scale=.5,trim=0 0 0 -5em]{signature-client.png}
+  \caption{Lewis J. McGibbney (Client) - October 26, 2016}
 
   \includegraphics[scale=1,trim=0 0 0 -5em]{signature-heidi.jpg}
-  \caption{Heidi Ann Clayton (Contractor)}
+  \caption{Heidi Clayton - October 26, 2016}
 
   \includegraphics[scale=1,trim=0 0 0 -5em]{signature-taylor.png}
-  \caption{Taylor Alexander Brown (Contractor)}
+  \caption{Taylor Alexander Brown - October 26, 2016}
 
   \includegraphics[scale=0.33,trim=0 0 0 -5em]{signature-xiaomei.png}
-  \caption{Xiaomei Wang (Contractor)}
+  \caption{Xiaomei Wang - October 26, 2016}
 \end{figure}
+
 
 \end{document}
