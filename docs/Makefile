@@ -1,4 +1,4 @@
-all : report.pdf problem-statement.pdf
+all : report.pdf problem-statement.pdf requirements.pdf
 
 report.pdf :
 	pdflatex report.ltx
