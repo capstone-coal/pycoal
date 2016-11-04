@@ -88,17 +88,25 @@ Provide documents that define the scope of the software suite from both the clie
 
 Provide a document that describes in detail what tasks are to be completed and when.
 
-\subsection{Suite of imagery processing algorithms with tests}
-\begin{enumerate}
-\item Mineral identification and classification
-  \begin{enumerate}
-  \item Preprocessing
-  \item Postprocessing: Plots, graphs
-  \end{enumerate}
-\item Identify mining activities
-\item Correlate mining and environmental impact
-\item Rank and document changes over time
-\end{enumerate}
+\subsection{Develop Software}
+
+Develop a suite of imagery processing algorithms using existing libraries and, if necessary, custom code. The behavior of each algorithm should be verified with automated tests. The algorithms should be efficient enough and effective enough for data scientists to justify adopting and deploying them to solve real-world problems. The results should include visualizations that allow data scientists to infer meaningful relationships from the data sets.
+
+\subsubsection{Mineral identification and classification}
+
+Implement algorithms to identify and classify minerals and their spatial relationships from imaging spectroscopy data.
+
+\subsubsection{Identify mining}
+
+Implement algorithms to identify regions of mining activity from the mineral identification and classification data.
+
+\subsubsection{Correlate mining with environmental impact}
+
+Implement algorithms to correlate the regions of mining activity with data on regions of environmental degradation.
+
+\subsubsection{Rank and document changes over time}
+
+Implement algorithms to derive spatial and temporal relationships between the regions of mining activity and the regions of environmental degradation.
 
 \subsection{API documentation}
 
