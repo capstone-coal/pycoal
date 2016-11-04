@@ -1,4 +1,8 @@
 # coal
+
+[![license](https://img.shields.io/github/license/capstone-coal/coal.svg?maxAge=2592000?style=plastic)](http://www.apache.org/licenses/LICENSE-2.0)
+[![Build Status](https://travis-ci.org/capstone-coal/coal.svg?branch=master)](https://travis-ci.org/capstone-coal/coal)
+
 Coal and Open-pit surface mining impacts on American Lands
 
 # Introduction and Context
