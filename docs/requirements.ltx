@@ -112,14 +112,13 @@ Provide a wiki with documentation for end users containing comprehensive usage i
 
 Provide a website that serves as the project homepage. The homepage should describe the project in general terms and demonstrate example imagery and data. Links to relevant sites including the source code repository, API documentation, Wiki, and developer profiles should be included. It should be accessible, interactive, and self-contained.
 
-\subsection{Release reusable components for cloud platforms}
+\subsection{Release Software}
 
-\subsection{Stretch goals}
-\begin{enumerate}
-\item Analyze all AVIRIS data
-\item Author research paper
-\item Present at workshop (AGU)
-\end{enumerate}
+Release the software as a collection of reusable modules which data scientists may deploy to cloud platforms. All code is to be released under the Apache License, Version 2.0.
+
+\subsection{Publish Research Paper}
+
+Publish a research paper and present it to a scientific society such as the American Geophysical Union. The paper should explain the research problem, describe the software developed to solve it, and present as a case study an analysis of imagery from the AVIRIS project.
 
 % academic calendar: http://catalog.oregonstate.edu/ChapterDetail.aspx?key=148
 % engineering calendar: http://eecs.oregonstate.edu/industry-relations/calendar
@@ -155,9 +154,8 @@ Provide a website that serves as the project homepage. The homepage should descr
     \ganttbar{API Documentation}{\fallprogressreportdue}{\releasedue} \\
     \ganttbar{User Documentation}{\fallprogressreportdue}{\releasedue} \\
     \ganttbar{Homepage}{\betareleasedue}{\releasedue} \\
-    \ganttbar{Release components}{\releasedue}{\finalreportdue} \\
-    \ganttbar{Analyze AVIRIS}{\releasedue}{\finalreportdue} \\
-    \ganttbar{Workshop Presentation}{\finalreportdue}{\lastdayofspringterm}
+    \ganttbar{Release Software}{\releasedue}{\finalreportdue} \\
+    \ganttbar{Publish Research Paper}{\releasedue}{\finalreportdue}
 
     % gantt chart links
     \ganttlink{problem}{requirements}
