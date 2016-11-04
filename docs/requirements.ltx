@@ -1,8 +1,7 @@
-\documentclass[10pt,technote,draftclsnofoot,onecolumn]{IEEEtran}
+\documentclass[10pt,draftclsnofoot,onecolumn,journal,compsoc]{IEEEtran}
 % for IEEEtran usage, see http://www.texdoc.net/texmf-dist/doc/latex/IEEEtran/IEEEtran_HOWTO.pdf
 
 \usepackage[margin=0.75in]{geometry}
-\usepackage[T1]{fontenc}
 \usepackage{graphicx}
 \usepackage{caption}
 \usepackage{hyperref}
@@ -17,31 +16,35 @@
 }
 \date{}
 
+\IEEEtitleabstractindextext{
+  \begin{abstract}
+    Mountain-top Mining (MTM) is a method of open surface mining with the primary
+    aim of exploring and exploiting coal seams present within the land and
+    solid earth (LSE) on mountaintops. Amongst other surface mining activities,
+    MTM is known to be an extremely destructive mining procedure predominantly
+    limited to the spatial boundaries of the Southern Appalachians (Eastern Kentucky,
+    West Virginia and very small sections of Virginia and Tennessee). MTM
+    is known to have caused irreparable damage to mountain landscapes and signifi-
+    cant immediate and longer-term damage to key streams and watersheds. Larger
+    afield, the rest of the U.S.A has some extensive surface mining in various places
+    for exploitation of resources such as gravel/sand, various metals, other minerals
+    and even radioactive materials, etc. Several studies have provided important
+    scientific understanding related to the local, regional and state-level impacts of
+    such environmentally destructive practices, however a similar understanding on
+    the national and continental levels are very much lacking.
+    This project will deliver COAL - Coal and Open-pit surface mining impacts
+    on American Lands - a suite of algorithms to identify, classify, characterize, and
+    quantify (by reporting a number of key metrics) the direct and indirect impacts
+    of MTM and related destructive surface mining activities across the continental
+    U.S (and further afield).
+  \end{abstract}
+}
+
 \begin{document}
 
 \maketitle
-
-\begin{abstract}
-Mountain-top Mining (MTM) is a method of open surface mining with the primary
-aim of exploring and exploiting coal seams present within the land and
-solid earth (LSE) on mountaintops. Amongst other surface mining activities,
-MTM is known to be an extremely destructive mining procedure predominantly
-limited to the spatial boundaries of the Southern Appalachians (Eastern Kentucky,
-West Virginia and very small sections of Virginia and Tennessee). MTM
-is known to have caused irreparable damage to mountain landscapes and signifi-
-cant immediate and longer-term damage to key streams and watersheds. Larger
-afield, the rest of the U.S.A has some extensive surface mining in various places
-for exploitation of resources such as gravel/sand, various metals, other minerals
-and even radioactive materials, etc. Several studies have provided important
-scientific understanding related to the local, regional and state-level impacts of
-such environmentally destructive practices, however a similar understanding on
-the national and continental levels are very much lacking.
-This project will deliver COAL - Coal and Open-pit surface mining impacts
-on American Lands - a suite of algorithms to identify, classify, characterize, and
-quantify (by reporting a number of key metrics) the direct and indirect impacts
-of MTM and related destructive surface mining activities across the continental
-U.S (and further afield).
-\end{abstract}
+\IEEEdisplaynontitleabstractindextext
+\IEEEpeerreviewmaketitle
 
 \newpage
 
@@ -53,22 +56,65 @@ U.S (and further afield).
 Our team name for this project is ``COAL'': Coal and Open-pit surface mining impacts on American Lands.
 
 \subsection{Purpose}
+The purpose of this document is to describe what COAL provides as a piece of software. This document will touch on interfaces, features, and constraints of COAL. This document is intended for developers, potential users of COAL, and any stakeholders in projects that make use of or reference COAL.
 
 \subsection{Scope}
+COAL will be a suite of algorithms that identifies, classifies, and quantifies the effects of open-pit mining on the surrounding environment. This will be done by first using spectroscopy data to identify mining activity and then using data provided by GRaND to attempt to correlate these identified sites with environmental impacts over time. These algorithms will be provided as reusable components that can be used in cloud-based systems such as NASA Ames Stereo Pipeline. There will also be a website that will present the algorithms and related data visualization as well as links to the source code, project wiki, API documentation, and developer profiles to anyone interested in using COAL for their cloud-based platform or research.
 
 \subsection{Definitions, acronyms, and abbreviations}
 
+% Taylor
+
+% it would be good to add stakeholders to this since I used it in the purpose section
+
+% % great comment, thanks!
+
+% GRaND as well - it's in our original problem statement
+
+% also NASA Ames Stereo Pipeline
+
+% Landsat-live
+
+% % if you want to take over this section you can -- i'm not working on it right now :-)
+
+% also AVIRIS, which is described as a case study in the research paper
+
+% this section as well as references and overview are probably best done last
+
+% % agreed, i keep finding more acronyms :-)
+
+% also i think we should go through this at the end to make sure that we're using "shall" instead of "should" when speaking about specific requirements. I think it's standard language that's preferred.
+
+% % i would be willing to make the change, but it'd be nice to have a citation... "shall" sounds a little stilted to me. "should" is commonly used in web RFCs for example: https://tools.ietf.org/html/rfc2119
+
+%%% I'm not dedicated to the cause, I just had to use that specific language both in my  software engineering classes and my internship so it's what I'm used to. I agree it sounds weird!
+
+%%%% an alternative would be to use neither and just describe things in the present (or the imperative) tense: "The client problem statement [provides]...", "The behavior of each algorithm [is]...", "The homepage [describes]..." though that might make for some awkward wordings as well.
+
 \subsection{References}
+
+%scikit-spectra
+
+%NumPy
 
 \subsection{Overview}
 
 \section{Overall description}
 
 \subsection{Product perspective}
+The COAL suite of algorithms will be compatible with cloud-based platforms such as NASA Ames Stereo Pipeline and Landsat-live. Users will interact with COAL's git.io website in order to view a detailed analysis of COAL's algorithms and data visualization using spectroscopy and mineral maps. COAL's algorithms and data analysis will be interfaced with the data analysis and visualization libraries NumPy and scikit-spectra. TIME/SPACE COMPLEXITY DISCUSSION? There are no hardware components to this product nor are there communications interfaces.
+
+% github.io, not git.io -- though it may suffice to say "homepage"
+
+% not sure how committed we are to some of these libraries -- may need to ask client
 
 \subsection{Product functions}
 
+
+
 \subsection{User characteristics}
+
+% Taylor
 
 \subsection{Constraints}
 
@@ -77,55 +123,42 @@ Our team name for this project is ``COAL'': Coal and Open-pit surface mining imp
 \section{Specific Requirements}
 
 \subsection{Research background literature and libraries}
-
 On an ongoing basis for the duration of the project, review background literature and libraries and provide relevant references in project documentation. Literature may include videos, books, websites, and journal articles. Libraries include third-party software modules used and any new versions and functionalities that are added to them.
 
 \subsection{Problem statement}
-
 Provide documents that define the scope of the software suite from both the client perspective and the student perspective. The client problem statement provides a high-level overview of the client's goals for the project. The student problem statement describes the project from a computer science perspective, giving an overview of the problem domain and the steps taken to solve it.
 
 \subsection{Requirements document}
-
 Provide a document that describes in detail what tasks are to be completed and when.
 
 \subsection{Develop Software}
-
 Develop a suite of imagery processing algorithms using existing libraries and, if necessary, custom code. The behavior of each algorithm should be verified with automated tests. The algorithms should be efficient enough and effective enough for data scientists to justify adopting and deploying them to solve real-world problems. The results should include visualizations that allow data scientists to infer meaningful relationships from the data sets.
 
 \subsubsection{Mineral identification and classification}
-
 Implement algorithms to identify and classify minerals and their spatial relationships from imaging spectroscopy data.
 
 \subsubsection{Identify mining}
-
 Implement algorithms to identify regions of mining activity from the mineral identification and classification data.
 
 \subsubsection{Correlate mining with environmental impact}
-
 Implement algorithms to correlate the regions of mining activity with data on regions of environmental degradation.
 
 \subsubsection{Rank and document changes over time}
-
 Implement algorithms to derive spatial and temporal relationships between the regions of mining activity and the regions of environmental degradation.
 
 \subsection{API documentation}
-
 Provide API documentation for developers in a human-readable format that is automatically generated from the codebase.
 
 \subsection{Wiki}
-
 Provide a wiki with documentation for end users containing comprehensive usage instructions and relevant background information. Also provide a development blog with weekly updates from the development team.
 
 \subsection{Homepage}
-
 Provide a website that serves as the project homepage. The homepage should describe the project in general terms and demonstrate example imagery and data. Links to relevant sites including the source code repository, API documentation, Wiki, and developer profiles should be included. It should be accessible, interactive, and self-contained.
 
 \subsection{Release Software}
-
 Release the software as a collection of reusable modules which data scientists may deploy to cloud platforms. All code is to be released under the Apache License, Version 2.0.
 
 \subsection{Publish Research Paper}
-
 Publish a research paper and present it to a scientific society such as the American Geophysical Union. The paper should explain the research problem, describe the software developed to solve it, and present as a case study an analysis of imagery from the AVIRIS project.
 
 % academic calendar: http://catalog.oregonstate.edu/ChapterDetail.aspx?key=148
@@ -181,20 +214,20 @@ Publish a research paper and present it to a scientific society such as the Amer
 
 \section{Signatures}
 
-\captionsetup[figure]{labelformat=empty}
-\begin{figure}
-  \centering
-  \includegraphics[scale=.5,trim=0 0 0 -5em]{signature-client.png}
-  \caption{Lewis J. McGibbney (Client)}
-
-  \includegraphics[scale=1,trim=0 0 0 -5em]{signature-heidi.jpg}
-  \caption{Heidi Clayton}
-
-  \includegraphics[scale=1,trim=0 0 0 -5em]{signature-taylor.png}
-  \caption{Taylor Alexander Brown}
-
-  \includegraphics[scale=0.33,trim=0 0 0 -5em]{signature-xiaomei.png}
-  \caption{Xiaomei Wang}
-\end{figure}
+% \captionsetup[figure]{labelformat=empty}
+% \begin{figure}
+%   \centering
+%   \includegraphics[scale=.5,trim=0 0 0 -5em]{signature-client.png}
+%   \caption{Lewis J. McGibbney (Client)}
+%
+%   \includegraphics[scale=1,trim=0 0 0 -5em]{signature-heidi.jpg}
+%   \caption{Heidi Clayton}
+%
+%   \includegraphics[scale=1,trim=0 0 0 -5em]{signature-taylor.png}
+%   \caption{Taylor Alexander Brown}
+%
+%   \includegraphics[scale=0.33,trim=0 0 0 -5em]{signature-xiaomei.png}
+%   \caption{Xiaomei Wang}
+% \end{figure}
 
 \end{document}
