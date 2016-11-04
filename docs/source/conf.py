@@ -260,7 +260,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'COAL.tex', u'COAL Documentation',
-     u'Taylor Brown, Heidi Clayton, and Xiaomei Wang', 'manual'),
+     u'Lewis John McGibbney, Kim D. Whitehall, Taylor Brown, Heidi Clayton, and Xiaomei Wang', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
