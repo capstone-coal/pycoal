@@ -113,7 +113,7 @@ The main criteria being evaluated are accuracy based on tests performed in previ
 
 \subsubsection{Discussion}
 In the experiments performed on AVIRIS data, there were no significant confounding factors that had an effect on the accuracy of the data when using the CGBP method. Just looking at the accuracy of the GML method, it looks like a fairly good choice, however this is a limitation to its use when using very high dimensional data like AVIRIS. The GML method relies on having "nonsingular (invertible)
-class-specific covariance matrices for all classes. [x]" Since there are often many dimensions to the data, there are cases when the sample size is smaller than the number of classes, which would make the data break the requirement of being nonsingular. The MED method performed the lowest in terms of accuracy and like the CGBP method, had no confounding factors that limited its usefulness. 
+class-specific covariance matrices for all classes \cite{aviris}." Since there are often many dimensions to the data, there are cases when the sample size is smaller than the number of classes, which would make the data break the requirement of being nonsingular. The MED method performed the lowest in terms of accuracy and like the CGBP method, had no confounding factors that limited its usefulness. 
 
 \subsubsection{Selection}
 We will be using the conjugate-gradient backpropagation method for classifying AVIRIS data.
