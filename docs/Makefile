@@ -8,3 +8,6 @@ problem-statement.pdf :
 
 requirements.pdf :
 	pdflatex requirements.ltx
+
+techreview.pdf :
+	pdflatex techreview.ltx
