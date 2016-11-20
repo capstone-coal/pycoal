@@ -5,7 +5,7 @@
 [![PyPI](https://img.shields.io/pypi/v/coal.svg?maxAge=2592000?style=plastic)](https://pypi.python.org/pypi/coal)
 [![Python Badge](https://img.shields.io/badge/python-3-blue.svg)](https://www.python.org/downloads/)
 [![Python Badge](https://img.shields.io/badge/python-2-blue.svg)](https://www.python.org/downloads/)
-[![Launch Binder](https://img.shields.io/badge/launch-binder-e66581.svg?style=plastic)](http://mybinder.org/repo/capstone-coal/coal)]
+[![Launch Binder](https://img.shields.io/badge/launch-binder-e66581.svg?style=plastic)](http://mybinder.org/repo/capstone-coal/coal)
 
 Coal and Open-pit surface mining impacts on American Lands
 
@@ -19,25 +19,25 @@ coal provides a suite of algorithms (written in Python) to identify, classify, c
 
 From the cheeseshop
 
-'''
+```
 pip install podaacpy
-'''
+```
     
 or from conda
 
-'''
+```
 conda install -c conda-forge coal    
-'''
+```
 
 or from source
 
-'''
+```
 git clone https://github.com/capstone-coal/coal.git && cd coal
 python setup.py install
-'''
+```
 
 # Quickstart
-[![Launch Binder](https://img.shields.io/badge/launch-binder-e66581.svg?style=plastic)](http://mybinder.org/repo/capstone-coal/coal)]
+[![Launch Binder](https://img.shields.io/badge/launch-binder-e66581.svg?style=plastic)](http://mybinder.org/repo/capstone-coal/coal)
 In the [examples directory](https://github.com/capstone-coal/coal/tree/master/examples) you can find several Jupyter notebooks with specific applications of coal. You can launch a cloud Jupyter server using binder to edit the notebooks without installing anything. Try it out!
 
 http://mybinder.org/repo/capstone-coal/coal
