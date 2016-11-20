@@ -1,5 +1,3 @@
-# Copyright 2016 California Institute of Technology.
-#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,7 +15,7 @@ from setuptools import find_packages, setup
 
 # Package data
 # ------------
-_author = 'COAL Capstone 2017 Devs'
+_author = 'COAL Capstone Develeopers'
 _author_email = 'coal-capstone@googlegroups.com'
 _classifiers = [
     'Environment :: Console',
@@ -34,7 +32,7 @@ _classifiers = [
 _description = 'COAL mining library for AVIRIS data.'
 _download_url = 'http://pypi.python.org/pypi/coal/'
 _requirements = ["spectral"]
-_keywords = ['spectroscopy', 'aviris', 'mining', 'minerals']
+_keywords = ['spectroscopy', 'aviris', 'aviris-ng', 'mining', 'minerals']
 _license = 'Apache License, Version 2.0'
 _long_description = 'A python suite for the identification and characterization of mining activity within AVIRIS data.'
 _name = 'coal'
