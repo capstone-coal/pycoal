@@ -6,6 +6,7 @@
 [![Python Badge](https://img.shields.io/badge/python-3-blue.svg)](https://www.python.org/downloads/)
 [![Python Badge](https://img.shields.io/badge/python-2-blue.svg)](https://www.python.org/downloads/)
 [![Launch Binder](https://img.shields.io/badge/launch-binder-e66581.svg?style=plastic)](http://mybinder.org/repo/capstone-coal/coal)
+[![Google Group](https://img.shields.io/badge/-Google%20Group-lightgrey.svg)](https://groups.google.com/forum/#!forum/coal-capstone)
 
 Coal and Open-pit surface mining impacts on American Lands
 
@@ -38,6 +39,7 @@ python setup.py install
 
 # Quickstart
 [![Launch Binder](https://img.shields.io/badge/launch-binder-e66581.svg?style=plastic)](http://mybinder.org/repo/capstone-coal/coal)
+
 In the [examples directory](https://github.com/capstone-coal/coal/tree/master/examples) you can find several Jupyter notebooks with specific applications of coal. You can launch a cloud Jupyter server using binder to edit the notebooks without installing anything. Try it out!
 
 http://mybinder.org/repo/capstone-coal/coal
@@ -45,6 +47,8 @@ http://mybinder.org/repo/capstone-coal/coal
 # Community and Development
 
 ## Mailing list
+[![Google Group](https://img.shields.io/badge/-Google%20Group-lightgrey.svg)](https://groups.google.com/forum/#!forum/coal-capstone)
+
 To become involved or if you require help using the project request to join our project [Google Group](https://groups.google.com/forum/#!forum/coal-capstone).
 
 ## Issue Tracker
