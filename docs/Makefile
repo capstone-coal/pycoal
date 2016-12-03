@@ -1,4 +1,4 @@
-all : report.pdf problem-statement.pdf requirements.pdf
+all : report.pdf problem-statement.pdf requirements.pdf techreview.pdf design.pdf
 
 report.pdf :
 	pdflatex report.ltx
@@ -11,3 +11,6 @@ requirements.pdf :
 
 techreview.pdf :
 	pdflatex techreview.ltx
+
+design.pdf :
+	pdflatex design.ltx
