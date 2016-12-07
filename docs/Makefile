@@ -24,3 +24,13 @@ problem-statement-student.pdf :
 
 fall-report.pdf :
 	pdflatex fall-report.ltx
+
+clean :
+	rm -f report.pdf
+	rm -f problem-statement.pdf
+	rm -f requirements.pdf
+#	rm -f techreview.pdf
+	rm -f design.pdf
+	rm -f presentation.pdf
+	rm -f problem-statement-student.pdf
+	rm -f fall-report.pdf
