@@ -3,3 +3,16 @@ signature-client.png
 signature-heidi.jpg
 signature-taylor.png
 signature-xiaomei.png
+
+# ignore temporary files
+*~
+*.aux
+*.toc
+*.out
+*.nav
+*.snm
+*.vrb
+
+# ignore local directories
+*-overleaf/
+old/
