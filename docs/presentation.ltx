@@ -1,0 +1,371 @@
+% assignment: http://eecs.oregonstate.edu/capstone/cs/capstone.cgi?hw=progress
+
+% based on https://github.com/browtayl/mini-mips/blob/master/presentation/presentation.ltx
+\documentclass[9pt]{beamer}
+
+% hide navigation bar
+\beamertemplatenavigationsymbolsempty
+
+% monospace font
+\usepackage{DejaVuSansMono}
+\renewcommand{\familydefault}{\ttdefault}
+\usepackage[T1]{fontenc}
+\frenchspacing
+
+% circle list items
+\setbeamertemplate{itemize items}[circle]
+
+% dark color scheme
+\definecolor{dark}{gray}{0.025}
+\definecolor{light}{gray}{0.975}
+\setbeamercolor{normal text}{bg=dark,fg=light}
+\setbeamercolor{frametitle}{fg=light}
+\setbeamercolor{title}{fg=light}
+\setbeamercolor{page number in head/foot}{fg=light}
+\setbeamercolor{itemize item}{fg=light}
+\setbeamercolor{itemize subitem}{fg=light}
+\setbeamercolor{itemize subsubitem}{fg=light}
+\setbeamercolor{bibliography item}{fg=light}
+\setbeamercolor*{bibliography entry title}{fg=light}
+\setbeamercolor*{bibliography entry author}{fg=light}
+\setbeamercolor*{bibliography entry journal}{fg=light}
+\setbeamercolor*{bibliography entry note}{fg=light}
+
+% frame numbering
+\setbeamertemplate{footline}[frame number]
+
+% images
+\usepackage{pdfpages}
+
+% graphics
+\usepackage{graphicx}
+
+% style captions
+% http://tex.stackexchange.com/questions/82456/how-to-remove-figure-caption-prefix-figure-in-beamer
+\setbeamertemplate{caption}{\insertcaption}
+
+% number citations
+% http://tex.stackexchange.com/questions/82456/how-to-remove-figure-caption-prefix-figure-in-beamer
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+
+% unicode
+% http://www.codeotaku.com/journal/2010-03/latex-symbols-in-verbatim/index
+\usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{2193}{$\downarrow$}
+
+% title
+\title{COAL: Coal and Open-pit surface mining impacts on American Lands}
+\author{Taylor Alexander Brown, Heidi Ann Clayton, and Xiaomei Wang \\ Group 18}
+\institute{CS 461: Senior Capstone Fall 2016 \\ Oregon State University}
+\date{}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\begin{frame}
+\frametitle{Introduction}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+    \begin{itemize}
+    \item Team Name: COAL\\(Coal and Open-pit surface mining impacts on American Lands)
+    \item Team Members: Taylor Alexander Brown, Heidi Ann Clayton, and Xiaomei Wang
+    \item Client: Dr. Lewis John McGibbney
+    \item Organization: Jet Propulsion Laboratory
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=150px]{161344main_image_feature_681b_ys_full.jpg}
+      \caption{Infrared imagery of a mine \cite{escondida}}
+    \end{figure}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Goal}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+    \begin{itemize}
+    \item Environmental monitoring
+    \item Reusable for other purposes
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=150px]{Twincreeksblast.jpg}
+      \caption{Open-pit mine \cite{open-pit-mine}}
+    \end{figure}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{What}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+    \begin{itemize}
+    \item Input
+      \begin{itemize}
+      \item Imaging Spectroscopy Data
+      \item GIS Environmental Data
+      \end{itemize}
+    \item Algorithm processing pipeline
+    \item Output
+      \begin{itemize}
+      \item Analyze
+      \item Visualize
+      \end{itemize}
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+\begin{verbatim}
+          Raw Imagery
+               ↓
+             Load
+               ↓
+           Preprocess
+               ↓
+       Identify Minerals
+               ↓
+        Identify Mining
+               ↓
+Correlate Environmental Impact
+               ↓
+           Over Time
+\end{verbatim}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Definitions}
+\begin{columns}
+  \begin{column}{0.3\textwidth}
+    \begin{itemize}
+    \item Bitmap
+    \item Imaging Spectroscopy
+    \item AVIRIS: Airborne Visible/Infrared Imaging Spectrometer
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.4\textwidth}
+    \begin{figure}
+      \includegraphics[height=50px]{av_swath_shadow.png}
+      \caption{AVIRIS illustration \cite{aviris-illustration}}
+
+      \includegraphics[height=50px]{instrument_outline.jpg}
+      \caption{AVIRIS instrument \cite{aviris-instrument}}
+
+      \includegraphics[height=50px]{aviris.jpg}
+      \caption{AVIRIS aboard a plane \cite{aviris-plane}}
+    \end{figure}
+  \end{column}
+  \begin{column}{0.3\textwidth}
+    \begin{figure}
+      \includegraphics[height=200px]{ang20150422t163638_RGB.jpeg}
+      \caption{AVIRIS flight line}
+    \end{figure}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Preliminary}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+    \begin{itemize}
+    \item Load into memory
+    	\begin{itemize}
+        \item Spectral Python \cite{spectral}
+        \end{itemize}
+    \item Preprocessing
+      \begin{itemize}
+      \item Atmospheric
+      \end{itemize}
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=150px]{absorption-inverted.png}
+      \caption{Transmittance spectra of atmospheric gases \cite{gao}}
+    \end{figure}
+  \end{column}
+\end{columns}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Identify Minerals}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+    \begin{itemize}
+    \item Minerals have unique signatures
+    \item USGS digital spectral library % TODO cite
+    \item Machine learning techniques
+    	\begin{itemize}
+        \item Neural networks
+        \item Statistical methods
+        \end{itemize}
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+    \begin{figure}
+      \includegraphics[height=150px]{2d-curves-inverted.png}
+      \caption{Example AVIRIS mineral spectrum \cite{gao}}
+    \end{figure}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Identify Mining}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+    \begin{itemize}
+    \item Use Mineral Identification Data
+    \item Criteria that characterize mines based on minerals
+    \item Process to label the pixels or regions
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=150px]{3d-curves-inverted.png}
+      \caption{Example spectral radiance curves \cite{benediktsson}}
+    \end{figure}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Environmental Impact}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+    \begin{itemize}
+    \item Use Mining Identification Data
+    \item Use EPA GIS Data
+    \item Correlate
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+    \begin{figure}
+      \includegraphics[height=75px]{Gislayers.jpg}
+      \caption{Example GIS data \cite{gis-image}}
+
+      \includegraphics[height=75px]{reclaimed-mining.png}
+      \caption{Comparing mines with permit boundaries \cite{movingmountaintops}}
+    \end{figure}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Environmental Impact Over Time}
+\begin{itemize}
+\item Process historical dataset
+\item Look for trends
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{API Documentation}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+    \begin{itemize}
+    \item Sphinx
+    \item reStructuredText
+    \item Python 2 and 3 support
+    \item Document each library
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+    \begin{figure}
+      \includegraphics[height=75px]{pythondoc.png}
+      \caption{Official Python documentation generted with Sphinx}
+
+      \includegraphics[width=150px]{restructext.png}
+      \caption{Documentation for reStrucuredText}
+    \end{figure}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Website}
+\begin{columns}
+  \begin{column}{0.5\textwidth}
+    \begin{itemize}
+    \item Content
+    \item Backend: Jekyll
+    \item Frontend: Bootstrap
+    \end{itemize}
+  \end{column}
+  \begin{column}{0.5\textwidth}
+    \begin{figure}
+      \includegraphics[width=150px]{website-screenshot.png}
+      \caption{Screenshot of website}
+    \end{figure}
+  \end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}
+\frametitle{Challenges}
+\begin{itemize}
+\item Balancing research readings with class writings
+\item Scheduling that works for the whole team
+	\begin{itemize}
+    \item Had to schedule more meetings
+    \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Conclusion}
+\begin{itemize}
+\item Develop methods to analyze complex data
+\item Contribute to environmental data science
+\item GitHub Organization: \url{https://github.com/capstone-coal}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[shrink=1] % http://tex.stackexchange.com/a/6126
+  \frametitle{References}
+
+  \begin{thebibliography}{99}
+
+  \bibitem{escondida}
+    \url{https://www.nasa.gov/multimedia/imagegallery/image_feature_681.html}
+
+  \bibitem{open-pit-mine}
+    \url{https://commons.wikimedia.org/wiki/File:Twincreeksblast.jpg}
+
+  \bibitem{aviris-illustration}
+    \url{http://aviris.jpl.nasa.gov/aviris/index.html}
+
+  \bibitem{aviris-instrument}
+    \url{http://aviris.jpl.nasa.gov/aviris/instrument.html}
+
+  \bibitem{aviris-plane}
+    \url{http://www.jpl.nasa.gov/missions/airborne-visible-infrared-imaging-spectrometer-aviris/}
+
+  \bibitem{spectral}
+    \url{https://github.com/spectralpython}
+
+  \bibitem{gao}
+    Gao, Bo-Cai and Goetz, Alexander F. H., ``Derivation of scaled surface reflectances from AVIRIS data,'' Remote Sensing of Environment, July 1993.
+
+  \bibitem{benediktsson}
+    J. A. Benediktsson \emph{et al}, ``\href{https://notendur.hi.is//~benedikt/aviris.pdf}{Classification and Feature Extraction of AVIRIS Data},'' IEEE Trans. on Geoscience and Remote Sensing, Vol. 33, No. 5, September 1995.
+
+  \bibitem{gis-image}
+    \url{https://commons.wikimedia.org/wiki/File:Gislayers.jpg}
+
+  \bibitem{movingmountaintops}
+    D. Nally, ``Moving Mountaintops: Monitoring Surface Mine Expansion and Reclamation Using Landsat Imagery,'' Tufts Univ., Spring 2011.
+
+  \end{thebibliography}
+
+\end{frame}
+
+\end{document}
