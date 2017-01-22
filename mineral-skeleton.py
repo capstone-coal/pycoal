@@ -16,7 +16,7 @@ principalComponents.reduce(numberOfLayers, ???)
 normalizedLibrary = principalComponents.transform(???(library))
 
 # generate training data
-trainingData = ???(library)
+trainingData = ???(normalizedLibrary)
 
 # initialize and train a neural network using the training data
 # it would be nice to find a way to save it to a file so we only train once
