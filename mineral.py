@@ -89,11 +89,13 @@ def classifyImage(imageFilename, classifier, classifiedImageFilename):
     # open the image
     image = spectral.io.aviris.open_image(imageFilename)
 
-    # get an iterator over pixels in the image
-    pixelIterator = spectral.algorithms.algorithms.ImageIterator(image)
-
     # allocate an MxN array for the classified image
     classifiedImage = numpy.ndarray(???)
+
+    # TODO conditionally load entire image ?
+
+    # get an iterator over pixels in the image
+    pixelIterator = spectral.algorithms.algorithms.ImageIterator(image)
 
     # for each pixel in the image
     for pixel in pixelIterator:
