@@ -3,12 +3,30 @@
 import spectral
 import pickle
 
-# define number of layers in normalized hyperpixel
+# define number of layers in normalized pixel
 NUMBER_OF_LAYERS = 128
 
 # define wavelength range
 WAVELENGTH_MIN = ???
 WAVELENGTH_MAX = ???
+
+def normalize(image):
+
+    """
+    Return a copy of an MxNxB image (or 1x1xB pixel) with constrained wavelength range and normalized spectra.
+    """
+
+    # TODO constrain wavelength range
+    # TODO convert micrometers to nanometers ?
+    # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
+
+    # normalize spectra
+    principalComponents = spectral.algorithms.algorithms.principal_components(image)
+    principalComponents.reduce(NUMBER_OF_LAYERS, ???)
+    normalizedImage = principalComponents.transform(image)
+
+    # return normalized image
+    return normalizedImage
 
 def trainClassifier(libraryFileName):
 
@@ -20,17 +38,8 @@ def trainClassifier(libraryFileName):
     # we may need to load it as an image instead
     library = spectral.io.envi.open(libraryFilename)
 
-    # TODO constrain wavelength range
-    # TODO convert micrometers to nanometers ?
-    # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
-
-    # normalize spectra
-    principalComponents = spectral.algorithms.algorithms.principal_components(???(library))
-    principalComponents.reduce(NUMBER_OF_LAYERS, ???)
-    normalizedLibrary = principalComponents.transform(???(library))
-
     # generate training data
-    trainingData = ???(normalizedLibrary)
+    trainingData = ???(normalize(???(library)))
 
     # initialize and train a neural network using the training data
     classifier = spectral.algorithms.classifiers.PerceptronClassifier(???)
@@ -67,16 +76,8 @@ def classifyPixel(pixel, classifier):
     Return the class id of an AVIRIS pixel classified using a trained classifier.
     """
 
-    # TODO constrain wavelength range
-    # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
-
-    # normalize spectra
-    principalComponents = spectral.algorithms.algorithms.principal_components(???(pixel))
-    principalComponents.reduce(NUMBER_OF_LAYERS, ???)
-    normalizedPixel = principalComponents.transform(pixel)
-
-    # classify pixel and return id
-    return classifier.classify_spectrum(normalizedPixel[???])
+    # classify normalized pixel and return class id
+    return classifier.classify_spectrum(normalize(pixel))
 
 def classifyImage(imageFilename, classifier, classifiedImageFilename):
 
