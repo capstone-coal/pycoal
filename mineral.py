@@ -17,7 +17,6 @@ def normalize(image):
     """
 
     # TODO constrain wavelength range
-    # TODO convert micrometers to nanometers ?
     # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
 
     # normalize spectra
@@ -37,6 +36,8 @@ def trainClassifier(libraryFileName):
     # open the digital spectral library
     # we may need to load it as an image instead
     library = spectral.io.envi.open(libraryFilename)
+
+    # TODO convert micrometers to nanometers ?
 
     # generate training data
     trainingData = ???(normalize(???(library)))
