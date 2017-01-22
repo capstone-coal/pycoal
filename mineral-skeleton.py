@@ -1,63 +1,113 @@
 #!/usr/bin/python
-import ???
+
+import spectral
+import pickle
 
 # define number of layers in normalized hyperpixel
-numberOfLayers = 128
+NUMBER_OF_LAYERS = 128
 
-## train the neural net using the digital spectral library
+def trainClassifier(libraryFileName):
 
-# open the digital spectral library
-# we may need to load it as an image instead
-library = spectral.io.envi.open("/path/to/s06av95a_envi.hdr")
+    """
+    Return a trained classifier given the path to the USGS Digital Spectral Library 06 in AVIRIS format.
+    """
 
-# TODO constrain wavelength
-# see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
+    # open the digital spectral library
+    # we may need to load it as an image instead
+    library = spectral.io.envi.open(libraryFilename)
 
-# normalize spectra
-principalComponents = spectral.algorithms.algorithms.principal_components(???(library))
-principalComponents.reduce(numberOfLayers, ???)
-normalizedLibrary = principalComponents.transform(???(library))
+    # TODO constrain wavelength range
+    # TODO convert micrometers to nanometers ?
+    # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
 
-# generate training data
-trainingData = ???(normalizedLibrary)
+    # normalize spectra
+    principalComponents = spectral.algorithms.algorithms.principal_components(???(library))
+    principalComponents.reduce(NUMBER_OF_LAYERS, ???)
+    normalizedLibrary = principalComponents.transform(???(library))
 
-# initialize and train a neural network using the training data
-# it would be nice to find a way to save it to a file so we only train once
-classifier = spectral.algorithms.classifiers.PerceptronClassifier(???)
-classifier.train(trainingData, ???)
+    # generate training data
+    trainingData = ???(normalizedLibrary)
 
-## classify an image using the trained classifier
+    # initialize and train a neural network using the training data
+    # it would be nice to find a way to save it to a file so we only train once
+    classifier = spectral.algorithms.classifiers.PerceptronClassifier(???)
+    classifier.train(trainingData, ???)
 
-# open the image
-# naturally we could also loop over a set of images
-image = spectral.io.aviris.open_image("/path/to/ang20150422t163638_???_v1e_img")
+    # return trained classifier
+    return classifier
 
-# get an iterator over pixels in the image
-pixelIterator = spectral.algorithms.algorithms.ImageIterator(image)
+def saveClassifier(classifier, classifierFilename):
 
-# define a linear transformation to scale the pixel if necessary
-# the scalars would presumably be read from metadata
-transform = spectral.algorithms.transforms.LinearTransform(???)
+    """
+    Save a classifier to a file.
+    """
 
-# allocate a MxN array for the classified image
-classifiedImage = numpy.ndarray(???)
+    pickle.dump(classifier, open(classifierFilename,"wb"))
 
-# for each pixel in the image
-for (pixel in pixelIterator)
+def readClassifier(classifierFilename):
 
-    # TODO constrain wavelength
+    """
+    Read a classifier from a file.
+    """
 
-    # transform it
-    transformedPixel = transform(pixel)
+    return pickle.load(open(classifierFilename,"rb"))
 
-    # normalize it
-    principalComponents = spectral.algorithms.algorithms.principal_components(???(transformedPixel))
-    principalComponents.reduce(numberOfLayers, ???)
-    normalizedTransformedPixel = principalComponents.transform(pixel)
+def classifyPixel(pixel, classifier):
 
-    # classify and store it in the classified image
-    classifiedImage[???] = classifier.classify_spectrum(normalizedTransformedPixel[???])
+    """
+    Return the class id of an AVIRIS pixel classified using a trained classifier.
+    """
 
-# save the classified image to a file
-# we can open it for viewing or use it as input for mining classification
-spectral.io.envi.save_classification("classifiedImageFilename.hdr", classifiedImage, ???)
+    # TODO constrain wavelength range
+    # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
+
+    # normalize spectra
+    principalComponents = spectral.algorithms.algorithms.principal_components(???(pixel))
+    principalComponents.reduce(NUMBER_OF_LAYERS, ???)
+    normalizedPixel = principalComponents.transform(pixel)
+
+    # classify pixel and return id
+    return classifier.classify_spectrum(normalizedPixel[???])
+
+def classifyImage(imageFilename, classifier, classifiedImageFilename):
+
+    """
+    Classify an AVIRIS image using a trained classifier and save the results to a file.
+    """
+
+    # open the image
+    image = spectral.io.aviris.open_image(imageFilename)
+
+    # get an iterator over pixels in the image
+    pixelIterator = spectral.algorithms.algorithms.ImageIterator(image)
+
+    # allocate an MxN array for the classified image
+    classifiedImage = numpy.ndarray(???)
+
+    # for each pixel in the image
+    for pixel in pixelIterator:
+
+        # define a linear transformation to scale the pixel if necessary
+        # the scalars would presumably be read from metadata
+        transform = spectral.algorithms.transforms.LinearTransform(???)
+
+        # transform it
+        transformedPixel = transform(pixel)
+
+        # classify and store it in the classified image
+        classifiedImage[???] = classifyPixel(transformedPixel, classifier)
+
+    # save the classified image to a file
+    spectral.io.envi.save_classification(classifiedImageFilename, classifiedImage, ???)
+
+def classifyImages(imageFilenames, classifier, classifiedImageFilenames):
+
+    """
+    Classify a set of AVIRIS images using a trained classifier and save the results to files.
+    """
+
+    # for each image in a set of images
+    for imageFilename,classifiedImageFilename in zip(imageFilenames,classifiedImageFilenames):
+
+        # classify the image and save it to a file
+        classifyImage(imageFilename, classifier, classifiedImageFilename)
