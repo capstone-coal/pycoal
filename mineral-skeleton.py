@@ -10,6 +10,9 @@ numberOfLayers = 128
 # we may need to load it as an image instead
 library = spectral.io.envi.open("/path/to/s06av95a_envi.hdr")
 
+# TODO constrain wavelength
+# see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
+
 # normalize spectra
 principalComponents = spectral.algorithms.algorithms.principal_components(???(library))
 principalComponents.reduce(numberOfLayers, ???)
@@ -41,6 +44,8 @@ classifiedImage = numpy.ndarray(???)
 
 # for each pixel in the image
 for (pixel in pixelIterator)
+
+    # TODO constrain wavelength
 
     # transform it
     transformedPixel = transform(pixel)
