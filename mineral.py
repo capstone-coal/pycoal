@@ -6,6 +6,10 @@ import pickle
 # define number of layers in normalized hyperpixel
 NUMBER_OF_LAYERS = 128
 
+# define wavelength range
+WAVELENGTH_MIN = ???
+WAVELENGTH_MAX = ???
+
 def trainClassifier(libraryFileName):
 
     """
