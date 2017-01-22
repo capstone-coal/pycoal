@@ -37,7 +37,8 @@ def trainClassifier(libraryFileName):
     # we may need to load it as an image instead
     library = spectral.io.envi.open(libraryFilename)
 
-    # TODO convert micrometers to nanometers ?
+    # TODO convert units ?
+    # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
 
     # generate training data
     trainingData = ???(normalize(???(library)))
@@ -93,12 +94,16 @@ def classifyImage(imageFilename, classifier, classifiedImageFilename):
     classifiedImage = numpy.ndarray(???)
 
     # TODO conditionally load entire image ?
+    # TODO conditionally load subimage (row) ?
 
     # get an iterator over pixels in the image
     pixelIterator = spectral.algorithms.algorithms.ImageIterator(image)
 
     # for each pixel in the image
     for pixel in pixelIterator:
+
+        # TODO convert units ?
+        # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
 
         # define a linear transformation to scale the pixel if necessary
         # the scalars would presumably be read from metadata
