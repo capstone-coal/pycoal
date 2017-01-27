@@ -21,7 +21,7 @@ coal provides a suite of algorithms (written in Python) to identify, classify, c
 From the cheeseshop
 
 ```
-pip install podaacpy
+pip install coal
 ```
     
 or from conda
