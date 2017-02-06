@@ -47,8 +47,6 @@ def trainClassifier(libraryFileName):
     classifier = spectral.algorithms.classifiers.PerceptronClassifier(???)
     classifier.train(trainingData, ???)
 
-    # TODO close file ?
-
     # return trained classifier
     return classifier
 
@@ -58,9 +56,8 @@ def saveClassifier(classifier, classifierFilename):
     Save a classifier to a file.
     """
 
-    # TODO close file ?
-
-    pickle.dump(classifier, open(classifierFilename,"wb"))
+    with open(classifierFilename,"wb") as f:
+        pickle.dump(classifier, f)
 
 def readClassifier(classifierFilename):
 
@@ -68,9 +65,8 @@ def readClassifier(classifierFilename):
     Read a classifier from a file.
     """
 
-    # TODO close file ?
-
-    return pickle.load(open(classifierFilename,"rb"))
+    with open(classifierFilename, "rb") as f:
+        return pickle.load(f)
 
 def classifyPixel(pixel, classifier):
 
@@ -117,8 +113,6 @@ def classifyImage(imageFilename, classifier, classifiedImageFilename):
 
     # save the classified image to a file
     spectral.io.envi.save_classification(classifiedImageFilename, classifiedImage, ???)
-
-    # TODO close files ?
 
 def classifyImages(imageFilenames, classifier, classifiedImageFilenames):
 
