@@ -4,6 +4,8 @@
 
 # TODO use spectral or gdal/orfeo for dataset manipulation and machine learning ?
 
+# TODO reuse saveClassifier, readClassifier ?
+
 import coal
 
 def generateTrainingData(miningFilename, mineralFilename, trainingFilename):
@@ -34,7 +36,7 @@ def generateTrainingData(miningFilename, mineralFilename, trainingFilename):
             # classify the region with the mining pixel
             ???
 
-    # apply the correlation and save the result
+    # generate and save the training data
     coal.gis.combine(pixelNeighbors, miningLayer, miningFilename, mineralFilename, trainingFilename)
 
 def trainMiningClassifier(miningFilename, mineralFilename):
