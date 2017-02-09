@@ -6,20 +6,25 @@ import pickle
 # define number of layers in normalized pixel
 NUMBER_OF_LAYERS = 128
 
-# define wavelength range
-WAVELENGTH_MIN = ???
-WAVELENGTH_MAX = ???
+# define wavelength range in nanometers
+WAVELENGTH_MIN = 383.150
+WAVELENGTH_MAX = 2508.200
 
 def normalize(image):
-
     """
-    Return a copy of an MxNxB image (or 1x1xB pixel) with constrained wavelength range and normalized spectra.
+    This takes the file name of the library to be used in the training and returns a
+    classifier
+    Args:
+       image (str): the image to normalize
+    Returns:
+       normalizedImage (LinearTransform): LinearTransform object?
     """
 
     # TODO constrain wavelength range
     # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
 
     # normalize spectra
+    #
     principalComponents = spectral.algorithms.algorithms.principal_components(image)
     principalComponents.reduce(NUMBER_OF_LAYERS, ???)
     normalizedImage = principalComponents.transform(image)
@@ -28,9 +33,13 @@ def normalize(image):
     return normalizedImage
 
 def trainClassifier(libraryFileName):
-
     """
-    Return a trained classifier given the path to the USGS Digital Spectral Library 06 in AVIRIS format.
+    This takes the file name of the library to be used in the training and returns a
+    classifier
+    Args:
+       libraryFileName (str): the name of the training library
+    Returns:
+       classifier (PerceptronClassifier): trained classifier
     """
 
     # open the digital spectral library
@@ -44,43 +53,58 @@ def trainClassifier(libraryFileName):
     trainingData = ???(normalize(???(library)))
 
     # initialize and train a neural network using the training data
-    classifier = spectral.algorithms.classifiers.PerceptronClassifier(???)
+    classifier = spectral.classifiers.PerceptronClassifier(???)
     classifier.train(trainingData, ???)
 
     # return trained classifier
     return classifier
 
 def saveClassifier(classifier, classifierFilename):
-
     """
-    Save a classifier to a file.
+    This saves a classifier to a file for reuse.
+    Args:
+       classifier (PerceptronClassifier): the classifier to write
+       classifierFilename (str): the file which to write the classifier
+    Returns:
+        None
     """
 
     with open(classifierFilename,"wb") as f:
         pickle.dump(classifier, f)
 
 def readClassifier(classifierFilename):
-
     """
-    Read a classifier from a file.
+    This reads a classifier from a file.
+    Args:
+       classifierFilename (str): the file from which to load the classifier
+    Returns:
+        ??? not sure about how to express this
     """
 
     with open(classifierFilename, "rb") as f:
         return pickle.load(f)
 
 def classifyPixel(pixel, classifier):
-
     """
     Return the class id of an AVIRIS pixel classified using a trained classifier.
+    Args:
+        pixel (???): the pixel to be classified
+       classifier (PerceptronClassifier): the classifier
+    Returns:
+        Class ID of pixel
     """
-
     # classify normalized pixel and return class id
     return classifier.classify_spectrum(normalize(pixel))
 
 def classifyImage(imageFilename, classifier, classifiedImageFilename):
-
     """
     Classify an AVIRIS image using a trained classifier and save the results to a file.
+    Args:
+       imageFilename (str): the image to be classified
+       classifier (PerceptronClassifier): the classifier
+       classifiedImageFilename (str): the file which to save the classified image
+    Returns:
+        None
     """
 
     # open the image
@@ -115,9 +139,14 @@ def classifyImage(imageFilename, classifier, classifiedImageFilename):
     spectral.io.envi.save_classification(classifiedImageFilename, classifiedImage, ???)
 
 def classifyImages(imageFilenames, classifier, classifiedImageFilenames):
-
     """
     Classify a set of AVIRIS images using a trained classifier and save the results to files.
+    Args:
+       imageFilenames (str): the images to be classified
+       classifier (PerceptronClassifier): the classifier
+       classifiedImageFilenames (str): the files which to save the classified images
+    Returns:
+        None
     """
 
     # for each image in a set of images
@@ -125,3 +154,4 @@ def classifyImages(imageFilenames, classifier, classifiedImageFilenames):
 
         # classify the image and save it to a file
         classifyImage(imageFilename, classifier, classifiedImageFilename)
+
