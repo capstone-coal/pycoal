@@ -55,9 +55,9 @@ def cropSourceToDest(sourceDataset, destDataset):
 
     # get destination bounding box
     minX = geotransform[0]
-    minY = maxY + (ySize * pixelYSize)
     maxX = minX + (xSize * pixelXSize)
     maxY = geotransform[3]
+    minY = maxY + (ySize * pixelYSize)
 
     # set warp options
     warpOptions = gdal.WarpOptions(format=???,
