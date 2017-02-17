@@ -1,4 +1,4 @@
-# coal
+# pycoal
 
 [![license](https://img.shields.io/github/license/capstone-coal/pycoal.svg?maxAge=2592000?style=plastic)](http://www.apache.org/licenses/LICENSE-2.0)
 [![Build Status](https://travis-ci.org/capstone-coal/pycoal.svg?branch=master)](https://travis-ci.org/capstone-coal/pycoal)
