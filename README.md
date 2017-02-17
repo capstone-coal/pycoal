@@ -21,13 +21,13 @@ coal provides a suite of algorithms (written in Python) to identify, classify, c
 From the cheeseshop
 
 ```
-pip install coal
+pip install pycoal
 ```
     
 or from conda
 
 ```
-conda install -c conda-forge coal    
+conda install -c conda-forge pycoal
 ```
 
 or from source
