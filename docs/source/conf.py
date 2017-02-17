@@ -48,9 +48,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'COAL'
-copyright = u'2016, Taylor Brown, Heidi Clayton, and Xiaomei Wang'
-author = u'Taylor Brown, Heidi Clayton, and Xiaomei Wang'
+project = u'pycoal'
+copyright = u'2017, Lewis John McGibbney, Taylor Brown, Heidi Clayton, and Xiaomei Wang'
+author = u'Lewis John McGibbney, Taylor Brown, Heidi Clayton, and Xiaomei Wang'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

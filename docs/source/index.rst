@@ -3,15 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to COAL's documentation!
+Welcome to pycoal's documentation!
 ================================
 
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
-
+   introduction
+   quikstart
+   utilities
+   mineral_classification
+   mining_classification
+   environmental_correlation
 
 Indices and tables
 ==================
