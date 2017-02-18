@@ -38,3 +38,7 @@ problem-statement-student.pdf :
 fall-report.pdf :
 	pdflatex fall-report.ltx
 	pdflatex fall-report.ltx
+
+winter-progress.pdf :
+	pdflatex winter-progress.ltx
+	pdflatex winter-progress.ltx
