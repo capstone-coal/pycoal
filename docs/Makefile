@@ -39,6 +39,10 @@ presentation.pdf :
 	pdflatex presentation.ltx
 	pdflatex presentation.ltx
 
+presentation-winter.pdf :
+	pdflatex presentation-winter.ltx
+	pdflatex presentation-winter.ltx
+
 problem-statement-student.pdf :
 	pdflatex problem-statement-student.ltx
 	pdflatex problem-statement-student.ltx
@@ -47,12 +51,6 @@ fall-report.pdf :
 	pdflatex fall-report.ltx
 	pdflatex fall-report.ltx
 
-clean :
-	rm -f report.pdf
-	rm -f problem-statement.pdf
-	rm -f requirements.pdf
-#	rm -f techreview.pdf
-	rm -f design.pdf
-	rm -f presentation.pdf
-	rm -f problem-statement-student.pdf
-	rm -f fall-report.pdf
+winter-progress.pdf :
+	pdflatex winter-progress.ltx
+	pdflatex winter-progress.ltx
