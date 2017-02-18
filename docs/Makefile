@@ -27,6 +27,10 @@ presentation.pdf :
 	pdflatex presentation.ltx
 	pdflatex presentation.ltx
 
+presentation-winter.pdf :
+	pdflatex presentation-winter.ltx
+	pdflatex presentation-winter.ltx
+
 problem-statement-student.pdf :
 	pdflatex problem-statement-student.ltx
 	pdflatex problem-statement-student.ltx
