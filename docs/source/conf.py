@@ -1,5 +1,17 @@
 # -*- coding: utf-8 -*-
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # COAL documentation build configuration file, created by
 # sphinx-quickstart on Thu Nov  3 19:45:34 2016.
 #
@@ -48,9 +60,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'COAL'
-copyright = u'2016, Taylor Brown, Heidi Clayton, and Xiaomei Wang'
-author = u'Taylor Brown, Heidi Clayton, and Xiaomei Wang'
+project = u'pycoal'
+copyright = u'2017, Lewis John McGibbney, Taylor Brown, Heidi Clayton, and Xiaomei Wang'
+author = u'Lewis John McGibbney, Taylor Brown, Heidi Clayton, and Xiaomei Wang'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

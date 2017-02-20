@@ -30,15 +30,15 @@ _classifiers = [
     'Topic :: Software Development :: Libraries :: Python Modules',
 ]
 _description = 'COAL mining library for AVIRIS data.'
-_download_url = 'http://pypi.python.org/pypi/coal/'
+_download_url = 'http://pypi.python.org/pypi/pycoal/'
 _requirements = ["spectral"]
 _keywords = ['spectroscopy', 'aviris', 'aviris-ng', 'mining', 'minerals']
 _license = 'Apache License, Version 2.0'
 _long_description = 'A python suite for the identification and characterization of mining activity within AVIRIS data.'
-_name = 'coal'
+_name = 'pycoal'
 _namespaces = []
-_test_suite = 'coal.tests'
-_url = 'https://github.com/capstone-coal/coal'
+_test_suite = 'pycoal.tests'
+_url = 'https://github.com/capstone-coal/pycoal'
 _version = '0.0.1'
 _zip_safe = False
 
