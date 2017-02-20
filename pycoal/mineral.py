@@ -12,19 +12,17 @@ WAVELENGTH_MAX = 2508.200
 
 def normalize(image):
     """
-    This takes the file name of the library to be used in the training and returns a
-    classifier
+    Return a copy of an MxNxB image (or 1x1xB pixel) with constrained wavelength range and normalized spectra.
     Args:
-       image (str): the image to normalize
+       image (numpy.ndarray): the image or pixel to normalize
     Returns:
-       normalizedImage (LinearTransform): LinearTransform object?
+       normalizedImage (numpy.ndarray): the normalize image or pixel
     """
 
     # TODO constrain wavelength range
     # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
 
     # normalize spectra
-    #
     principalComponents = spectral.algorithms.algorithms.principal_components(image)
     principalComponents.reduce(NUMBER_OF_LAYERS, ???)
     normalizedImage = principalComponents.transform(image)
