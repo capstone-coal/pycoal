@@ -10,25 +10,49 @@ NUMBER_OF_LAYERS = 128
 WAVELENGTH_MIN = 383.150
 WAVELENGTH_MAX = 2508.200
 
-def normalize(image):
+def normalize(image, wavelengthList=None):
     """
     Return a copy of an MxNxB image (or 1x1xB pixel) with constrained wavelength range and normalized spectra.
     Args:
        image (numpy.ndarray): the image or pixel to normalize
+       wavelengthList (list) (default None): the list of wavelengths for the pixel
     Returns:
        normalizedImage (numpy.ndarray): the normalize image or pixel
     """
 
-    # TODO constrain wavelength range
-    # see https://groups.google.com/d/msg/coal-capstone/6oordALy0dA/a_6VIuWbBAAJ
+    # constrain wavelength range
+    if (wavelengthList == None):
+        wavelengthList = image.metadata.get('wavelength')
+
+    # get the indices of the minimum and maximum element
+    i = indexOfGreaterThan(wavelengthList, WAVELENGTH_MIN)
+    j = indexOfGreaterThan(wavelengthList, WAVELENGTH_MAX)
+
+    # constrain wavelength range
+    # slice the array from MxNxB to MxNx(j-i) for indices i,j
+    image = image[:,:,i:j]
 
     # normalize spectra
     principalComponents = spectral.algorithms.algorithms.principal_components(image)
-    principalComponents.reduce(NUMBER_OF_LAYERS, ???)
+    principalComponents.reduce(NUMBER_OF_LAYERS)
     normalizedImage = principalComponents.transform(image)
 
     # return normalized image
     return normalizedImage
+
+def indexOfGreaterThan(elements, value):
+    """
+    Return the index of the first element greater than the value.
+    Args:
+       elements (list): list of elements
+       value (float): the value to compare
+    Returns:
+       index (int): the index of the first element greater than the value
+    """
+
+    for index,element in enumerate(elements):
+        if (element > value):
+            return index
 
 def trainClassifier(libraryFileName):
     """
@@ -82,17 +106,18 @@ def readClassifier(classifierFilename):
     with open(classifierFilename, "rb") as f:
         return pickle.load(f)
 
-def classifyPixel(pixel, classifier):
+def classifyPixel(pixel, classifier, wavelengthList):
     """
     Return the class id of an AVIRIS pixel classified using a trained classifier.
     Args:
         pixel (???): the pixel to be classified
        classifier (PerceptronClassifier): the classifier
+       wavelengthList (list): the list of wavelengths for the pixel
     Returns:
         Class ID of pixel
     """
     # classify normalized pixel and return class id
-    return classifier.classify_spectrum(normalize(pixel))
+    return classifier.classify_spectrum(normalize(pixel, wavelengthList))
 
 def classifyImage(imageFilename, classifier, classifiedImageFilename):
     """
@@ -107,6 +132,9 @@ def classifyImage(imageFilename, classifier, classifiedImageFilename):
 
     # open the image
     image = spectral.io.aviris.open_image(imageFilename)
+
+    # get wavelength list
+    wavelengthList = image.metadata.get('wavelength')
 
     # allocate an MxN array for the classified image
     classifiedImage = numpy.ndarray(???)
@@ -131,7 +159,7 @@ def classifyImage(imageFilename, classifier, classifiedImageFilename):
         transformedPixel = transform(pixel)
 
         # classify and store it in the classified image
-        classifiedImage[???] = classifyPixel(transformedPixel, classifier)
+        classifiedImage[???] = classifyPixel(transformedPixel, classifier, wavelengthList)
 
     # save the classified image to a file
     spectral.io.envi.save_classification(classifiedImageFilename, classifiedImage, ???)
