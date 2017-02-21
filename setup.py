@@ -23,7 +23,7 @@ _classifiers = [
     'Intended Audience :: Information Technology',
     'Intended Audience :: Science/Research',
     'Topic :: Scientific/Engineering',
-    'Development Status :: 4 - Development/Unstable',
+    'Development Status :: 1 - Planning',
     'License :: OSI Approved :: Apache Software License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
