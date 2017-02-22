@@ -61,12 +61,14 @@ class MineralClassification:
             if element > value:
                 return index
 
-    def trainClassifier(self, libraryFileName):
+    def trainClassifier(self, libraryFileName, classifierType):
         """
         This takes the file name of the library to be used in the training and returns a
         classifier
         Args:
            libraryFileName (str): the name of the training library
+           classifierType (str): the type of classifier. Currently, can be one of:
+                                 perceptron, gaussian, or mahalanobisdistance
         Returns:
            classifier (PerceptronClassifier): trained classifier
         """
@@ -78,15 +80,31 @@ class MineralClassification:
         # get dimensions of library to create mask for training class
         dimensions = library.spectra.shape
 
-        # create mask
-        mask = [[x for x in range(dimensions[1])] for y in range(dimensions[0])]
+        # initialize the type of classifier
+        if classifierType == 'perceptron':
+            classifier = spectral.classifiers.PerceptronClassifier(???)
+        elif classifierType == 'gaussian':
+            classifier = spectral.classifiers.GaussianClassifier()
+        elif classifierType == 'mahalanobisdistance':
+            classifier = spectral.classifiers.MahalanobisDistanceClassifier()
+        else:
+            raise ValueError('Invalid classifier type provided.')
+
+        # create mask of distinct values.
+        mask = numpy.ndarray(shape=dimensions)
+
+        # is there a more concise way of doing this?
+        value = 1
+        for i in range(dimensions[0]):
+            for j in range(dimensions[1]):
+                mask[i][j] = value
+                value += 1
 
         # generate training data
         trainingData = spectral.algorithms.create_training_classes(self.normalize(library), mask)
 
         # initialize and train a neural network using the training data
-        classifier = spectral.classifiers.PerceptronClassifier(???)
-        classifier.train(trainingData, ???)
+        classifier.train(trainingData)
 
         # return trained classifier
         return classifier
@@ -124,7 +142,7 @@ class MineralClassification:
            classifier (PerceptronClassifier): the classifier
            wavelengthList (list): the list of wavelengths for the pixel
         Returns:
-            Class ID of pixel
+            (int) Class ID of pixel
         """
         # classify normalized pixel and return class id
         return classifier.classify_spectrum(self.normalize(pixel, wavelengthList))
@@ -141,7 +159,7 @@ class MineralClassification:
         """
 
         # open the image
-        image = spectral.io.aviris.open_image(imageFilename)
+        image = spectral.io.aviris.open(imageFilename)
 
         # change units from nanometers to micrometers if applicable
         if image.metadata.get('wavelength units') == u'Nanometers':
@@ -152,7 +170,7 @@ class MineralClassification:
         wavelengthList = image.metadata.get('wavelength')
 
         # allocate an MxN array for the classified image
-        classifiedImage = numpy.ndarray(???)
+        classifiedImage = numpy.ndarray(image.shape)
 
         # TODO conditionally load entire image ?
         # TODO conditionally load subimage (row) ?
@@ -168,7 +186,7 @@ class MineralClassification:
 
             # define a linear transformation to scale the pixel if necessary
             # the scalars would presumably be read from metadata
-            transform = spectral.algorithms.transforms.LinearTransform(???)
+            transform = spectral.transforms.LinearTransform(???)
 
             # transform it
             transformedPixel = transform(pixel)
@@ -177,7 +195,7 @@ class MineralClassification:
             classifiedImage[???] = self.classifyPixel(transformedPixel, classifier, wavelengthList)
 
         # save the classified image to a file
-        spectral.io.envi.save_classification(classifiedImageFilename, classifiedImage, ???)
+        spectral.io.envi.save_classification(classifiedImageFilename, classifiedImage)
 
     def classifyImages(self, imageFilenames, classifier, classifiedImageFilenames):
         """
