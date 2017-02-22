@@ -170,7 +170,10 @@ class MineralClassification:
         wavelengthList = image.metadata.get('wavelength')
 
         # allocate an MxN array for the classified image
-        classifiedImage = numpy.ndarray(image.shape)
+        classifiedImage = numpy.ndarray((image.shape[0] * image.shape[1],))
+
+        # the index of the where to store the next classified pixel
+        imageIndex = 0
 
         # TODO conditionally load entire image ?
         # TODO conditionally load subimage (row) ?
@@ -192,8 +195,9 @@ class MineralClassification:
             transformedPixel = transform(pixel)
 
             # classify and store it in the classified image
-            classifiedImage[???] = self.classifyPixel(transformedPixel, classifier, wavelengthList)
+            classifiedImage[imageIndex] = self.classifyPixel(transformedPixel, classifier, wavelengthList)
 
+            imageIndex += 1
         # save the classified image to a file
         spectral.io.envi.save_classification(classifiedImageFilename, classifiedImage)
 
