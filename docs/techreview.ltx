@@ -47,9 +47,9 @@ This document is a review of technology and literature relevant to the COAL proj
 \item Provide API documentation for developers
 \item Provide a website that serves as the project homepage
 \end{itemize}
-At this point in the project our team is working with the client to become familiar with the data and the available literature, so some material is subject to change as our understanding improves.
+In the past weeks our team has been working with each other and the client to become familiar with the data and the libraries we have selected so we have a more advanced understanding than when we started. However, some material is subject to change as our understanding improves.
 
-Sections \ref{subsec:featureextraction} and \ref{subsec:classification} were authored by Heidi who will take responsibility for the algorithms to identify and classify minerals. Section \ref{subsec:identifymining} was authored by Taylor on behalf of Xiaomei, who will take responsibility for the algorithms to identify regions of mining activity. Sections \ref{subsec:preprocessing}, \ref{subsec:correlate}, and \ref{subsec:changesovertime} were authored by Taylor who will take responsibility for the algorithms to correlate mining with environmental impact and to rank and document changes over time. Section \ref{subsec:apidoc} was written by Heidi who will take responsibility for the API documentation. Sections \ref{subsec:websitebackend} and \ref{subsec:websitefrontend} were written by Xiaomei who will take responsibility for implementing the backend and the frontend of the project homepage.
+Sections \ref{subsec:featureextraction} and \ref{subsec:classification} were authored by Heidi who will take responsibility for the algorithms to identify and classify minerals. Section \ref{subsec:identifymining} was authored by Taylor on behalf of Xiaomei, who will take responsibility for the algorithms to identify regions of mining activity. Sections \ref{subsec:preprocessing}, \ref{subsec:correlate}, and \ref{subsec:changesovertime} were authored by Taylor who will take responsibility for the algorithms to correlate mining with environmental impact and to rank and document changes over time. Section \ref{subsec:apidoc} was written by Heidi who will take responsibility for the API documentation. Sections \ref{subsec:staticsitegenerator} and \ref{subsec:frontendframework} were written by Xiaomei who will take responsibility for implementing the backend and the frontend of the project homepage.
 
 \section{Technologies}
 
@@ -59,64 +59,63 @@ Sections \ref{subsec:featureextraction} and \ref{subsec:classification} were aut
 
 \subsubsection{Options}
 \begin{enumerate}
-\item Automatic scale selection 
-\item Spoke filter
-\item Template matching
+\item Spectral Python \cite{spectral}
+\item HyperSpy \cite{hyperspy}
+\item MATLAB Hyperspectral Toolbox \cite{matlab}
 \end{enumerate}
 \subsubsection{Goals}
-In order to properly analyze the AVIRIS images, COAL needs a way to identify regions in an image that indicate a particular mineral or other pattern. Blob detection is a good way of doing this, as it is a way of separating out regions that differ from their surroundings.
+In order to properly analyze the AVIRIS images, COAL needs a way to identify regions in an image that indicate a particular mineral or other pattern. We need to have a tool that can process hyperspectral imagery in order to recognize the spectral signatures of different minerals and land surfaces so that AVIRIS images can be classified. 
 
 \subsubsection{Criteria}
-The main criteria being evaluated are sensitivity to noise, ability to detect many different shapes, and speed.
+The main criteria being evaluated are if the software library is currently maintained and developed, if the software is compatible with neural networks, and what language is used in the software.
 
 \subsubsection{Comparison}
 \begin{tabular}{ | l | l | l | l |}
     \hline
-    & Automatic scale selection & Spoke filter & Template matching \\ \hline
-    Sensitive to noise & $\times$ & \checkmark & \checkmark \\ \hline
-    Good for non-homogeneous shapes & \checkmark & $\times$ & $\times$ \\ \hline
-    Speed & slow & fast & fast \\
+    & Spectral Python & HyperSpy & MATLAB Hyperspectral Toolbox \\ \hline
+    Currently maintained & \checkmark & \checkmark & $\times$ \\ \hline
+    Has neural network functionality & \checkmark & $\times$ & $\times$ \\ \hline
+    Language & Python & Python & MATLAB \\
     \hline
 \end{tabular} \\ \\
-This table shows an overview of the automatic scale selection, spoke filter, and template matching blob detection methods against noise sensitivity, ability to detect blobs of any shape, and speed of detection \cite{blobdetection}.
+This table shows an overview of the three choices of software libraries against the criteria of being currently maintained, having neural network functionality, and the language that is used in the implementation.
 
 \subsubsection{Discussion}
-The spoke filter and template matching methods are both fairly fast, however they do not meet the crucial requirement of being able to detect blobs of many different shapes. The spoke filter method does a poor job of blob detection on any non-circular blob. The template matching method only matches blobs that match a template pattern. Both are also sensitive to noise, which is often present in AVIRIS data. Automatic scale selection is the slowest method of the three options as, indicated by the name, it uses multiple scales. However, it is also insensitive to noise and can detect all kinds of shapes, not just circular shapes or shapes provided by a template. In this case, the slow speed is outweighed by the flexibility \cite{blobdetection}.
+At first glance, it is fairly apparent that the MATLAB Hyperspectral Toolbox does not meet the criteria well at all. It is not currently maintained or developed, with the last update to its GitHub repository being from 2015. There is also a note in the README file that it has been abandoned. MATLAB Hyperspectral Toolbox also does not have neural network functionality, which we would like to use to process the spectral signatures as it has been shown to work well with AVIRIS data \cite{aviris}. As the name implies, it is also implemented in MATLAB. This is not something that would absolutely stop the team from using a software library, but as the team is more familiar with Python, it is preferred. HyperSpy is a better fit, as it is currently maintained, however it does not have neural network functionality built into the library. Spectral Python is the only option that satisfies all criteria. 
 
 \subsubsection{Selection}
-We will be using automatic scale selection.
+We will be using Spectral Python.
 
 \subsection{Classification of AVIRIS data}
 \label{subsec:classification}
 
 \subsubsection{Options}
 \begin{enumerate}
-\item Conjugate-gradient backpropagation (CGBP)
-\item Gaussian maximum likelihood (GML)
-\item Minimum Euclidean distance (MED)
+\item Spectral Python
+\item PyLearn2 \cite{pylearn2}
+\item TensorFlow \cite{tensorflow}
 \end{enumerate}
 \subsubsection{Goals}
 Before any further data analysis can take place, classifying the AVIRIS data into classes based on mineral concentrations and categories such as vegetation and bodies of water will be needed in order to have variables to correlate (or not) with the environmental effects of mining. 
 
 \subsubsection{Criteria}
-The main criteria being evaluated are accuracy based on tests performed in previous research and any aspects of the algorithms that could affect the accuracy during the training phase.
+The main crite
 
 \subsubsection{Comparison}
 \begin{tabular}{ | l | l | l | l |}
     \hline
-    & CGBP & GML & MED \\ \hline
-    Test accuracy & 94.083\% & 90.48\% & 71.675\% \\ \hline
-    Confounding factors & $\times$  & \checkmark & $\times$ \\
+    & Spectral Python & PyLearn2 & TensorFlow \\ \hline
+    Currently maintained & \checkmark & $\times$ & \checkmark \\ \hline
+    Compatible with feature extraction technology & \checkmark  & $\times$ & $\times$ \\
     \hline
 \end{tabular}
-\\ \\ This table shows an overview of CGBP, GML, and MED against the average overall test accuracy and presence of any confounding factors (yes or no) in a set of experiments conducted on AVIRIS data collected on Icelandic lands \cite{aviris}. GML is the only option that has a confounding factor. 
+\\ \\ This table shows an overview of the three choices of software to classify the data from the trained neural network generated in the feature extraction stage. The only software that meets all of the requirements is Spectral Python.
 
 \subsubsection{Discussion}
-In the experiments performed on AVIRIS data, there were no significant confounding factors that had an effect on the accuracy of the data when using the CGBP method. Just looking at the accuracy of the GML method, it looks like a fairly good choice, however this is a limitation to its use when using very high dimensional data like AVIRIS. The GML method relies on having "nonsingular (invertible)
-class-specific covariance matrices for all classes \cite{aviris}." Since there are often many dimensions to the data, there are cases when the sample size is smaller than the number of classes, which would make the data break the requirement of being nonsingular. The MED method performed the lowest in terms of accuracy and like the CGBP method, had no confounding factors that limited its usefulness. 
+Feature extraction and classification go hand-in-hand, so unsurprisingly, Spectral Python already has the ability to classify hyperspectral imagery based on the feature extraction stage. It is convenient and, as mentioned above, it is  currently maintained so that any bugs or new features can be handled in a timely manner. PyLearn2 is not currently maintained. PyLearn2 and TensorFlow are also not designed to be used with Spectral Python, so it would take a lot of time to build that functionality if we decided on either technology. Overall, Spectral Python is the most logical and convenient option to use for mineral classification.
 
 \subsubsection{Selection}
-We will be using the conjugate-gradient backpropagation method for classifying AVIRIS data.
+We will be using Spectral Python for the classification of AVIRIS data.
 
 % xiaomei: requirement 3.4.2: identify mining
 \subsection{Identify Mining}
@@ -200,7 +199,7 @@ Converting the environmental impact data from GIS so that it is compatible with 
 Converting both the processed imagery and the geographic information to a third format would provide a choice about compatibility and suitability for further processing. The research and development time for this approach is estimated to be higher.
 
 \subsubsection{Selection}
-Since this is an intermediate step, standards compatibility is less important than research and development time, and precision is more important. Based on these estimates, it is recommended to preprocess data by converting the geographic information so it can be combined with the processed imagery.
+As we began to design and implement this step, it was concluded that the most straightforward means of combining geographic information and hyperspectral imagery is to convert the GIS data to the same raster format as the imagery. This will facilitate user-defined correlation functions which operate on pixels or regions of each image. The Geospatial Data Abstraction Library (GDAL) handles many standard georeferenced vector and raster file formats, so the output should be broadly compatible.
 
 % taylor: requirement 3.4.3 part 2: feature extraction to correlate mining with environmental impact
 \subsection{Feature Extraction to Correlate Mining with Environmental Impact}
@@ -242,7 +241,7 @@ Another way to correlate the data is to use statistical methods to identify zone
 The most complex way to correlate the data is to use machine learning approaches such as the neural networks which were used to classify the spectroscopic imagery. This would require more research and development time and much more computational complexity than either of the other approaches. It is unknown whether the accuracy of this approach for correlation would exceed that of the statistical method, but it estimated to be as good or better.
 
 \subsubsection{Selection}
-At present, we have insufficient information to come to a firm conclusion. Further research is recommended to determine which approach is best suited to our needs. Because the logical approach is so simple, the little cost that has been estimated may be worth the small benefit of analyzing data this way. The statistical approach is hypothesized to be the best suited for this step, however machine learning should be chosen if research determines it is more accurate and achievable under our time constraints.
+Because we are interested in programming the library but not necessarily conducting a detailed environmental analysis, we have decided to pursue the logical approach to environmental correlation as a case study. We plan to identify pixels where waterway pollution corresponds to mining regions. Although our correlation function will be simplistic, our model will enable more sophisticated functions to be developed for environmental research.
 
 % taylor: requirement 3.4.4: rank and document changes over time
 \subsection{Rank and Document Changes Over Time}
@@ -259,7 +258,7 @@ Several approaches to correlating imagery and historical data include:
 Each option describes a high-level approach to designing the algorithm. Implementation details to be determined based on choice.
 
 \subsubsection{Goals}
-The goal of this stage is to add a temporal dimension to the spatial correlation between mining and environmental impact. It will require processing multiple historical datasets which may be disjoint: For example, imaging spectroscopy data gathered from different dates may have different geographic coordinates or atmospheric conditions. The end user should be able to select a geographical region of interest and view a sequence of correlations that compensate for varying observation conditions.
+The goal of this stage is to add a temporal dimension to the spatial correlation between mining and environmental impact. It will require processing multiple historical data sets. The end user will be expected to select environmental data sets and imagery for a given geographical region. These may be processed manually for maximum control or automatically for batch operation. Because this module relies on all previous stages of the data processing pipeline, implementation details remain to be finalized.
 
 \subsubsection{Criteria}
 Criteria being evaluated include the time needed to research and develop each method, the computational complexity of each approach, and the quality of the results.
@@ -282,10 +281,10 @@ The simplest approach is to process the data separately and compare the results 
 
 A more sophisticated design is to devise a means of combining multiple correlations and producing a unified result. This approach would reuse most of the original data flow and provide a comparison of the results. If variables such as geographic coordinates and atmospheric conditions could be successfully postprocessed by this method, the quality of the results is estimated to be better than the previous approach.
 
-The most complicated approach would be to process multiple historical datasets simultaneously to mediate their transformations. This would require more research and development and likely some degree of refactoring. All of these approaches require a high computational cost, but this one is estimated to have the highest. However, if successfully implemented, this method is estimated to have the highest quality because each of the datasets is available for synchronization from beginning to end.
+The most complicated approach would be to process multiple historical data sets simultaneously to mediate their transformations. This would require more research and development and likely some degree of refactoring. All of these approaches require a high computational cost, but this one is estimated to have the highest. However, if successfully implemented, this method is estimated to have the highest quality because each of the data sets is available for synchronization from beginning to end.
 
 \subsubsection{Selection}
-More research is recommended to determine which options are best suited for the project. The third approach is arguably the most elegant since it encapsulates the entire process, however the second approach is likely to be more achievable within the timeframe. The first approach puts more responsibility on the end user than desirable, however with a low implementation cost it may be worth implementing for experimental purposes.
+We now expect to implement a combination of the options discussed above. The user will be required to select the data for analysis. Then the data could be manually processed for maximum control or batch processed for convenience. Thus we expect to facilitate automated comparisons with both separate and simultaneous processing.
 
 % heidi: requirement 3.5: api documentation
 \subsection{API Documentation}
@@ -359,11 +358,12 @@ A static site generator will provide a fast and simple back-end for COAL's homep
 \end{tabular}
 
 \subsubsection{Discussion}
-Jekyll is defined as “a simple, blog-aware, static site generator” and it is the most widely used today. Jekyll is also very easy to use. It has default integration with GitHub pages, which makes set-up and updates very simple.
+Jekyll is defined as “a simple, blog-aware, static site generator” and it is the most widely used today. Jekyll is also very easy to use. It has default integration with GitHub pages, which makes set-up and updates very simple. Consider what we are going to do right now: the blog post page, and compatible with GitHub pages. Jekyll is an ideal choice.
+
 Middleman is not as widely used. Middleman does not have built-in support with GitHub pages, so it is more difficult to set up and update compared to Jekyll. Middleman is also difficult to write extensions for as it is not well documented. Roots is less used than Middleman, but it relies heavily on extensions and is easily extendable \cite{staticsite}.
 
 \subsubsection{Selection}
-Jekyll seems to be the best choice after our discussion. Since we are using GitHub pages, it will be the simplest to use and fits our needs.
+Jekyll seems to be the best choice after our discussion. Since we are using GitHub pages, it will be the simplest to use and fits our needs.Because one of our need for our website is to create a page for blog posting, so we intend to use Jekyll mainly for that function, which is considered very convenient. 
 
 % xiaomei: requirement 3.7 part 2: website frontend
 % e.g., plain stylesheets, frameworks like bootstrap, etc.
@@ -404,18 +404,58 @@ Skeleton is fairly bare-bones, so it isn't ideal for when developers want many t
 We will be using Bootstrap for the front-end framework of COAL's homepage.
 
 \section{Conclusion}
-In this paper we described and compared technologies for implementing the COAL algorithm suite and associated documentation. The core functionality consists of a data processing pipeline that transforms raw imagery and data into meaningful relationships. At this point in our group's research we have collected the most literature on the beginning stages, so later stages are described at a less granular level. In addition to the algorithms, our project will be supported by API documentation for programmers and a homepage for end users. A discussion of implementation choices for each component was provided along with a recommendation based on a comparison of costs and benefits. The team members responsible for each component were identified in the introduction \ref{sec:intro}. We hope that this discussion has provided the reader with a better understanding of the design choices our team faces as we continue to collaborate with our client on research and development.
+In this paper we described and compared technologies for implementing the COAL algorithm suite and associated documentation. The core functionality consists of a data processing pipeline that transforms raw imagery and data into meaningful relationships. We have become familiar with relevant literature, developed detailed sketches of our algorithms, and implemented a framework for most of the modules using the libraries we have chosen. In addition to the algorithms, our project will be supported by API documentation for programmers and a homepage for end users. A discussion of implementation choices for each component was provided along with a recommendation based on a comparison of costs and benefits. The team members responsible for each component were identified in the introduction \ref{sec:intro}. We hope that this discussion has provided the reader with a better understanding of the design choices that have been and have yet to be made as we continue to collaborate with our client on research and development.
+
+\section{Revisions}
+\label{sec:revisions}
+\subsection{Feature extraction in AVIRIS data}
+Revisions to Section \ref{subsec:featureextraction}: .
+
+\subsection{Classification of AVIRIS data}
+Revisions to Section \ref{subsec:classification}: .
+
+\subsection{Identify Mining}
+Revisions to Section \ref{subsec:identifymining}: .
+
+\subsection{Preprocessing Data to Correlate Mining with Environmental Impact}
+Revisions to Section \ref{subsec:preprocessing}: Revised to document our choice to convert GIS to raster data.
+
+\subsection{Feature Extraction to Correlate Mining with Environmental Impact}
+Revisions to Section \ref{subsec:correlate}: Revised to describe the simple case study chosen by client.
+
+\subsection{Rank and Document Changes Over Time}
+Revisions to Section \ref{subsec:changesovertime}: Revised to describe expectation that end user will choose data sets, and updated the selection to be a combination of manual and batch processing.
+
+\subsection{API Documentation}
+Revisions to Section \ref{subsec:apidoc}: .
+
+\subsection{Static site generator}
+Revisions to Section \ref{subsec:staticsitegenerator}: .
+
+\subsection{Front-end framework}
+Revisions to Section \ref{subsec:frontendframework}: .
 
 \begin{thebibliography}{9}
 % for IEEE citation reference, see https://www.ieee.org/documents/ieeecitationref.pdf
 \bibitem{requirements}
   T. A. Brown, H. Clayton, and X. Wang, Requirements document, Fall 2016.
-  
-\bibitem{blobdetection}
-  A. Kaspers, ``\href{http://dspace.library.uu.nl/handle/1874/204781}{Blob Detection},'' Master Thesis, Biomedical Image Sci., Image Sci. Inst., UMC Utrecht, Utrecht, Netherlands, 2011.
+\bibitem{spectral}
+\url{http://www.spectralpython.net/}
+
+\bibitem{hyperspy}
+\url{https://github.com/hyperspy/hyperspy}
+
+\bibitem{matlab}
+\url{https://github.com/isaacgerg/matlabHyperspectralToolbox}
 
 \bibitem{aviris}
   J. A. Benediktsson \emph{et al}, ``\href{https://notendur.hi.is//~benedikt/aviris.pdf}{Classification and Feature Extraction of AVIRIS Data},'' IEEE Trans. on Geoscience and Remote Sensing, Vol. 33, No. 5, September 1995.
+  
+\bibitem{pylearn2}
+\url{http://deeplearning.net/software/pylearn2/}
+
+\bibitem{tensorflow}
+\url{https://github.com/tensorflow/tensorflow}
 
 \bibitem{leadville}
   G. A. Swayze \emph{et al}, ``Using Imaging Spectroscopy to Cost-Effectively Locate Acid-Generating Minerals at Mine Sites: An Example from the California Gulch Superfund Site in Leadville, Colorado,'' paper presented at JPL Airborne Geoscience Workshop, Leadville, Colorado, 1998.
