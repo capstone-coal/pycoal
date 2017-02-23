@@ -4,18 +4,14 @@ import spectral
 import pickle
 import numpy
 
-# define number of layers in normalized pixel
-NUMBER_OF_LAYERS = 128
-
-# define wavelength range in micrometers
-WAVELENGTH_MIN = 0.38315
-WAVELENGTH_MAX = 2.5082
-
 class MineralClassification:
     def __init__(self):
-        # maybe we could put the constants above in here?
-        # any other variables to move in here?
-        pass
+        # define wavelength range in micrometers
+        self.wavelength_min = 0.38315
+        self.wavelength_max = 2.5082
+
+        # define number of layers in normalized pixel
+        self.num_layers = 128
 
     def normalize(self, image, wavelengthList=None):
         """
@@ -32,8 +28,8 @@ class MineralClassification:
             wavelengthList = image.metadata.get('wavelength')
 
         # get the indices of the minimum and maximum element
-        i = self.__indexOfGreaterThan(wavelengthList, WAVELENGTH_MIN)
-        j = self.__indexOfGreaterThan(wavelengthList, WAVELENGTH_MAX)
+        i = self.__indexOfGreaterThan(wavelengthList, self.wavelength_min)
+        j = self.__indexOfGreaterThan(wavelengthList, self.wavelength_max)
 
         # constrain wavelength range
         # slice the array from MxNxB to MxNx(j-i) for indices i,j
@@ -41,7 +37,7 @@ class MineralClassification:
 
         # normalize spectra
         principalComponents = spectral.algorithms.principal_components(image)
-        principalComponents.reduce(NUMBER_OF_LAYERS)
+        principalComponents.reduce(self.num_layers)
         normalizedImage = principalComponents.transform(image)
 
         # return normalized image
@@ -61,14 +57,16 @@ class MineralClassification:
             if element > value:
                 return index
 
-    def trainClassifier(self, libraryFileName, classifierType):
+    def trainClassifier(self, libraryFileName, classifierType='gaussian'):
         """
         This takes the file name of the library to be used in the training and returns a
         classifier
         Args:
            libraryFileName (str): the name of the training library
-           classifierType (str): the type of classifier. Currently, can be one of:
-                                 perceptron, gaussian, or mahalanobisdistance
+           classifierType (str) [default 'gaussian']: the type of classifier.
+                                                      Currently, can be one of:
+                                                      perceptron, gaussian, or
+                                                      mahalanobisdistance.
         Returns:
            classifier (PerceptronClassifier): trained classifier
         """
@@ -189,13 +187,13 @@ class MineralClassification:
 
             # define a linear transformation to scale the pixel if necessary
             # the scalars would presumably be read from metadata
-            transform = spectral.transforms.LinearTransform(???)
+            #transform = spectral.transforms.LinearTransform(???)
 
             # transform it
-            transformedPixel = transform(pixel)
+            #transformedPixel = transform(pixel)
 
             # classify and store it in the classified image
-            classifiedImage[imageIndex] = self.classifyPixel(transformedPixel, classifier, wavelengthList)
+            classifiedImage[imageIndex] = self.classifyPixel(pixel, classifier, wavelengthList)
 
             imageIndex += 1
         # save the classified image to a file
