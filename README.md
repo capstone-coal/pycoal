@@ -7,6 +7,7 @@
 [![Python Badge](https://img.shields.io/badge/python-2-blue.svg)](https://www.python.org/downloads/)
 [![Launch Binder](https://img.shields.io/badge/launch-binder-e66581.svg?style=plastic)](http://mybinder.org/repo/capstone-coal/pycoal)
 [![Google Group](https://img.shields.io/badge/-Google%20Group-lightgrey.svg)](https://groups.google.com/forum/#!forum/coal-capstone)
+[![Documentation](https://readthedocs.org/projects/pycoal/badge/?version=latest)](http://pycoal.readthedocs.io/en/latest/)
 
 Coal and Open-pit surface mining impacts on American Lands
 
@@ -45,6 +46,13 @@ python setup.py install
 In the [examples directory](https://github.com/capstone-coal/pycoal/tree/master/examples) you can find several Jupyter notebooks with specific applications of coal. You can launch a cloud Jupyter server using binder to edit the notebooks without installing anything. Try it out!
 
 http://mybinder.org/repo/capstone-coal/pycoal
+
+# Documentation
+PyCOAL documentation can be found at http://pycoal.readthedocs.io however you can also build documentation manually.
+```
+$ cd docs/source && make html
+```
+Documentation can then be located in ```_build/html/index.html```
 
 # Community and Development
 
