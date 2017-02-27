@@ -8,6 +8,8 @@
 [![Launch Binder](https://img.shields.io/badge/launch-binder-e66581.svg?style=plastic)](http://mybinder.org/repo/capstone-coal/pycoal)
 [![Google Group](https://img.shields.io/badge/-Google%20Group-lightgrey.svg)](https://groups.google.com/forum/#!forum/coal-capstone)
 [![Documentation](https://readthedocs.org/projects/pycoal/badge/?version=latest)](http://pycoal.readthedocs.io/en/latest/)
+[![Requirements Status](https://requires.io/github/capstone-coal/pycoal/requirements.svg?branch=master)](https://requires.io/github/capstone-coal/pycoal/requirements/?branch=master)
+[![Code Health](https://landscape.io/github/capstone-coal/pycoal/master/landscape.svg?style=plastic)](https://landscape.io/github/capstone-coal/pycoal/master)
 
 Coal and Open-pit surface mining impacts on American Lands
 
