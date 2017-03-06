@@ -94,10 +94,7 @@ class MineralClassification:
         if classifierType == 'perceptron':
             # try out using the neural net structure used in the following
             # paper: http://www.aaai.org/Papers/FLAIRS/1999/FLAIRS99-057.pdf
-            nn_structure = numpy.ndarray((3,))
-            nn_structure[0] = 9
-            nn_structure[1] = 35
-            nn_structure[2] = 60
+            nn_structure = [9, 35, 60]
             classifier = spectral.classifiers.PerceptronClassifier(nn_structure)
         elif classifierType == 'gaussian':
             classifier = spectral.classifiers.GaussianClassifier()
