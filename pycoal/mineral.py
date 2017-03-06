@@ -1,4 +1,14 @@
-#!/usr/bin/env python
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import spectral
 import pickle
@@ -25,7 +35,7 @@ class MineralClassification:
 
         # constrain wavelength range
         if wavelengthList is None:
-            wavelengthList = image.metadata.get('wavelength')
+            wavelengthList = map(float, image.metadata.get('wavelength'))
 
         # get the indices of the minimum and maximum element
         i = self.__indexOfGreaterThan(wavelengthList, self.wavelength_min)
@@ -55,7 +65,8 @@ class MineralClassification:
 
         for index,element in enumerate(elements):
             if element > value:
-                return index
+                break
+        return index
 
     def trainClassifier(self, libraryFileName, classifierType='gaussian'):
         """
@@ -68,7 +79,8 @@ class MineralClassification:
                                                       perceptron, gaussian, or
                                                       mahalanobisdistance.
         Returns:
-           classifier (PerceptronClassifier): trained classifier
+           classifier (PerceptronClassifier, GaussianClassifier,
+                       or MahalanobisDistanceClassifier): trained classifier
         """
 
         # open the digital spectral library
@@ -165,13 +177,13 @@ class MineralClassification:
         # open the image
         image = spectral.io.aviris.open(imageFilename)
 
+        # get wavelength list
+        wavelengthList = map(float, image.metadata.get('wavelength'))
+
         # change units from nanometers to micrometers if applicable
         if image.metadata.get('wavelength units') == u'Nanometers':
             image.metadata['wavelength'] = [x / 1000 for x in image.metadata.get('wavelength')]
             image.metadata['wavelength units'] = u'Micrometers'
-
-        # get wavelength list
-        wavelengthList = image.metadata.get('wavelength')
 
         # allocate an MxN array for the classified image
         classifiedImage = numpy.ndarray((image.shape[0] * image.shape[1],))
