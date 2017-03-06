@@ -25,24 +25,21 @@ def test_indexOfGreaterThan():
     Returns:
         None
     """
-    # test object
-    test_obj = mineral.MineralClassification()
-
     test_list = [0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
 
     # [0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
     #                         ---  ---
     # 6.0 is the first value greater than 5.0, so the return should be its index (6)
-    assert test_obj._MineralClassification__indexOfGreaterThan(test_list, 5.0) == 6
+    assert mineral.MineralClassification._MineralClassification__indexOfGreaterThan(test_list, 5.0) == 6
 
     # [0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
     #     ---  ---
     # 2.0 is the first value greater than 1.0, so the return should be its index (2)
-    assert test_obj._MineralClassification__indexOfGreaterThan(test_list, 1.0) == 2
+    assert mineral.MineralClassification._MineralClassification__indexOfGreaterThan(test_list, 1.0) == 2
 
     # [0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0]
     # 11.0 is not in the range of this list, so the return will just be the last index
-    assert test_obj._MineralClassification__indexOfGreaterThan(test_list, 11.0) == 9
+    assert mineral.MineralClassification._MineralClassification__indexOfGreaterThan(test_list, 11.0) == 9
 
 def test_trainClassifier():
     pass

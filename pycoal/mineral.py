@@ -53,7 +53,8 @@ class MineralClassification:
         # return normalized image
         return normalizedImage
 
-    def __indexOfGreaterThan(self, elements, value):
+    @staticmethod
+    def __indexOfGreaterThan(elements, value):
         """
         Return the index of the first element greater than the value.
         Args:
