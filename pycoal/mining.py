@@ -10,8 +10,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-#!/usr/bin/env python
-
 # TODO shrink not overlap ? pixel subset ?
 
 # TODO use spectral or gdal/orfeo for dataset manipulation and machine learning ?
