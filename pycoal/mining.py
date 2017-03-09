@@ -16,7 +16,7 @@
 
 # TODO reuse saveClassifier, readClassifier ?
 
-import coal
+import pycoal
 
 class MiningClassification:
 
@@ -49,7 +49,7 @@ class MiningClassification:
                 ???
 
         # generate and save the training data
-        coal.gis.combine(pixelNeighbors, miningLayer, miningFilename, mineralFilename, trainingFilename)
+        pycoal.GISProcessing.gis.combine(pixelNeighbors, miningLayer, miningFilename, mineralFilename, trainingFilename)
 
     def trainMiningClassifier(miningFilename, mineralFilename):
 

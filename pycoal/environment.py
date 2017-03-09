@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import coal
+import pycoal
 
 class EnvironmentalCorrelation:
 
@@ -33,4 +33,4 @@ class EnvironmentalCorrelation:
             ???
 
         # apply the correlation and save the result
-        coal.gis.combine(correlate, impactLayer, environmentFilename, miningFilename, outputFilename)
+        pycoal.gis.GISProcessing.combine(correlate, impactLayer, environmentFilename, miningFilename, outputFilename)
