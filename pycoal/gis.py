@@ -2,101 +2,103 @@
 
 import gdal
 
-def combine(rasterFunction, selectLayers, gisFilename, classifiedFilename, outputFilename):
+class GISProcessing:
 
-    """
-    Combine GIS layers with a classified image using a transformation function and write the output to a file.
-    """
+    def combine(rasterFunction, selectLayers, gisFilename, classifiedFilename, outputFilename):
 
-    # TODO update docstring
-    # TODO test
+        """
+        Combine GIS layers with a classified image using a transformation function and write the output to a file.
+        """
 
-    # load gis
-    gisDataset = gdal.Open(gisFilename, gdalconst.GA_ReadOnly)
+        # TODO update docstring
+        # TODO test
 
-    # load classified image
-    classifiedDataset = gdal.Open(classifiedFilename, gdalconst.GA_ReadOnly)
+        # load gis
+        gisDataset = gdal.Open(gisFilename, gdalconst.GA_ReadOnly)
 
-    # select one or more layers
-    # FIXME temporary dataset ?
-    gisLayersDataset = selectLayers(gisDataset)
+        # load classified image
+        classifiedDataset = gdal.Open(classifiedFilename, gdalconst.GA_ReadOnly)
 
-    # crop to flightline and convert to bitmap
-    # FIXME temporary dataset ?
-    gisRasterLayersDataset = cropSourceToDest(gisLayersDataset, classifiedDataset)
+        # select one or more layers
+        # FIXME temporary dataset ?
+        gisLayersDataset = selectLayers(gisDataset)
 
-    # apply function to result dataset and write to file
-    resultRasterDataset = createEmptyCopy(classifiedDataset, outputFilename)
-    rasterFunction(gisRasterLayersDataset, classifiedDataset, resultRasterDataset)
-    resultRasterDataset = None
+        # crop to flightline and convert to bitmap
+        # FIXME temporary dataset ?
+        gisRasterLayersDataset = cropSourceToDest(gisLayersDataset, classifiedDataset)
 
-def cropSourceToDest(sourceDataset, destDataset):
+        # apply function to result dataset and write to file
+        resultRasterDataset = createEmptyCopy(classifiedDataset, outputFilename)
+        rasterFunction(gisRasterLayersDataset, classifiedDataset, resultRasterDataset)
+        resultRasterDataset = None
 
-    """
-    Crop a vector source dataset to the same dimensions and format as a raster destination dataset.
-    """
+    def cropSourceToDest(sourceDataset, destDataset):
 
-    # TODO update docstring
-    # TODO test
+        """
+        Crop a vector source dataset to the same dimensions and format as a raster destination dataset.
+        """
 
-    # get destination projection (spatial reference system)
-    projection = destDataset.GetProjection()
+        # TODO update docstring
+        # TODO test
 
-    # get destination image size (in pixels)
-    xSize = destDataset.RasterXSize
-    ySize = destDataset.RasterYSize
+        # get destination projection (spatial reference system)
+        projection = destDataset.GetProjection()
 
-    # get destination transform
-    geotransform = destDataset.GetGeoTransform()
+        # get destination image size (in pixels)
+        xSize = destDataset.RasterXSize
+        ySize = destDataset.RasterYSize
 
-    # get destination pixel size
-    pixelXSize = geotransform[1]
-    pixelYSize = geotransform[5]
+        # get destination transform
+        geotransform = destDataset.GetGeoTransform()
 
-    # get destination bounding box
-    minX = geotransform[0]
-    maxX = minX + (xSize * pixelXSize)
-    maxY = geotransform[3]
-    minY = maxY + (ySize * pixelYSize)
+        # get destination pixel size
+        pixelXSize = geotransform[1]
+        pixelYSize = geotransform[5]
 
-    # set warp options
-    warpOptions = gdal.WarpOptions(format=???,
-                                   dstSRS=projection,
-                                   width=xSize,
-                                   height=ySize,
-                                   outputBounds=(minX,minY,maxX,maxY))
+        # get destination bounding box
+        minX = geotransform[0]
+        maxX = minX + (xSize * pixelXSize)
+        maxY = geotransform[3]
+        minY = maxY + (ySize * pixelYSize)
 
-    # TODO define resultDataset ?
+        # set warp options
+        warpOptions = gdal.WarpOptions(format=???,
+                                       dstSRS=projection,
+                                       width=xSize,
+                                       height=ySize,
+                                       outputBounds=(minX,minY,maxX,maxY))
 
-    # crop source to destination dimensions and format
-    gdal.Warp(resultDataset, sourceDataset, warpOptions)
+        # TODO define resultDataset ?
 
-    # return the result
-    return resultDataset
+        # crop source to destination dimensions and format
+        gdal.Warp(resultDataset, sourceDataset, warpOptions)
 
-def createEmptyCopy(inputDataset, filename):
+        # return the result
+        return resultDataset
 
-    """
-    Return an empty dataset with the given filename and the same dimensions as the input dataset.
-    """
+    def createEmptyCopy(inputDataset, filename):
 
-    # TODO test
+        """
+        Return an empty dataset with the given filename and the same dimensions as the input dataset.
+        """
 
-    # get driver
-    driver = gdal.GetDriverByName(???) # TODO
+        # TODO test
 
-    # copy dimensions from input dataset
-    xSize = inputDataset.RasterXSize
-    ySize = inputDataset.RasterYSize
-    layerCount = inputDataset.GetLayerCount()
-    dataType = gdal.GDT_??? # TODO
+        # get driver
+        driver = gdal.GetDriverByName(???) # TODO
 
-    # create output dataset
-    outputDataset = driver.create(filename, xSize, ySize, layerCount, dataType)
+        # copy dimensions from input dataset
+        xSize = inputDataset.RasterXSize
+        ySize = inputDataset.RasterYSize
+        layerCount = inputDataset.GetLayerCount()
+        dataType = gdal.GDT_??? # TODO
 
-    # copy transform and projection from input dataset
-    outputDataset.SetGeoTransform(inputDataset.GetGeoTransform())
-    outputDataset.SetProjection(inputDataset.GetProjection())
+        # create output dataset
+        outputDataset = driver.create(filename, xSize, ySize, layerCount, dataType)
 
-    # return output dataset
-    return outputDataset
+        # copy transform and projection from input dataset
+        outputDataset.SetGeoTransform(inputDataset.GetGeoTransform())
+        outputDataset.SetProjection(inputDataset.GetProjection())
+
+        # return output dataset
+        return outputDataset

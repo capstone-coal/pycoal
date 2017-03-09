@@ -2,23 +2,25 @@
 
 import coal
 
-def correlateMiningEnvironment(environmentFilename, miningFilename, outputFilename):
+class EnvironmentalCorrelation:
 
-    """
-    Correlate environmental impact GIS data with classified mines and save the result to a file.
-    """
+    def correlateMiningEnvironment(environmentFilename, miningFilename, outputFilename):
 
-    # define function to select the environmental impact layer
-    def impactLayer(environmentDataset):
+        """
+        Correlate environmental impact GIS data with classified mines and save the result to a file.
+        """
 
-        ???
+        # define function to select the environmental impact layer
+        def impactLayer(environmentDataset):
 
-        return impactDataset
+            ???
 
-    # define raster function to correlate environmental impact with classified mines
-    def correlate(impactDataset, miningDataset, outputDataset):
+            return impactDataset
 
-        ???
+        # define raster function to correlate environmental impact with classified mines
+        def correlate(impactDataset, miningDataset, outputDataset):
 
-    # apply the correlation and save the result
-    coal.gis.combine(correlate, impactLayer, environmentFilename, miningFilename, outputFilename)
+            ???
+
+        # apply the correlation and save the result
+        coal.gis.combine(correlate, impactLayer, environmentFilename, miningFilename, outputFilename)
