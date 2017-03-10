@@ -25,8 +25,12 @@ def test_normalize():
     obj = mineral.MineralClassification()
     library = spectral.open_image("s06av95a_envi.hdr")
 
+    # TODO this causes a warning, change to concatenate
     spectra = library.spectra[..., numpy.newaxis, ...]
-    normalized = obj.normalize(spectra, library.metadata.get('wavelength'))
+
+    normalized = obj.normalize(spectra, map(float, library.metadata.get('wavelength')))
+
+    assert normalized.shape == (1365, 128)
 
 
 def test_indexOfGreaterThan():
@@ -61,4 +65,3 @@ def test_classifyImage():
 
 def test_classifyImages():
     pass
-
