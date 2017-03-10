@@ -15,4 +15,9 @@ signature-xiaomei.png
 
 # ignore local directories
 *-overleaf/
-old/
+
+# ignore backups
+*.bak
+
+# ignore archives
+*.zip

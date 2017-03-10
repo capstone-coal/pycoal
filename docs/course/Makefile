@@ -10,47 +10,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# makefile to build course documents
+
 all : report.pdf problem-statement.pdf requirements.pdf techreview.pdf design.pdf \
 presentation.pdf problem-statement-student.pdf fall-report.pdf
 
-# execute pdflatex twice to update references
-
 report.pdf :
-	pdflatex report.ltx
-	pdflatex report.ltx
+	./build.sh report/report.ltx report
 
 problem-statement.pdf :
-	pdflatex problem-statement.ltx
-	pdflatex problem-statement.ltx
+	./build.sh problem-statement/problem-statement.ltx problem-statement
 
 requirements.pdf :
-	pdflatex requirements.ltx
-	pdflatex requirements.ltx
+	./build.sh requirements/requirements.ltx requirements
 
 techreview.pdf :
-	pdflatex techreview.ltx
-	pdflatex techreview.ltx
+	./build.sh technology-review/techreview.ltx technology-review
 
 design.pdf :
-	pdflatex design.ltx
-	pdflatex design.ltx
+	./build.sh design/design.ltx design
 
 presentation.pdf :
-	pdflatex presentation.ltx
-	pdflatex presentation.ltx
+	./build.sh presentation/presentation.ltx presentation
 
 presentation-winter.pdf :
-	pdflatex presentation-winter.ltx
-	pdflatex presentation-winter.ltx
+	./build.sh presentation-winter/presentation-winter.ltx presentation-winter
 
 problem-statement-student.pdf :
-	pdflatex problem-statement-student.ltx
-	pdflatex problem-statement-student.ltx
+	./build.sh problem-statement-student/problem-statement-student.ltx problem-statement-student
 
 fall-report.pdf :
-	pdflatex fall-report.ltx
-	pdflatex fall-report.ltx
+	./build.sh fall-report/fall-report.ltx fall-report
 
 winter-progress.pdf :
-	pdflatex winter-progress.ltx
-	pdflatex winter-progress.ltx
+	./build.sh winter-progress/winter-progress.ltx winter-progress
