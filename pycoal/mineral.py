@@ -11,7 +11,6 @@
 # limitations under the License.
 
 import spectral
-import pickle
 import numpy
 
 class MineralClassification:
@@ -47,8 +46,8 @@ class MineralClassification:
 
         # normalize spectra
         principalComponents = spectral.algorithms.principal_components(image)
-        principalComponents.reduce(self.num_layers)
-        normalizedImage = principalComponents.transform(image)
+        reduced = principalComponents.reduce(num=self.num_layers)
+        normalizedImage = reduced.transform(image)
 
         # return normalized image
         return normalizedImage
@@ -68,85 +67,6 @@ class MineralClassification:
             if element > value:
                 break
         return index
-
-    def trainClassifier(self, libraryFileName, classifierType='gaussian'):
-        """
-        This takes the file name of the library to be used in the training and returns a
-        classifier
-        Args:
-           libraryFileName (str): the name of the training library
-           classifierType (str) [default 'gaussian']: the type of classifier.
-                                                      Currently, can be one of:
-                                                      perceptron, gaussian, or
-                                                      mahalanobisdistance.
-        Returns:
-           classifier (PerceptronClassifier, GaussianClassifier,
-                       or MahalanobisDistanceClassifier): trained classifier
-        """
-
-        # open the digital spectral library
-        # we may need to load it as an image instead
-        library = spectral.io.envi.open(libraryFileName)
-
-        # get dimensions of library to create mask for training class
-        dimensions = library.spectra.shape
-
-        # initialize the type of classifier
-        if classifierType == 'perceptron':
-            # try out using the neural net structure used in the following
-            # paper: http://www.aaai.org/Papers/FLAIRS/1999/FLAIRS99-057.pdf
-            nn_structure = [9, 35, 60]
-            classifier = spectral.classifiers.PerceptronClassifier(nn_structure)
-        elif classifierType == 'gaussian':
-            classifier = spectral.classifiers.GaussianClassifier()
-        elif classifierType == 'mahalanobisdistance':
-            classifier = spectral.classifiers.MahalanobisDistanceClassifier()
-        else:
-            raise ValueError('Invalid classifier type provided.')
-
-        # create mask of distinct values.
-        mask = numpy.ndarray(shape=dimensions)
-
-        # is there a more concise way of doing this?
-        value = 1
-        for i in range(dimensions[0]):
-            for j in range(dimensions[1]):
-                mask[i][j] = value
-                value += 1
-
-        # generate training data
-        trainingData = spectral.algorithms.create_training_classes(self.normalize(library), mask)
-
-        # initialize and train a neural network using the training data
-        classifier.train(trainingData)
-
-        # return trained classifier
-        return classifier
-
-    def saveClassifier(self, classifier, classifierFilename):
-        """
-        This saves a classifier to a file for reuse.
-        Args:
-           classifier (PerceptronClassifier): the classifier to write
-           classifierFilename (str): the file which to write the classifier
-        Returns:
-            None
-        """
-
-        with open(classifierFilename,"wb") as f:
-            pickle.dump(classifier, f)
-
-    def readClassifier(self, classifierFilename):
-        """
-        This reads a classifier from a file.
-        Args:
-           classifierFilename (str): the file from which to load the classifier
-        Returns:
-            ??? not sure about how to express this
-        """
-
-        with open(classifierFilename, "rb") as f:
-            return pickle.load(f)
 
     def classifyPixel(self, pixel, classifier, wavelengthList):
         """
