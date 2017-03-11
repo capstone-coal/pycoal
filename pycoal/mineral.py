@@ -18,9 +18,9 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
     Classify minerals in an AVIRIS image using spectral angle mapper classification with a spectral library and save the results to a file.
 
     Args:
-       imageFilename (str):             filename of the image to be classified
-       libraryFilename (numpy.ndarray): filename of the spectral library
-       classifiedImageFilename (str):   filename of the classified image
+       imageFilename (str):      filename of the image to be classified
+       libraryFilename (str):    filename of the spectral library
+       classifiedFilename (str): filename of the classified image
 
     Returns:
         None
