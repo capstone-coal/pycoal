@@ -51,15 +51,24 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
             # read the pixel from the file
             pixel = data[x,y]
 
-            # resample the pixel ignoring NaNs from target bands that don't overlap
-            # TODO fix spectral library so that bands are in order
-            resampledPixel = numpy.nan_to_num(resample(pixel))
+            # if it is a no data pixel
+            if pixel[0] < 0:
 
-            # calculate spectral angles
-            angles = spectral.spectral_angles(resampledPixel[numpy.newaxis,numpy.newaxis,...], library.spectra)
+                # give it a negative class id
+                classified[x,y] = -1;
 
-            # get classification
-            classified[x,y] = numpy.argmin(angles)
+            # otherwise
+            else:
+
+                # resample the pixel ignoring NaNs from target bands that don't overlap
+                # TODO fix spectral library so that bands are in order
+                resampledPixel = numpy.nan_to_num(resample(pixel))
+
+                # calculate spectral angles
+                angles = spectral.spectral_angles(resampledPixel[numpy.newaxis,numpy.newaxis,...], library.spectra)
+
+                # get classification
+                classified[x,y] = numpy.argmin(angles)
 
     # save the classified image to a file
     spectral.io.envi.save_classification(classifiedFilename, classified, class_names=library.names)
