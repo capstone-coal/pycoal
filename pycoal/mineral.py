@@ -43,7 +43,7 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
                                       library.bands.centers)
 
     # allocate an MxN array for the classified image
-    classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+    classified = numpy.zeros(shape=(M,N), dtype=numpy.int16)
 
     # for each pixel in the image
     for x in xrange(M):
