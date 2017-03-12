@@ -73,4 +73,9 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
     # save the classified image to a file
     spectral.io.envi.save_classification(classifiedFilename,
                                          classified,
-                                         class_names=library.names)
+                                         class_names=library.names,
+                                         metadata={
+                                             'data ignore value': 0,
+                                             'description': 'Mineral classified image.',
+                                             'map info': image.metadata.get('map info')
+                                         })
