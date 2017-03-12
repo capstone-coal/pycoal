@@ -43,9 +43,9 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
     classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
 
     # for each pixel in the image
-    for y in range(0, M-1):
+    for x in xrange(M):
 
-        for x in range(0, N-1):
+        for y in xrange(N):
 
             # read the pixel from the file
             pixel = image.read_pixel(x,y)
