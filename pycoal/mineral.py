@@ -54,7 +54,7 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
             pixel = data[x,y]
 
             # if it is a no data pixel
-            if pixel[0] < 0:
+            if numpy.isclose(pixel[0], -0.005):
 
                 # give it a negative class id
                 classified[x,y] = -1;
