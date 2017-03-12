@@ -15,7 +15,8 @@ import spectral
 
 def classifyImage(imageFilename, libraryFilename, classifiedFilename):
     """
-    Classify minerals in an AVIRIS image using spectral angle mapper classification with a spectral library and save the results to a file.
+    Classify minerals in an AVIRIS image using spectral angle mapper
+    classification with a spectral library and save the results to a file.
 
     Args:
        imageFilename (str):      filename of the image to be classified
@@ -38,7 +39,8 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
     # define a resampler
     # TODO detect and scale units
     # TODO band resampler should do this
-    resample = spectral.BandResampler([x/1000 for x in image.bands.centers], library.bands.centers)
+    resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
+                                      library.bands.centers)
 
     # allocate an MxN array for the classified image
     classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
@@ -65,10 +67,15 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
                 resampledPixel = numpy.nan_to_num(resample(pixel))
 
                 # calculate spectral angles
-                angles = spectral.spectral_angles(resampledPixel[numpy.newaxis,numpy.newaxis,...], library.spectra)
+                angles = spectral.spectral_angles(resampledPixel[numpy.newaxis,
+                                                                 numpy.newaxis,
+                                                                 ...],
+                                                  library.spectra)
 
                 # get classification
                 classified[x,y] = numpy.argmin(angles)
 
     # save the classified image to a file
-    spectral.io.envi.save_classification(classifiedFilename, classified, class_names=library.names)
+    spectral.io.envi.save_classification(classifiedFilename,
+                                         classified,
+                                         class_names=library.names)
