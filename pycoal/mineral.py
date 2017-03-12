@@ -28,6 +28,7 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
 
     # open the image
     image = spectral.open_image(imageFilename)
+    data = image.asarray()
     M = image.shape[0]
     N = image.shape[1]
 
@@ -48,7 +49,7 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
         for y in xrange(N):
 
             # read the pixel from the file
-            pixel = image.read_pixel(x,y)
+            pixel = data[x,y]
 
             # resample the pixel ignoring NaNs from target bands that don't overlap
             # TODO fix spectral library so that bands are in order
