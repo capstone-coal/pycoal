@@ -62,4 +62,4 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
             classified[x,y] = numpy.argmin(angles)
 
     # save the classified image to a file
-    spectral.io.envi.save_classification(classifiedFilename, classified)
+    spectral.io.envi.save_classification(classifiedFilename, classified, class_names=library.names)
