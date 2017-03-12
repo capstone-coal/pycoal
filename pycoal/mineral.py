@@ -16,8 +16,8 @@ import spectral
 def classifyImage(imageFilename, libraryFilename, classifiedFilename):
     """
     Classify minerals in an AVIRIS image using spectral angle mapper
-    classification with the USGS Digital Spectral Library 06 save the results to
-    a file.
+    classification with the USGS Digital Spectral Library 06 and save the
+    results to a file.
 
     Args:
        imageFilename (str):      filename of the image to be classified
