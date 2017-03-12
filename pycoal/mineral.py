@@ -42,8 +42,8 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
     resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
                                       library.bands.centers)
 
-    # allocate an MxN array for the classified image
-    classified = numpy.zeros(shape=(M,N), dtype=numpy.int16)
+    # allocate a zero-initialized MxN array for the classified image
+    classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
 
     # for each pixel in the image
     for x in xrange(M):
@@ -53,14 +53,8 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
             # read the pixel from the file
             pixel = data[x,y]
 
-            # if it is a no data pixel
-            if numpy.isclose(pixel[0], -0.005):
-
-                # give it a negative class id
-                classified[x,y] = -1;
-
-            # otherwise
-            else:
+            # if it is not a no data pixel
+            if not numpy.isclose(pixel[0], -0.005):
 
                 # resample the pixel ignoring NaNs from target bands that don't overlap
                 # TODO fix spectral library so that bands are in order
@@ -73,7 +67,7 @@ def classifyImage(imageFilename, libraryFilename, classifiedFilename):
                                                   library.spectra)
 
                 # get classification
-                classified[x,y] = numpy.argmin(angles)
+                classified[x,y] = numpy.argmin(angles) + 1
 
     # save the classified image to a file
     spectral.io.envi.save_classification(classifiedFilename,
