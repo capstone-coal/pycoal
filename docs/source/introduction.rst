@@ -14,3 +14,15 @@
    
 Introduction
 ************
+
+============
+Introduction
+============
+COAL is a Python library for processing hyperspectral imagery from remote sensing devices such as the Airborne Visible/InfraRed Imaging Spectrometer (AVIRIS). COAL is being developed as a 2016 – 2017 senior capstone collaboration between scientists at the Jet Propulsion Laboratory (JPL) and computer science students at Oregon State University (OSU). COAL aims to provide a suite of algorithms for classifying land cover, identifying mines and other geographic features, and correlating them with environmental data sets. COAL is Free and Open Source Software under the terms of the Apache License Version 2.0.
+
+================
+What is Pycoal?
+================
+pycoal provides a suite of algorithms (written in Python) to identify, classify, characterize, and quantify (by reporting a number of key metrics) the direct and indirect impacts of MTM and related destructive surface mining activities across the continental U.S.A (and further afield).
+
+More information on coal can be seen at the `project Website <https://capstone-coal.github.io/>`_ as well as the `docs directory <https://github.com/capstone-coal/pycoal/tree/master/docs>`_.

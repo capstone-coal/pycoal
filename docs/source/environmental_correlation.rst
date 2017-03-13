@@ -15,5 +15,5 @@
 pycoal environmental correlation API
 ************************************
 
-.. autoclass:: ecor.ECOR
+.. autoclass:: ecor.EnvironmentalCorrelation
     :members:
