@@ -13,69 +13,74 @@
 import numpy
 import spectral
 
-def classifyImage(imageFilename, libraryFilename, classifiedFilename):
-    """
-    Classify minerals in an AVIRIS image using spectral angle mapper
-    classification with the USGS Digital Spectral Library 06 and save the
-    results to a file.
+class MineralClassification:
 
-    Args:
-       imageFilename (str):      filename of the image to be classified
-       libraryFilename (str):    filename of the spectral library
-       classifiedFilename (str): filename of the classified image
+    def __init__(self):
+        pass
 
-    Returns:
-        None
-    """
+    def classifyImage(imageFilename, libraryFilename, classifiedFilename):
+        """
+        Classify minerals in an AVIRIS image using spectral angle mapper
+        classification with the USGS Digital Spectral Library 06 and save the
+        results to a file.
 
-    # open the image
-    image = spectral.open_image(imageFilename)
-    data = image.asarray()
-    M = image.shape[0]
-    N = image.shape[1]
+        Args:
+           imageFilename (str):      filename of the image to be classified
+           libraryFilename (str):    filename of the spectral library
+           classifiedFilename (str): filename of the classified image
 
-    # open the library
-    library = spectral.open_image(libraryFilename)
+        Returns:
+            None
+        """
 
-    # define a resampler
-    # TODO detect and scale units
-    # TODO band resampler should do this
-    resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
+        # open the image
+        image = spectral.open_image(imageFilename)
+        data = image.asarray()
+        M = image.shape[0]
+        N = image.shape[1]
+
+        # open the library
+        library = spectral.open_image(libraryFilename)
+
+        # define a resampler
+        # TODO detect and scale units
+        # TODO band resampler should do this
+        resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
                                       library.bands.centers)
 
-    # allocate a zero-initialized MxN array for the classified image
-    classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+        # allocate a zero-initialized MxN array for the classified image
+        classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
 
-    # for each pixel in the image
-    for x in xrange(M):
+        # for each pixel in the image
+        for x in xrange(M):
 
-        for y in xrange(N):
+            for y in xrange(N):
 
-            # read the pixel from the file
-            pixel = data[x,y]
+                # read the pixel from the file
+                pixel = data[x,y]
 
-            # if it is not a no data pixel
-            if not numpy.isclose(pixel[0], -0.005):
+                # if it is not a no data pixel
+                if not numpy.isclose(pixel[0], -0.005):
 
-                # resample the pixel ignoring NaNs from target bands that don't overlap
-                # TODO fix spectral library so that bands are in order
-                resampledPixel = numpy.nan_to_num(resample(pixel))
+                    # resample the pixel ignoring NaNs from target bands that don't overlap
+                    # TODO fix spectral library so that bands are in order
+                    resampledPixel = numpy.nan_to_num(resample(pixel))
 
-                # calculate spectral angles
-                angles = spectral.spectral_angles(resampledPixel[numpy.newaxis,
-                                                                 numpy.newaxis,
-                                                                 ...],
-                                                  library.spectra)
+                    # calculate spectral angles
+                    angles = spectral.spectral_angles(resampledPixel[numpy.newaxis,
+                                                                     numpy.newaxis,
+                                                                     ...],
+                                                      library.spectra)
 
-                # get classification
-                classified[x,y] = numpy.argmin(angles) + 1
+                    # get classification
+                    classified[x,y] = numpy.argmin(angles) + 1
 
-    # save the classified image to a file
-    spectral.io.envi.save_classification(classifiedFilename,
-                                         classified,
-                                         class_names=['No data']+library.names,
-                                         metadata={
-                                             'data ignore value': 0,
-                                             'description': 'Mineral classified image.',
-                                             'map info': image.metadata.get('map info')
-                                         })
+        # save the classified image to a file
+        spectral.io.envi.save_classification(classifiedFilename,
+                                             classified,
+                                             class_names=['No data']+library.names,
+                                             metadata={
+                                                 'data ignore value': 0,
+                                                 'description': 'Mineral classified image.',
+                                                 'map info': image.metadata.get('map info')
+                                             })
