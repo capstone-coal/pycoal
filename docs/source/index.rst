@@ -22,9 +22,9 @@ Contents:
 
    introduction
    quickstart
-   mineral_classification
-   mining_classification
-   environmental_correlation
+   mineral
+   mining
+   environment
 
 Indices and tables
 ==================
