@@ -15,19 +15,24 @@ import spectral
 
 class MineralClassification:
 
-    def __init__(self):
-        pass
-
-    def classifyImage(imageFilename, libraryFilename, classifiedFilename):
+    def __init__(self, libraryFilename):
         """
-        Classify minerals in an AVIRIS image using spectral angle mapper
-        classification with the USGS Digital Spectral Library 06 and save the
-        results to a file.
+        Construct a new MineralClassification object with the USGS Digital
+        Spectral Library 06.
 
         Args:
-           imageFilename (str):      filename of the image to be classified
-           libraryFilename (str):    filename of the spectral library
-           classifiedFilename (str): filename of the classified image
+            libraryFilename (str):    filename of the spectral library
+        """
+        self.library = spectral.open_image(libraryFilename)
+
+    def classifyImage(self, imageFilename, classifiedFilename):
+        """
+        Classify minerals in an AVIRIS image using spectral angle mapper
+        classification and save the results to a file.
+
+        Args:
+            imageFilename (str):      filename of the image to be classified
+            classifiedFilename (str): filename of the classified image
 
         Returns:
             None
@@ -39,14 +44,11 @@ class MineralClassification:
         M = image.shape[0]
         N = image.shape[1]
 
-        # open the library
-        library = spectral.open_image(libraryFilename)
-
         # define a resampler
         # TODO detect and scale units
         # TODO band resampler should do this
         resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
-                                      library.bands.centers)
+                                      self.library.bands.centers)
 
         # allocate a zero-initialized MxN array for the classified image
         classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
@@ -70,7 +72,7 @@ class MineralClassification:
                     angles = spectral.spectral_angles(resampledPixel[numpy.newaxis,
                                                                      numpy.newaxis,
                                                                      ...],
-                                                      library.spectra)
+                                                      self.library.spectra)
 
                     # get classification
                     classified[x,y] = numpy.argmin(angles) + 1
@@ -78,7 +80,7 @@ class MineralClassification:
         # save the classified image to a file
         spectral.io.envi.save_classification(classifiedFilename,
                                              classified,
-                                             class_names=['No data']+library.names,
+                                             class_names=['No data']+self.library.names,
                                              metadata={
                                                  'data ignore value': 0,
                                                  'description': 'Mineral classified image.',
