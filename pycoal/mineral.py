@@ -62,7 +62,7 @@ class MineralClassification:
                 pixel = data[x,y]
 
                 # if it is not a no data pixel
-                if not numpy.isclose(pixel[0], -0.005):
+                if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
 
                     # resample the pixel ignoring NaNs from target bands that don't overlap
                     # TODO fix spectral library so that bands are in order
