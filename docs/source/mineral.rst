@@ -15,5 +15,5 @@
 pycoal mineral classification API
 *********************************
 
-.. autoclass:: mineral.CLASSIFY
+.. autoclass:: mineral.MineralClassification
     :members:

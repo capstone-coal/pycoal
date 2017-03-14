@@ -15,5 +15,5 @@
 pycoal mining classification API
 ********************************
 
-.. autoclass:: mining.CLASSIFY
+.. autoclass:: mining.MiningClassification
     :members:
