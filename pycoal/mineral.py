@@ -48,7 +48,7 @@ class MineralClassification:
         # TODO detect and scale units
         # TODO band resampler should do this
         resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
-                                      self.library.bands.centers)
+                                          self.library.bands.centers)
 
         # allocate a zero-initialized MxN array for the classified image
         classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
