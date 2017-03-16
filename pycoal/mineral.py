@@ -17,8 +17,9 @@ class MineralClassification:
 
     def __init__(self, libraryFilename):
         """
-        Construct a new MineralClassification object with the USGS Digital
-        Spectral Library 06.
+        Construct a new MineralClassification object with the `USGS Digital
+        Spectral Library 06 <https://speclab.cr.usgs.gov/spectral.lib06/>`_
+        in ENVI format.
 
         Args:
             libraryFilename (str):    filename of the spectral library
