@@ -12,6 +12,7 @@
 
 import numpy
 import spectral
+import pycoal
 
 class MineralClassification:
 
@@ -84,6 +85,6 @@ class MineralClassification:
                                              class_names=['No data']+self.library.names,
                                              metadata={
                                                  'data ignore value': 0,
-                                                 'description': 'Mineral classified image.',
+                                                 'description': 'PyCOAL '+pycoal.version+' mineral classified image.',
                                                  'map info': image.metadata.get('map info')
                                              })
