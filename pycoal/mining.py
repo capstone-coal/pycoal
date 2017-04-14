@@ -10,103 +10,66 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO shrink not overlap ? pixel subset ?
-
-# TODO use spectral or gdal/orfeo for dataset manipulation and machine learning ?
-
-# TODO reuse saveClassifier, readClassifier ?
-
+import spectral
 import pycoal
+import numpy
 
 class MiningClassification:
 
-    def generateTrainingData(miningFilename, mineralFilename, trainingFilename):
-
+    def __init__(self, classNames=None):
         """
-        Generate training data for mining classification by comparing a GIS mining map with the region surrounding each pixel in a mineral-classified image and writing the result to a file.
-        """
+        Construct a new MiningClassification object given a list of spectral
+        class names corresponding to mines or other features.
 
-        # define function to select the mining layer
-        def miningLayer(miningDataset):
-
-            return ???
-
-        # define raster function to classify mineral regions with known mines
-        def pixelNeighbors(miningDataset, mineralDataset, resultDataset):
-
-            # TODO represent as dataset or array ?
-
-            # for each pixel in the mining and mineral-classified datasets
-            for ???:
-
-                # get the region surrounding the mineral-classified pixel as a multiband pixel
-                mineralRegion = getRegionAsMultibandPixel(mineralDataset, x, y)
-
-                # get the mining pixel
-                miningPixel = ???
-
-                # classify the region with the mining pixel
-                ???
-
-        # generate and save the training data
-        pycoal.GISProcessing.gis.combine(pixelNeighbors, miningLayer, miningFilename, mineralFilename, trainingFilename)
-
-    def trainMiningClassifier(miningFilename, mineralFilename):
-
-        """
-        Return a trained mining classifier given a mineral classified image and a GIS mining map.
+        Args:
+            classes (str[]): list of class names to identify.
         """
 
-        # generate training data in a temporary file
-        trainingFilename = ???
-        generateTrainingData(mineralFilename, miningFilename, trainingFilename)
+        self.classNames = classNames
 
-        # load training data
-        trainingData = ???(trainingFilename)
-
-        # initialize and train a neural network using the training data
-        ???(trainingData)
-
-        # TODO delete temporary file ?
-
-        # return trained mining clasifier
-        return classifier
-
-    def classifyRegion(mineralRegion, miningClassifier):
+    def classifyImage(self, imageFilename, classifiedFilename):
 
         """
+        Classify mines or other features in a Pycoal classified image by copying
+        relevant pixels and discarding the rest in a new file.
+
+        Args:
+            imageFilename (str):      filename of the image to be classified
+            classifiedFilename (str): filename of the classified image
+
+        Returns:
+            None
         """
 
-        return ???
+        # open the image
+        image = spectral.open_image(imageFilename)
+        data = image.asarray()
+        M = image.shape[0]
+        N = image.shape[1]
 
-    def classifyImage(mineralFilename, miningClassifier, miningFilename):
+        # allocate a zero-initialized MxN array for the classified image
+        classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
 
-        """
-        Classify a mineral-classified image using a trained mining classifier and save the results to a file.
-        """
+        # get class numbers from names
+        classNums = [image.metadata.get('class names').index(className) for className in self.classNames]
 
-        # open the mineral-classified image
+        # for each pixel in the image
+        for y in xrange(N):
 
-        # allocate an MxN array for the mining-classified image
-        classifiedImage = numpy.ndarray(???)
+            for x in xrange(M):
 
-        # for each pixel in the mineral-classified image
-        for ???:
+                pixel = data[x,y]
 
-            # get the surrounding region as a multiband pixel
-            mineralRegion = getRegionAsMultibandPixel(mineralDataset, x, y)
+                if pixel[0] in classNums:
 
-            # classify it
-            classifiedImage[???] = classifyRegion(mineralRegion, miningClassifier)
+                    classified[x,y] = 1 + classNums.index(pixel[0])
 
-        # save the mining-classified image to a file
-
-    def getRegionAsMultibandPixel(image, x, y):
-
-        """
-        Return a multiband pixel representing the region in an image surrounding a given pixel.
-        """
-
-        # get the surrounding region
-
-        # represent the region as a multiband pixel
+        # save the classified image to a file
+        spectral.io.envi.save_classification(classifiedFilename,
+                                             classified,
+                                             class_names=['No data']+self.classNames,
+                                             metadata={
+                                                 'data ignore value': 0,
+                                                 'description': 'PyCOAL '+pycoal.version+' mining classified image.',
+                                                 'map info': image.metadata.get('map info')
+                                             })
