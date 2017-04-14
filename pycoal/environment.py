@@ -10,27 +10,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pycoal
+# import pycoal
 
-class EnvironmentalCorrelation:
+# class EnvironmentalCorrelation:
 
-    def correlateMiningEnvironment(environmentFilename, miningFilename, outputFilename):
+#     def correlateMiningEnvironment(environmentFilename, miningFilename, outputFilename):
 
-        """
-        Correlate environmental impact GIS data with classified mines and save the result to a file.
-        """
+#         """
+#         Correlate environmental impact GIS data with classified mines and save the result to a file.
+#         """
 
-        # define function to select the environmental impact layer
-        def impactLayer(environmentDataset):
+#         # define function to select the environmental impact layer
+#         def impactLayer(environmentDataset):
 
-            ???
+#             ???
 
-            return impactDataset
+#             return impactDataset
 
-        # define raster function to correlate environmental impact with classified mines
-        def correlate(impactDataset, miningDataset, outputDataset):
+#         # define raster function to correlate environmental impact with classified mines
+#         def correlate(impactDataset, miningDataset, outputDataset):
 
-            ???
+#             ???
 
-        # apply the correlation and save the result
-        pycoal.gis.GISProcessing.combine(correlate, impactLayer, environmentFilename, miningFilename, outputFilename)
+#         # apply the correlation and save the result
+#         pycoal.gis.GISProcessing.combine(correlate, impactLayer, environmentFilename, miningFilename, outputFilename)
