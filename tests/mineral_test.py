@@ -15,4 +15,38 @@ import spectral
 import numpy
 
 def test_classifyImage():
-    pass
+    """
+    This function tests the method "classifyImage" from the "mineral" class.
+    Args:
+        None
+    Returns:
+        None
+    """
+    lib_file = "/home/claytonh/Downloads/USGS/s06av95a_envi.hdr"
+
+    tst_class = mineral.MineralClassification(lib_file)
+
+    # make sure library is being opened as such
+    assert isinstance(tst_class.library, spectral.io.envi.SpectralLibrary)
+
+    raw_filename = "/home/claytonh/Downloads/raw/ang20140912t192359_corr_v1c_img.hdr"
+    class_filename = "/home/claytonh/Downloads/classified/ang20140912t192359_corr_v1c_img_class.hdr"
+
+    #classify image
+    #tst_class.classifyImage(raw_filename, class_filename)
+
+    raw_image = spectral.open_image(raw_filename)
+    class_image = spectral.open_image(class_filename)
+    library_image = spectral.open_image(lib_file)
+
+    # make sure shape is consistent between raw and classified
+    assert raw_image.nrows == class_image.nrows
+    assert raw_image.ncols == class_image.ncols
+
+    # make sure number of classes in classified image is consistent with library
+    assert int(class_image.metadata.get(u'classes')) == len(library_image.names) + 1
+
+    
+
+
+test_classifyImage()
