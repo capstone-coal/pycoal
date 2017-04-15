@@ -56,6 +56,12 @@ $ cd docs/source && make html
 ```
 Documentation can then be located in ```_build/html/index.html```
 
+# Tests
+Pycoal uses the popular [nose](http://nose.readthedocs.io/en/latest/testing.html) testing framework. Tests can be run as follows
+```
+$ nosetests
+```
+
 # Community and Development
 
 ## Mailing list
