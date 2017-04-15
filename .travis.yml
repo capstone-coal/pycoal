@@ -26,10 +26,10 @@ install:
   - sudo apt-get update
   - sudo apt-get -y install python-dev python-pip
   - python setup.py install
-  - pip install spectral pylint
+  - pip install spectral #pylint
 script:
   - nosetests  --with-coverage --cover-package=podaac -v
-  - pylint pycoal
+  #- pylint pycoal
 after_success: # Generate coverage reports only on success
   - coveralls
 deploy: # Runs on every commit to master branch
