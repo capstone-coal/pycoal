@@ -56,9 +56,9 @@ class MineralClassification:
         classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
 
         # for each pixel in the image
-        for x in xrange(M):
+        for x in range(M):
 
-            for y in xrange(N):
+            for y in range(N):
 
                 # read the pixel from the file
                 pixel = data[x,y]
