@@ -134,21 +134,31 @@ class MineralClassification:
         # update the metadata
         rgbMetadata = image.metadata
         rgbMetadata['description'] = 'PyCOAL '+pycoal.version+' three-band RGB image.'
-        rgbMetadata['wavelength'] = [wavelengthStrings[redIndex],
-                                     wavelengthStrings[greenIndex],
-                                     wavelengthStrings[blueIndex]]
-        rgbMetadata['correction factors'] = [image.metadata.get('correction factors')[redIndex],
-                                             image.metadata.get('correction factors')[greenIndex],
-                                             image.metadata.get('correction factors')[blueIndex]]
-        rgbMetadata['fwhm'] = [image.metadata.get('fwhm')[redIndex],
-                               image.metadata.get('fwhm')[greenIndex],
-                               image.metadata.get('fwhm')[blueIndex]]
-        rgbMetadata['bbl'] = [image.metadata.get('bbl')[redIndex],
-                              image.metadata.get('bbl')[greenIndex],
-                              image.metadata.get('bbl')[blueIndex]]
-        rgbMetadata['smoothing factors'] = [image.metadata.get('smoothing factors')[redIndex],
-                                            image.metadata.get('smoothing factors')[greenIndex],
-                                            image.metadata.get('smoothing factors')[blueIndex]]
+        if wavelengthStrings:
+            rgbMetadata['wavelength'] = [
+                wavelengthStrings[redIndex],
+                wavelengthStrings[greenIndex],
+                wavelengthStrings[blueIndex]]
+        if image.metadata.get('correction factors'):
+            rgbMetadata['correction factors'] = [
+                image.metadata.get('correction factors')[redIndex],
+                image.metadata.get('correction factors')[greenIndex],
+                image.metadata.get('correction factors')[blueIndex]]
+        if image.metadata.get('fwhm'):
+            rgbMetadata['fwhm'] = [
+                image.metadata.get('fwhm')[redIndex],
+                image.metadata.get('fwhm')[greenIndex],
+                image.metadata.get('fwhm')[blueIndex]]
+        if image.metadata.get('bbl'):
+            rgbMetadata['bbl'] = [
+                image.metadata.get('bbl')[redIndex],
+                image.metadata.get('bbl')[greenIndex],
+                image.metadata.get('bbl')[blueIndex]]
+        if image.metadata.get('smoothing factors'):
+            rgbMetadata['smoothing factors'] = [
+                image.metadata.get('smoothing factors')[redIndex],
+                image.metadata.get('smoothing factors')[greenIndex],
+                image.metadata.get('smoothing factors')[blueIndex]]
 
         # save the three-band RGB image to a file
         spectral.envi.save_image(rgbImageFilename, rgb, metadata=rgbMetadata)
