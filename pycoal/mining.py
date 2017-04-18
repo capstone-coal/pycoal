@@ -54,9 +54,9 @@ class MiningClassification:
         classNums = [image.metadata.get('class names').index(className) for className in self.classNames]
 
         # for each pixel in the image
-        for y in xrange(N):
+        for y in range(N):
 
-            for x in xrange(M):
+            for x in range(M):
 
                 pixel = data[x,y]
 
