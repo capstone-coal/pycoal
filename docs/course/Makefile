@@ -36,6 +36,9 @@ presentation.pdf :
 presentation-winter.pdf :
 	./build.sh presentation-winter/presentation-winter.ltx presentation-winter
 
+presentation-winter-final.pdf :
+	./build.sh presentation-winter-final/presentation-winter-final.ltx presentation-winter-final
+
 problem-statement-student.pdf :
 	./build.sh problem-statement-student/problem-statement-student.ltx problem-statement-student
 
