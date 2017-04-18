@@ -116,7 +116,7 @@ class MineralClassification:
 
         # load the list of wavelengths as floats
         wavelengthStrings = image.metadata.get('wavelength')
-        wavelengthFloats = map(float, wavelengthStrings)
+        wavelengthFloats = list(map(float, wavelengthStrings))
 
         # find the index of the red, green, and blue bands
         redIndex = indexOfGreaterThan(wavelengthFloats, red)
