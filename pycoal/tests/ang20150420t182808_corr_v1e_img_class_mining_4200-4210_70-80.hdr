@@ -1,0 +1,16 @@
+ENVI
+description = {
+  PyCOAL 0.2 mining classified image.}
+samples = 10
+lines = 10
+bands = 1
+header offset = 0
+file type = ENVI Standard
+data type = 12
+interleave = bip
+byte order = 0
+map info = { UTM , 1.000 , 1.000 , 724440.117 , 4077192.168 , 1.1000000000e+00 , 1.1000000000e+00 , 12 , North , WGS-84 , units=Meters , rotation=75.00000000 }
+class names = { No data , Schwertmannite BZ93-1 s06av95a=b , Renyolds_TnlSldgWet SM93-15w s06av95a=a , Renyolds_Tnl_Sludge SM93-15 s06av95a=a }
+classes = 4
+data ignore value = 0
+class lookup = { 0 , 0 , 0 , 255 , 0 , 0 , 0 , 255 , 0 , 0 , 0 , 255 }
