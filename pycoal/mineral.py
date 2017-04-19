@@ -89,6 +89,46 @@ class MineralClassification:
                                                  'map info': image.metadata.get('map info')
                                              })
 
+        # remove unused classes from the image
+        pycoal.mineral.MineralClassification.filterClasses(classifiedFilename)
+
+    @staticmethod
+    def filterClasses(classifiedFilename):
+        """
+        Modify a classified image to remove unused classes.
+
+        Args:
+            classifiedFilename (str): file of the classified image
+
+        Returns:
+            None
+        """
+
+        # open the image
+        classified = spectral.open_image(classifiedFilename)
+        data = classified.asarray()
+        M = classified.shape[0]
+        N = classified.shape[1]
+
+        # allocate a copy for reindexed pixels
+        copy = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+
+        # find classes actually present in the image
+        classes = sorted(set(classified.asarray().flatten().tolist()))
+        lookup = [classes.index(i) if i in classes else 0 for i in range(int(classified.metadata.get('classes')))]
+
+        # reindex each pixel
+        for x in range(M):
+            for y in range(N):
+                copy[x,y] = lookup[data[x,y,0]]
+
+        # overwrite the file
+        spectral.io.envi.save_classification(classifiedFilename,
+                                             copy,
+                                             force=True,
+                                             class_names=[classified.metadata.get('class names')[i] for i in classes],
+                                             metadata=classified.metadata)
+
     @staticmethod
     def toRGB(imageFilename, rgbImageFilename, red=680.0, green=532.5, blue=472.5):
         """

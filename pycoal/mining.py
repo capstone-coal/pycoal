@@ -51,7 +51,8 @@ class MiningClassification:
         classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
 
         # get class numbers from names
-        classNums = [image.metadata.get('class names').index(className) for className in self.classNames]
+        classList = image.metadata.get('class names')
+        classNums = [classList.index(className) if className in classList else -1 for className in self.classNames]
 
         # for each pixel in the image
         for y in range(N):
