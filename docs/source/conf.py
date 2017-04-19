@@ -61,8 +61,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pycoal'
-copyright = u'2017, Lewis John McGibbney, Taylor Brown, Heidi Clayton, and Xiaomei Wang'
-author = u'Lewis John McGibbney, Taylor Brown, Heidi Clayton, and Xiaomei Wang'
+copyright = u'2017, Lewis John McGibbney, Taylor Alexander Brown, Heidi Clayton, and Xiaomei Wang'
+author = u'Lewis John McGibbney, Taylor Alexander Brown, Heidi Clayton, and Xiaomei Wang'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -272,7 +272,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'COAL.tex', u'COAL Documentation',
-     u'Lewis John McGibbney, Kim D. Whitehall, Taylor Brown, Heidi Clayton, and Xiaomei Wang', 'manual'),
+     u'Lewis John McGibbney, Kim D. Whitehall, Taylor Alexander Brown, Heidi Clayton, and Xiaomei Wang', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
