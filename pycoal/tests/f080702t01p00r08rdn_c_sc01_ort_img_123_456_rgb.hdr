@@ -1,0 +1,16 @@
+ENVI
+description = {
+  PyCOAL 0.2 three-band RGB image.}
+samples = 1
+lines = 1
+bands = 3
+header offset = 0
+file type = ENVI Standard
+data type = 2
+interleave = bip
+byte order = 0
+map info = { UTM , 1 , 1 , 663139.010 , 4406866.600 , 16.400 , 16.400 , 17 , North , WGS-84 , units=Meters , rotation=-27.0000 }
+y start = 1
+x start = 1
+wavelength = { 684.6979 , 540.5568 , 482.1898 }
+fwhm = { 9.758482 , 9.205512 , 9.339684 }
