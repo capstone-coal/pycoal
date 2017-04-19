@@ -1,0 +1,19 @@
+ENVI
+description = {
+  PyCOAL 0.2 three-band RGB image.}
+samples = 1
+lines = 1
+bands = 3
+header offset = 0
+file type = ENVI Standard
+data type = 4
+interleave = bip
+sensor type = Unknown
+byte order = 0
+map info = { UTM , 1.000 , 1.000 , 736600.089 , 4078126.750 , 2.7000000000e+00 , 2.7000000000e+00 , 12 , North , WGS-84 , units=Meters , rotation=-66.00000000 }
+wavelength units = Nanometers
+correction factors = { 0.928583 , 0.932706 , 0.997332 }
+wavelength = { 681.8804678 , 536.6290378 , 476.5249978 }
+fwhm = { 5.71676 , 5.66235 , 5.63275 }
+bbl = { 1.0 , 1.0 , 1.0 }
+smoothing factors = { 1.0 , 1.0 , 1.0 }

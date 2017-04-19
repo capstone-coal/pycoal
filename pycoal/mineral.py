@@ -128,3 +128,77 @@ class MineralClassification:
                                              force=True,
                                              class_names=[classified.metadata.get('class names')[i] for i in classes],
                                              metadata=classified.metadata)
+
+    @staticmethod
+    def toRGB(imageFilename, rgbImageFilename, red=680.0, green=532.5, blue=472.5):
+        """
+        Generate a three-band RGB image from an AVIRIS image and save it to a file.
+
+        Args:
+            imageFilename (str):     filename of the source image
+            rgbImageFilename (str):  filename of the three-band RGB image
+            red (float, optional):   wavelength in nanometers of the red band
+            green (float, optional): wavelength in nanometers of the green band
+            blue (float, optional):  wavelength in nanometers of the blue band
+
+        Returns:
+            None
+        """
+
+        # find the index of the first element in a list greater than the value
+        def indexOfGreaterThan(elements, value):
+            for index,element in enumerate(elements):
+                if element > value:
+                    return index
+
+        # open the image
+        image = spectral.open_image(imageFilename)
+
+        # load the list of wavelengths as floats
+        wavelengthStrings = image.metadata.get('wavelength')
+        wavelengthFloats = list(map(float, wavelengthStrings))
+
+        # find the index of the red, green, and blue bands
+        redIndex = indexOfGreaterThan(wavelengthFloats, red)
+        greenIndex = indexOfGreaterThan(wavelengthFloats, green)
+        blueIndex = indexOfGreaterThan(wavelengthFloats, blue)
+
+        # read the red, green, and blue bands from the image
+        redBand = image[:,:,redIndex]
+        greenBand = image[:,:,greenIndex]
+        blueBand = image[:,:,blueIndex]
+
+        # combine the red, green, and blue bands into a three-band RGB image
+        rgb = numpy.concatenate([redBand,greenBand,blueBand], axis=2)
+
+        # update the metadata
+        rgbMetadata = image.metadata
+        rgbMetadata['description'] = 'PyCOAL '+pycoal.version+' three-band RGB image.'
+        if wavelengthStrings:
+            rgbMetadata['wavelength'] = [
+                wavelengthStrings[redIndex],
+                wavelengthStrings[greenIndex],
+                wavelengthStrings[blueIndex]]
+        if image.metadata.get('correction factors'):
+            rgbMetadata['correction factors'] = [
+                image.metadata.get('correction factors')[redIndex],
+                image.metadata.get('correction factors')[greenIndex],
+                image.metadata.get('correction factors')[blueIndex]]
+        if image.metadata.get('fwhm'):
+            rgbMetadata['fwhm'] = [
+                image.metadata.get('fwhm')[redIndex],
+                image.metadata.get('fwhm')[greenIndex],
+                image.metadata.get('fwhm')[blueIndex]]
+        if image.metadata.get('bbl'):
+            rgbMetadata['bbl'] = [
+                image.metadata.get('bbl')[redIndex],
+                image.metadata.get('bbl')[greenIndex],
+                image.metadata.get('bbl')[blueIndex]]
+        if image.metadata.get('smoothing factors'):
+            rgbMetadata['smoothing factors'] = [
+                image.metadata.get('smoothing factors')[redIndex],
+                image.metadata.get('smoothing factors')[greenIndex],
+                image.metadata.get('smoothing factors')[blueIndex]]
+
+        # save the three-band RGB image to a file
+        spectral.envi.save_image(rgbImageFilename, rgb, metadata=rgbMetadata)
