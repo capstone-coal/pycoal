@@ -25,6 +25,10 @@ test_filterClasses_Image = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_4
 test_filterClasses_testFilename = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80_filtered.hdr'
 test_filterClasses_testImage = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80_filtered.img'
 
+# test files for the classifyImage test
+test_classifyImage_testFilename_1 = "ang20140912t192359_corr_v1c_img_400-410_10-20.hdr"
+test_classifyImage_classifiedFilename_1 = "ang20140912t192359_corr_v1c_img_400-410_10-20_class.hdr"
+
 # set up filterClasses test by copying classified image
 def _test_filterClasses_setup():
     shutil.copyfile(test_filterClasses_Filename, test_filterClasses_testFilename)
@@ -112,3 +116,29 @@ def test_toRGB_AVC():
     assert expected.metadata.get('fwhm') == actual.metadata.get('fwhm')
     assert expected.metadata.get('bbl') == actual.metadata.get('bbl')
     assert expected.metadata.get('smoothing factors') == actual.metadata.get('smoothing factors')
+
+
+# verify that classified images have valid classifications
+def test_classifyImage():
+    # TODO: get correct download link
+    lib = "/home/claytonh/Downloads/USGS/s06av95a_envi.hdr"
+
+    tst_cls = pycoal.mineral.MineralClassification(lib)
+
+    # make sure library is being opened as such
+    assert isinstance(tst_cls.library, spectral.io.envi.SpectralLibrary)
+
+    tst_cls.classifyImage(test_classifyImage_testFilename_1, test_classifyImage_classifiedFilename_1)
+
+    classified = spectral.open_image(test_classifyImage_classifiedFilename_1)
+
+    # access classified pixels
+    cls_memmap = classified.open_memmap()
+
+    # assert there are no invalid class numbers
+    for i in cls_memmap:
+        for j in i:
+            assert 0 <= j[0] <= tst_cls.library.names + 1
+
+    # TODO: generate two more test images
+
