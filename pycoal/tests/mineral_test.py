@@ -26,8 +26,8 @@ test_filterClasses_testFilename = 'pycoal/tests/ang20150420t182808_corr_v1e_img_
 test_filterClasses_testImage = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80_filtered.img'
 
 # test files for the classifyImage test
-test_classifyImage_testFilename_1 = "ang20140912t192359_corr_v1c_img_400-410_10-20.hdr"
-test_classifyImage_classifiedFilename_1 = "ang20140912t192359_corr_v1c_img_400-410_10-20_class.hdr"
+test_classifyImage_testFilename_1 = "pycoal/tests/ang20140912t192359_corr_v1c_img_400-410_10-20.hdr"
+test_classifyImage_classifiedFilename_1 = "pycoal/tests/ang20140912t192359_corr_v1c_img_400-410_10-20_class.hdr"
 
 # set up filterClasses test by copying classified image
 def _test_filterClasses_setup():
@@ -138,7 +138,7 @@ def test_classifyImage():
     # assert there are no invalid class numbers
     for i in cls_memmap:
         for j in i:
-            assert 0 <= j[0] <= tst_cls.library.names + 1
+            assert 0 <= j[0] <= len(tst_cls.library.names) + 1
 
     # TODO: generate two more test images
 
