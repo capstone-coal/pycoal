@@ -117,6 +117,7 @@ def test_toRGB_AVC():
 #TODO use an AVIRIS-NG image for two test cases
 test_classifyImage_testFilename_1 = "pycoal/tests/ang20140912t192359_corr_v1c_img_400-410_10-20.hdr"
 test_classifyImage_testFilename_2 = "pycoal/tests/ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr"
+test_classifyImage_testFilename_3 = "pycoal/tests/ang20150422t163638_corr_v1e_img_4000-4010_550-560.hdr"
 
 ftp_url = "ftp://ftpext.cr.usgs.gov/"
 library_files = ["s06av95a_envi.hdr", "s06av95a_envi.sli"]
@@ -127,6 +128,8 @@ def _test_classifyImage_teardown():
              test_classifyImage_testFilename_1[:-4] + "_class.img",
              test_classifyImage_testFilename_2[:-4] + "_class.hdr",
              test_classifyImage_testFilename_2[:-4] + "_class.img",
+             test_classifyImage_testFilename_3[:-4] + "_class.hdr",
+             test_classifyImage_testFilename_3[:-4] + "_class.img",
              "pycoal/tests/" + library_files[0],
              "pycoal/tests/" + library_files[1]]
 
@@ -156,7 +159,7 @@ def test_classifyImage():
     # make sure library is being opened as such
     assert isinstance(tst_cls.library, spectral.io.envi.SpectralLibrary)
 
-    for f in (test_classifyImage_testFilename_1, test_classifyImage_testFilename_2):
+    for f in (test_classifyImage_testFilename_1, test_classifyImage_testFilename_2, test_classifyImage_testFilename_3):
         tst_cls.classifyImage(f, f[:-4] + "_class.hdr")
 
         classified = spectral.open_image(f[:-4] + "_class.hdr")
