@@ -18,7 +18,6 @@ import numpy
 import spectral
 from pycoal import mineral
 import ftplib
-import urlparse
 
 # test files for filterClasses test
 test_filterClasses_Filename = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
@@ -141,8 +140,7 @@ def _test_classifyImage_teardown():
 # verify that classified images have valid classifications
 @with_setup(None, _test_classifyImage_teardown)
 def test_classifyImage():
-    url = urlparse.urlparse(ftp_url)
-    ftp = ftplib.FTP(url.netloc)
+    ftp = ftplib.FTP("ftpext.cr.usgs.gov")
     ftp.login()
 
     ftp.cwd("pub/cr/co/denver/speclab/pub/spectral.library/splib06.library/Convolved.libraries/")
