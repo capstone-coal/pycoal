@@ -17,7 +17,8 @@ import shutil
 import numpy
 import spectral
 from pycoal import mineral
-import urllib2 as urllib
+import ftplib
+import urlparse
 
 # test files for filterClasses test
 test_filterClasses_Filename = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
@@ -118,9 +119,8 @@ def test_toRGB_AVC():
 test_classifyImage_testFilename_1 = "pycoal/tests/ang20140912t192359_corr_v1c_img_400-410_10-20.hdr"
 test_classifyImage_testFilename_2 = "pycoal/tests/ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr"
 
-library_files = ["ftp://ftpext.cr.usgs.gov/pub/cr/co/denver/speclab/pub/spectral.library/splib06.library/Convolved.libraries/s06av95a_envi.hdr",
-                 "ftp://ftpext.cr.usgs.gov/pub/cr/co/denver/speclab/pub/spectral.library/splib06.library/Convolved.libraries/s06av95a_envi.sli"]
-
+ftp_url = "ftp://ftpext.cr.usgs.gov/"
+library_files = ["s06av95a_envi.hdr", "s06av95a_envi.sli"]
 
 # delete temporary files
 def _test_classifyImage_teardown():
@@ -128,7 +128,8 @@ def _test_classifyImage_teardown():
              test_classifyImage_testFilename_1[:-4] + "_class.img",
              test_classifyImage_testFilename_2[:-4] + "_class.hdr",
              test_classifyImage_testFilename_2[:-4] + "_class.img",
-             library_files[0][-17:], library_files[1][-17:]]
+             "pycoal/tests/" + library_files[0],
+             "pycoal/tests/" + library_files[1]]
 
     for f in files:
         try:
@@ -140,13 +141,18 @@ def _test_classifyImage_teardown():
 # verify that classified images have valid classifications
 @with_setup(None, _test_classifyImage_teardown)
 def test_classifyImage():
+    url = urlparse.urlparse(ftp_url)
+    ftp = ftplib.FTP(url.netloc)
+    ftp.login()
+
+    ftp.cwd("pub/cr/co/denver/speclab/pub/spectral.library/splib06.library/Convolved.libraries/")
+
     for f in library_files:
-        url = urllib.urlopen(f)
+        print f
+        with open("pycoal/tests/" + f, "wb") as lib_f:
+            ftp.retrbinary('RETR %s' % f, lib_f.write)
 
-        with open(f[-17:], "wb") as lib_f:
-            lib_f.write(url.read())
-
-    lib = "s06av95a_envi.hdr"
+    lib = "pycoal/tests/s06av95a_envi.hdr"
 
     tst_cls = mineral.MineralClassification(lib)
 
