@@ -114,8 +114,10 @@ def test_toRGB_AVC():
     assert expected.metadata.get('smoothing factors') == actual.metadata.get('smoothing factors')
 
 # test files for the classifyImage test
-test_classifyImage_testFilename_1 = "pycoal/tests/ang20140912t192359_corr_v1c_img_400-410_10-20.hdr"
-test_classifyImage_classifiedFilename_1 = "pycoal/tests/ang20140912t192359_corr_v1c_img_400-410_10-20_class.hdr"
+#TODO use an AVIRIS-NG image for two test cases
+test_classifyImage_testFilename_1 = "ang20140912t192359_corr_v1c_img_400-410_10-20.hdr"
+test_classifyImage_testFilename_2 = "ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr"
+
 
 # verify that classified images have valid classifications
 def test_classifyImage():
@@ -127,12 +129,28 @@ def test_classifyImage():
     # make sure library is being opened as such
     assert isinstance(tst_cls.library, spectral.io.envi.SpectralLibrary)
 
-    tst_cls.classifyImage(test_classifyImage_testFilename_1, test_classifyImage_classifiedFilename_1)
+    for f in (test_classifyImage_testFilename_1, test_classifyImage_testFilename_2):
+        tst_cls.classifyImage(f, f[:-4] + "_class.hdr")
 
-    classified = spectral.open_image(test_classifyImage_classifiedFilename_1)
+        classified = spectral.open_image(f[:-4] + "_class.hdr")
 
-    # assert there are no invalid class numbers
-    for i in classified.asarray().flatten():
-        assert 0 <= i <= len(tst_cls.library.names) + 1
+        # assert there are no invalid class numbers
+        for i in classified.asarray().flatten():
+            assert 0 <= i <= len(tst_cls.library.names) + 1
 
-    # TODO: generate two more test images
+    clean_up()
+
+
+def clean_up():
+    files = [test_classifyImage_testFilename_1[:-4] + "_class.hdr",
+             test_classifyImage_testFilename_1[:-4] + "_class.img",
+             test_classifyImage_testFilename_2[:-4] + "_class.hdr",
+             test_classifyImage_testFilename_2[:-4] + "_class.img"]
+
+    for f in files:
+        try:
+            os.remove(f)
+        except OSError:
+            pass
+
+test_classifyImage()
