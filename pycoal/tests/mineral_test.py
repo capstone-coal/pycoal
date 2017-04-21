@@ -16,8 +16,8 @@ import os
 import shutil
 import numpy
 import spectral
-import pycoal
-import pycoal.mineral
+from pycoal import mineral
+import urllib2 as urllib
 
 # test files for filterClasses test
 test_filterClasses_Filename = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
@@ -41,7 +41,7 @@ def _test_filterClasses_teardown():
 # verify that filterClasses removes unused classes and reindexes correctly
 @with_setup(_test_filterClasses_setup, _test_filterClasses_teardown)
 def test_filterClasses():
-    pycoal.mineral.MineralClassification.filterClasses(test_filterClasses_testFilename)
+    mineral.MineralClassification.filterClasses(test_filterClasses_testFilename)
     original = spectral.open_image(test_filterClasses_Filename)
     filtered = spectral.open_image(test_filterClasses_testFilename)
     assert int(filtered.metadata.get('classes')) == len(set(original.asarray().flatten().tolist()))
@@ -72,7 +72,7 @@ def _test_toRGB_teardown():
 # verify that the RGB converter selects the correct bands and updates the metadata
 @with_setup(None, _test_toRGB_teardown)
 def test_toRGB():
-    pycoal.mineral.MineralClassification.toRGB(test_toRGB_imageFilename, test_toRGB_testFilename)
+    mineral.MineralClassification.toRGB(test_toRGB_imageFilename, test_toRGB_testFilename)
     expected = spectral.open_image(test_toRGB_rgbFilename)
     actual = spectral.open_image(test_toRGB_testFilename)
     assert numpy.array_equal(expected.asarray(), actual.asarray())
@@ -103,7 +103,7 @@ def _test_toRGB_AVC_teardown():
 # verify that the RGB converter selects the correct bands and updates the metadata
 @with_setup(None, _test_toRGB_AVC_teardown)
 def test_toRGB_AVC():
-    pycoal.mineral.MineralClassification.toRGB(test_toRGB_AVC_imageFilename, test_toRGB_AVC_testFilename)
+    mineral.MineralClassification.toRGB(test_toRGB_AVC_imageFilename, test_toRGB_AVC_testFilename)
     expected = spectral.open_image(test_toRGB_AVC_rgbFilename)
     actual = spectral.open_image(test_toRGB_AVC_testFilename)
     assert numpy.array_equal(expected.asarray(), actual.asarray())
@@ -115,16 +115,40 @@ def test_toRGB_AVC():
 
 # test files for the classifyImage test
 #TODO use an AVIRIS-NG image for two test cases
-test_classifyImage_testFilename_1 = "ang20140912t192359_corr_v1c_img_400-410_10-20.hdr"
-test_classifyImage_testFilename_2 = "ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr"
+test_classifyImage_testFilename_1 = "pycoal/tests/ang20140912t192359_corr_v1c_img_400-410_10-20.hdr"
+test_classifyImage_testFilename_2 = "pycoal/tests/ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr"
+
+library_files = ["ftp://ftpext.cr.usgs.gov/pub/cr/co/denver/speclab/pub/spectral.library/splib06.library/Convolved.libraries/s06av95a_envi.hdr",
+                 "ftp://ftpext.cr.usgs.gov/pub/cr/co/denver/speclab/pub/spectral.library/splib06.library/Convolved.libraries/s06av95a_envi.sli"]
+
+
+# delete temporary files
+def _test_classifyImage_teardown():
+    files = [test_classifyImage_testFilename_1[:-4] + "_class.hdr",
+             test_classifyImage_testFilename_1[:-4] + "_class.img",
+             test_classifyImage_testFilename_2[:-4] + "_class.hdr",
+             test_classifyImage_testFilename_2[:-4] + "_class.img",
+             library_files[0][-17:], library_files[1][-17:]]
+
+    for f in files:
+        try:
+            os.remove(f)
+        except OSError:
+            pass
 
 
 # verify that classified images have valid classifications
+@with_setup(None, _test_classifyImage_teardown)
 def test_classifyImage():
-    # TODO: get correct download link
-    lib = "/home/claytonh/Downloads/USGS/s06av95a_envi.hdr"
+    for f in library_files:
+        url = urllib.urlopen(f)
 
-    tst_cls = pycoal.mineral.MineralClassification(lib)
+        with open(f[-17:], "wb") as lib_f:
+            lib_f.write(url.read())
+
+    lib = "s06av95a_envi.hdr"
+
+    tst_cls = mineral.MineralClassification(lib)
 
     # make sure library is being opened as such
     assert isinstance(tst_cls.library, spectral.io.envi.SpectralLibrary)
@@ -137,20 +161,3 @@ def test_classifyImage():
         # assert there are no invalid class numbers
         for i in classified.asarray().flatten():
             assert 0 <= i <= len(tst_cls.library.names) + 1
-
-    clean_up()
-
-
-def clean_up():
-    files = [test_classifyImage_testFilename_1[:-4] + "_class.hdr",
-             test_classifyImage_testFilename_1[:-4] + "_class.img",
-             test_classifyImage_testFilename_2[:-4] + "_class.hdr",
-             test_classifyImage_testFilename_2[:-4] + "_class.img"]
-
-    for f in files:
-        try:
-            os.remove(f)
-        except OSError:
-            pass
-
-test_classifyImage()
