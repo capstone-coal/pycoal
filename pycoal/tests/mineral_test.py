@@ -161,6 +161,9 @@ def test_classifyImage():
 
         classified = spectral.open_image(f[:-4] + "_class.hdr")
 
+        assert classified.metadata.get(u'description') == u'PyCOAL 0.2 mineral classified image.'
+        assert classified.metadata.get(u'file type') == u'ENVI Classification'
+
         # assert there are no invalid class numbers
         for i in classified.asarray().flatten():
             assert 0 <= i <= len(tst_cls.library.names) + 1
