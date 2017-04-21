@@ -148,7 +148,6 @@ def test_classifyImage():
     ftp.cwd("pub/cr/co/denver/speclab/pub/spectral.library/splib06.library/Convolved.libraries/")
 
     for f in library_files:
-        print f
         with open("pycoal/tests/" + f, "wb") as lib_f:
             ftp.retrbinary('RETR %s' % f, lib_f.write)
 
