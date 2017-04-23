@@ -24,7 +24,7 @@ class MiningClassification:
         class names corresponding to mines or other features.
 
         Args:
-            classes (str[]): list of class names to identify.
+            classNames (str[]): list of class names to identify.
         """
 
         self.classNames = classNames
