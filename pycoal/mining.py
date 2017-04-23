@@ -16,7 +16,9 @@ import numpy
 
 class MiningClassification:
 
-    def __init__(self, classNames=None):
+    def __init__(self, classNames=[u'Schwertmannite BZ93-1 s06av95a=b',
+                                   u'Renyolds_TnlSldgWet SM93-15w s06av95a=a',
+                                   u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a']):
         """
         Construct a new MiningClassification object given a list of spectral
         class names corresponding to mines or other features.
