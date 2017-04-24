@@ -14,17 +14,20 @@ import spectral
 import pycoal
 import numpy
 
+# classes identified as proxies for coal mining
+proxyClassNames = [u'Schwertmannite BZ93-1 s06av95a=b',
+                   u'Renyolds_TnlSldgWet SM93-15w s06av95a=a',
+                   u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a']
+
 class MiningClassification:
 
-    def __init__(self, classNames=[u'Schwertmannite BZ93-1 s06av95a=b',
-                                   u'Renyolds_TnlSldgWet SM93-15w s06av95a=a',
-                                   u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a']):
+    def __init__(self, classNames=proxyClassNames):
         """
-        Construct a new MiningClassification object given a list of spectral
-        class names corresponding to mines or other features.
+        Construct a new MiningClassification object given an optional list of
+        spectral class names which defaults to coal mining proxies.
 
         Args:
-            classes (str[]): list of class names to identify.
+            classNames (str[]): list of class names to identify.
         """
 
         self.classNames = classNames

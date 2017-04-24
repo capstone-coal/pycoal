@@ -10,22 +10,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import math
 import numpy
 import spectral
 import pycoal
 
 class MineralClassification:
 
-    def __init__(self, libraryFilename):
+    def __init__(self, libraryFilename, classNames=None, threshold=0.0):
         """
         Construct a new MineralClassification object with the `USGS Digital
         Spectral Library 06 <https://speclab.cr.usgs.gov/spectral.lib06/>`_
         in ENVI format.
 
+        If provided, the optional class name parameter will initialize the
+        classifier with a subset of the spectral library, otherwise the full
+        spectral library will be used.
+
+        The optional threshold parameter defines a confidence value between zero
+        and one below which classifications will be discarded, otherwise all
+        classifications will be included.
+
         Args:
-            libraryFilename (str):    filename of the spectral library
+            libraryFilename (str):        filename of the spectral library
+            classNames (str[], optional): list of names of classes to include
+            threshold (float, optional):  classification threshold
         """
+
+        # load and optionally subset the spectral library
         self.library = spectral.open_image(libraryFilename)
+        if classNames is not None:
+            self.library = self.subsetSpectralLibrary(self.library, classNames)
+
+        # store the threshold
+        self.threshold = threshold
 
     def classifyImage(self, imageFilename, classifiedFilename):
         """
@@ -76,8 +94,18 @@ class MineralClassification:
                                                                      ...],
                                                       self.library.spectra)
 
-                    # get classification
-                    classified[x,y] = numpy.argmin(angles) + 1
+                    # normalize confidence values from [pi,0] to [0,1]
+                    for z in range(angles.shape[2]):
+                        angles[0,0,z] = 1-angles[0,0,z]/math.pi
+
+                    # get index of class with largest confidence value
+                    indexOfMax = numpy.argmax(angles)
+
+                    # classify pixel if confidence above threshold
+                    if angles[0,0,indexOfMax] > self.threshold:
+
+                        # index from one (after zero for no data)
+                        classified[x,y] = indexOfMax + 1
 
         # save the classified image to a file
         spectral.io.envi.save_classification(classifiedFilename,
@@ -202,3 +230,39 @@ class MineralClassification:
 
         # save the three-band RGB image to a file
         spectral.envi.save_image(rgbImageFilename, rgb, metadata=rgbMetadata)
+
+    @staticmethod
+    def subsetSpectralLibrary(spectralLibrary, classNames):
+
+        # adapted from https://git.io/v9ThM
+
+        """
+        Create a copy of the spectral library containing only the named classes.
+
+        Args:
+            spectralLibrary (SpectralLibrary): ENVI spectral library
+            classNames (str[]):                list of names of classes to include
+
+        Returns:
+            SpectralLibrary: subset of ENVI spectral library
+        """
+
+        # empty array for spectra
+        spectra = numpy.empty((len(classNames), len(spectralLibrary.bands.centers)))
+
+        # empty list for names
+        names = []
+
+        # copy class spectra and names
+        for newIndex, className in enumerate(classNames):
+            oldIndex = spectralLibrary.names.index(className)
+            spectra[newIndex] = spectralLibrary.spectra[oldIndex]
+            names.append(className)
+
+        # copy metadata
+        metadata = {'wavelength units': spectralLibrary.metadata.get('wavelength units'),
+                    'spectra names': names,
+                    'wavelength': spectralLibrary.bands.centers }
+
+        # return new spectral library
+        return spectral.io.envi.SpectralLibrary(spectra, metadata, {})

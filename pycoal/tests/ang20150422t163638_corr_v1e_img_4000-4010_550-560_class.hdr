@@ -1,0 +1,16 @@
+ENVI
+description = {
+  PyCOAL 0.2 mineral classified image.}
+samples = 10
+lines = 10
+bands = 1
+header offset = 0
+file type = ENVI Classification
+data type = 12
+interleave = bip
+byte order = 0
+map info = { UTM , 1.000 , 1.000 , 736600.089 , 4078126.750 , 2.7000000000e+00 , 2.7000000000e+00 , 12 , North , WGS-84 , units=Meters , rotation=-66.00000000 }
+class names = { No data , Azurite WS316 s06av95a=a , Limonite HS41.3 s06av95a=b , Hematite_Coatd_Qtz BR93-34C s06av95a=a , Renyolds_Tnl_Sludge SM93-15 s06av95a=a }
+classes = 5
+data ignore value = 0
+class lookup = { 0 , 0 , 0 , 255 , 0 , 0 , 0 , 255 , 0 , 0 , 0 , 255 , 255 , 255 , 0 }
