@@ -41,7 +41,7 @@ def _test_classifyImage_teardown():
 def test_classifyImage():
 
     # classify mining and and save to temporary file
-    mc = pycoal.mining.MiningClassification([u'Schwertmannite BZ93-1 s06av95a=b', u'Renyolds_TnlSldgWet SM93-15w s06av95a=a', u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a'])
+    mc = pycoal.mining.MiningClassification()
     mc.classifyImage(mineralFilename, testFilename)
 
     # open the mining and temporary files
