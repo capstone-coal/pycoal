@@ -19,6 +19,7 @@ import numpy
 import spectral
 import pycoal
 from pycoal import mineral
+from pycoal import mining
 
 # file names of USGS Digital Spectral Library 06 in ENVI format
 libraryFilenames = ["s06av95a_envi.hdr", "s06av95a_envi.sli"]
@@ -92,6 +93,63 @@ def test_classifyImage():
 
         # verify that every pixel has the same classification
         assert numpy.array_equal(expected.asarray(), actual.asarray())
+
+# test files for classify image threshold and subset tests
+test_classifyImage_threshold_subset_imageFilename = 'ang20150420t182808_corr_v1e_img_4200-4210_70-80.hdr'
+test_classifyImage_threshold_subset_testFilename = 'ang20150420t182808_corr_v1e_img_4200-4210_70-80_class_test.hdr'
+test_classifyImage_threshold_subset_testImage = 'ang20150420t182808_corr_v1e_img_4200-4210_70-80_class_test.img'
+test_classifyImage_threshold_subset_classifiedFilename = 'ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
+
+# tear down classify image subset test by deleting classified file
+def _test_classifyImage_threshold_subset_teardown():
+    try:
+        os.remove(test_classifyImage_threshold_subset_testFilename)
+        os.remove(test_classifyImage_threshold_subset_testImage)
+    except OSError:
+        pass
+
+# verify that threshold classification gives either the same result or no data for each pixel
+@with_setup(None, _test_classifyImage_threshold_subset_teardown)
+def test_classifyImage_threshold():
+
+    # create mineral classification instance with threshold
+    mc = mineral.MineralClassification(libraryFilenames[0], threshold=0.75)
+
+    # classify image
+    mc.classifyImage(test_classifyImage_threshold_subset_imageFilename, \
+                     test_classifyImage_threshold_subset_testFilename)
+    actual = spectral.open_image(test_classifyImage_threshold_subset_testFilename)
+
+    # compare expected to actual classifications
+    expected = spectral.open_image(test_classifyImage_threshold_subset_classifiedFilename)
+    for x in range(actual.shape[0]):
+        for y in range(actual.shape[1]):
+            actualClassId = actual[x,y,0]
+            actualClassName = actual.metadata.get('class names')[actualClassId]
+            expectedClassId = expected[x,y,0]
+            expectedClassName = expected.metadata.get('class names')[expectedClassId]
+            assert actualClassName == expectedClassName \
+                or actualClassName == 'No data'
+
+# verify that subset classification identifies only the selected classes
+@with_setup(None, _test_classifyImage_threshold_subset_teardown)
+def test_classifyImage_subset():
+
+    # create mineral classification instance with mining subset
+    mc = mineral.MineralClassification(libraryFilenames[0], classNames=mining.proxyClassNames)
+
+    # classify image
+    mc.classifyImage(test_classifyImage_threshold_subset_imageFilename, \
+                     test_classifyImage_threshold_subset_testFilename)
+    actual = spectral.open_image(test_classifyImage_threshold_subset_testFilename)
+
+    # inspect the classifications
+    for x in range(actual.shape[0]):
+        for y in range(actual.shape[1]):
+            actualClassId = actual[x,y,0]
+            actualClassName = actual.metadata.get('class names')[actualClassId]
+            assert actualClassName in mining.proxyClassNames \
+                or actualClassName == 'No data'
 
 # test files for filterClasses test
 test_filterClasses_Filename = 'ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
