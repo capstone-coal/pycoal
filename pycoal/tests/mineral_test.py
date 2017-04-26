@@ -85,7 +85,7 @@ def test_classifyImage():
         expected = spectral.open_image(imageFilename[:-4] + "_class.hdr")
 
         # validate metadata
-        assert expected.metadata.get(u'description') == 'PyCOAL '+pycoal.version+' mineral classified image.'
+        assert actual.metadata.get(u'description') == 'PyCOAL '+pycoal.version+' mineral classified image.'
         assert expected.metadata.get(u'file type') == actual.metadata.get(u'file type')
         assert expected.metadata.get(u'map info') == actual.metadata.get(u'map info')
         assert expected.metadata.get(u'class names') == actual.metadata.get(u'class names')
