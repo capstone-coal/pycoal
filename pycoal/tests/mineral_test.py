@@ -11,6 +11,7 @@
 # limitations under the License.
 
 from nose import with_setup
+from nose.tools import assert_raises
 
 import os
 import shutil
@@ -20,6 +21,14 @@ import spectral
 import pycoal
 from pycoal import mineral
 from pycoal import mining
+
+# utility function to remove multiple test files
+def _remove_files(listOfFileNames):
+    for fileName in listOfFileNames:
+        try:
+            os.remove(fileName)
+        except OSError:
+            pass
 
 # file names of USGS Digital Spectral Library 06 in ENVI format
 libraryFilenames = ["s06av95a_envi.hdr", "s06av95a_envi.sli"]
@@ -56,12 +65,8 @@ test_classifyImage_testFilenames = ["ang20140912t192359_corr_v1c_img_400-410_10-
 
 # delete temporary files for classifyImage tests
 def _test_classifyImage_teardown():
-    for filename in test_classifyImage_testFilenames:
-        try:
-            os.remove(filename[:-4] + "_class_test.hdr")
-            os.remove(filename[:-4] + "_class_test.img")
-        except OSError:
-            pass
+    _remove_files([f[:-4]+'_class_test.hdr' for f in test_classifyImage_testFilenames] \
+                 +[f[:-4]+'_class_test.img' for f in test_classifyImage_testFilenames])
 
 # verify that classified images have valid classifications
 @with_setup(None, _test_classifyImage_teardown)
@@ -102,11 +107,8 @@ test_classifyImage_threshold_subset_classifiedFilename = 'ang20150420t182808_cor
 
 # tear down classify image subset test by deleting classified file
 def _test_classifyImage_threshold_subset_teardown():
-    try:
-        os.remove(test_classifyImage_threshold_subset_testFilename)
-        os.remove(test_classifyImage_threshold_subset_testImage)
-    except OSError:
-        pass
+    _remove_files([test_classifyImage_threshold_subset_testFilename,
+                   test_classifyImage_threshold_subset_testImage])
 
 # verify that threshold classification gives either the same result or no data for each pixel
 @with_setup(None, _test_classifyImage_threshold_subset_teardown)
@@ -164,11 +166,8 @@ def _test_filterClasses_setup():
 
 # tear down filterClasses test by deleting filtered image
 def _test_filterClasses_teardown():
-    try:
-        os.remove(test_filterClasses_testFilename)
-        os.remove(test_filterClasses_testImage)
-    except OSError:
-        pass
+    _remove_files([test_filterClasses_testFilename,
+                   test_filterClasses_testImage])
 
 # verify that filterClasses removes unused classes and reindexes correctly
 @with_setup(_test_filterClasses_setup, _test_filterClasses_teardown)
@@ -191,11 +190,8 @@ test_toRGB_testImage = 'ang20150422t163638_corr_v1e_img_987_654_rgb_test.img'
 
 # tear down AVIRIS-NG toRGB test by deleting temporary files
 def _test_toRGB_teardown():
-    try:
-        os.remove(test_toRGB_testFilename)
-        os.remove(test_toRGB_testImage)
-    except OSError:
-        pass
+    _remove_files([test_toRGB_testFilename,
+                   test_toRGB_testImage])
 
 # verify that the RGB converter selects the correct AVIRIS-NG bands and updates the metadata
 @with_setup(None, _test_toRGB_teardown)
@@ -218,11 +214,8 @@ test_toRGB_AVC_testImage = 'f080702t01p00r08rdn_c_sc01_ort_img_rgb_test.img'
 
 # tear down AVIRIS-C toRGB test by deleting temporary files
 def _test_toRGB_AVC_teardown():
-    try:
-        os.remove(test_toRGB_AVC_testFilename)
-        os.remove(test_toRGB_AVC_testImage)
-    except OSError:
-        pass
+    _remove_files([test_toRGB_AVC_testFilename,
+                   test_toRGB_AVC_testImage])
 
 # verify that the RGB converter selects the correct AVIRIS-C bands and updates the metadata
 @with_setup(None, _test_toRGB_AVC_teardown)
@@ -236,3 +229,27 @@ def test_toRGB_AVC():
     assert expected.metadata.get('fwhm') == actual.metadata.get('fwhm')
     assert expected.metadata.get('bbl') == actual.metadata.get('bbl')
     assert expected.metadata.get('smoothing factors') == actual.metadata.get('smoothing factors')
+
+# test files for ASTER conversion test
+_test_AsterConversion_data = 'ASTER/data'
+_test_AsterConversion_db = 'ASTER-2.0.db'
+_test_AsterConversion_envi = 'ASTER-2.0'
+
+# tear down ASTER conversion test by deleting test files
+def _test_AsterConversion_teardown():
+    _remove_files([_test_AsterConversion_db,
+                   _test_AsterConversion_envi+'.hdr',
+                   _test_AsterConversion_envi+'.sli'])
+
+# verify that a small subset of the ASTER Spectral Library 2.0 is converted to ENVI format
+@with_setup(None, _test_AsterConversion_teardown)
+def test_AsterConversion():
+    data, db, envi = _test_AsterConversion_data, _test_AsterConversion_db, _test_AsterConversion_envi
+    asterConversion = mineral.AsterConversion()
+    assert_raises(ValueError, asterConversion.convert, data_dir=data)
+    assert_raises(ValueError, asterConversion.convert, data_dir=data, hdr_file=envi)
+    assert_raises(ValueError, asterConversion.convert, data_dir=data, db_file=db)
+    asterConversion.convert(data_dir=data, db_file=db, hdr_file=envi)
+    aster = spectral.open_image(envi+'.hdr')
+    assert isinstance(aster, spectral.io.envi.SpectralLibrary)
+    assert aster.spectra.shape == (3, 128)
