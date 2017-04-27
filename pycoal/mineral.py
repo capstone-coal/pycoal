@@ -19,9 +19,11 @@ class MineralClassification:
 
     def __init__(self, libraryFilename, classNames=None, threshold=0.0):
         """
-        Construct a new MineralClassification object with the `USGS Digital
-        Spectral Library 06 <https://speclab.cr.usgs.gov/spectral.lib06/>`_
-        in ENVI format.
+        Construct a new MineralClassification object with a spectral library
+        in ENVI format such as the `USGS Digital Spectral Library 06
+        <https://speclab.cr.usgs.gov/spectral.lib06/>`_ or the `ASTER Spectral
+        Library Version 2.0 <https://speclib.jpl.nasa.gov/>`_ converted with
+        ``pycoal.mineral.AsterConversion.convert()``.
 
         If provided, the optional class name parameter will initialize the
         classifier with a subset of the spectral library, otherwise the full
@@ -268,12 +270,12 @@ class MineralClassification:
         return spectral.io.envi.SpectralLibrary(spectra, metadata, {})
 
 
-class asterConvert:
+class AsterConversion:
 
     def __init__(self):
         """
-        This class provides a method for converting the ASTER spectral 
-        library into ENVI format.
+        This class provides a method for converting the ASTER Spectral
+        Library Version 2.0 into ENVI format.
 
         Args:
             None
@@ -283,26 +285,24 @@ class asterConvert:
     @classmethod
     def convert(cls, data_dir="", db_file="", hdr_file=""):
         """
-         This class method generates an ENVI format spectral library file.
-         `data_dir` is optional as long as `db_file` is provided. Note that
-         generating a sqlite database takes upwards of 10 minutes and creating
-         an ENVI format file takes up to 5 minutes.
+        This class method generates an ENVI format spectral library file.
+        ``data_dir`` is optional as long as ``db_file`` is provided. Note that
+        generating an SQLite database takes upwards of 10 minutes and creating
+        an ENVI format file takes up to 5 minutes.
 
-         Args:
-             data_dir (str, optional): path to directory containing ASCII data files
-             db_file (str):            path to sqlite file that either already exists if 
-                                       `data_dir` isn't provided, or will be generated if 
-                                       `data_dir` is provided
-             hdr_file (str):           path to generated .hdr and .sli files.
-         """
+        Args:
+            data_dir (str, optional): path to directory containing ASCII data files
+            db_file (str):            name of the SQLite file that either already exists if
+                                      ``data_dir`` isn't provided, or will be generated if
+                                      ``data_dir`` is provided
+            hdr_file (str):           name of the ENVI spectral library to generate
+                                      (without the ``.hdr`` or ``.sli`` extension)
+        """
         if not hdr_file:
             raise ValueError("Must provide path for generated ENVI header file.")
 
         elif not db_file:
             raise ValueError("Must provide path for sqlite file.")
-
-        if not db_file.endswith(".sqlite"):
-            raise ValueError("Sqlite extension should be '.sqlite'.")
 
         if data_dir:
             spectral.AsterDatabase.create(db_file, data_dir)
