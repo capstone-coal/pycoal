@@ -266,3 +266,55 @@ class MineralClassification:
 
         # return new spectral library
         return spectral.io.envi.SpectralLibrary(spectra, metadata, {})
+
+
+class asterConvert:
+
+    def __init__(self):
+        """
+        This class provides a method for converting the ASTER spectral 
+        library into ENVI format.
+
+        Args:
+            None
+        """
+        pass
+
+    @classmethod
+    def convert(cls, data_dir="", db_file="", hdr_file=""):
+        """
+         This class method generates an ENVI format spectral library file.
+         `data_dir` is optional as long as `db_file` is provided. Note that
+         generating a sqlite database takes upwards of 10 minutes and creating
+         an ENVI format file takes up to 5 minutes.
+
+         Args:
+             data_dir (str, optional): path to directory containing ASCII data files
+             db_file (str):            path to sqlite file that either already exists if 
+                                       `data_dir` isn't provided, or will be generated if 
+                                       `data_dir` is provided
+             hdr_file (str):           path to generated .hdr and .sli files.
+         """
+        if not hdr_file:
+            raise ValueError("Must provide path for generated ENVI header file.")
+
+        elif not db_file:
+            raise ValueError("Must provide path for sqlite file.")
+
+        if not db_file.endswith(".sqlite"):
+            raise ValueError("Sqlite extension should be '.sqlite'.")
+
+        if data_dir:
+            spectral.AsterDatabase.create(db_file, data_dir)
+
+        asterDatabase = spectral.AsterDatabase(db_file)
+        spectrumIDs = [x[0] for x in asterDatabase.query('SELECT SampleID FROM Samples').fetchall()]
+        bandMin = 0.38315
+        bandMax = 2.5082
+        bandNum = 128
+        bandInfo = spectral.BandInfo()
+        bandInfo.centers = numpy.arange(bandMin, bandMax, (bandMax - bandMin) / bandNum)
+        bandInfo.band_unit = 'micrometer'
+        library = asterDatabase.create_envi_spectral_library(spectrumIDs, bandInfo)
+
+        library.save(hdr_file)
