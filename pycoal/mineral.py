@@ -289,17 +289,20 @@ class asterConvert:
          an ENVI format file takes up to 5 minutes.
 
          Args:
-             data_dir (str, optional): name of directory containing ASCII data files
-             db_file (str):            name of sqlite file that either already exists if 
+             data_dir (str, optional): path to directory containing ASCII data files
+             db_file (str):            path to sqlite file that either already exists if 
                                        `data_dir` isn't provided, or will be generated if 
                                        `data_dir` is provided
-             hdr_file (str):           name of generated .hdr and .sli files
+             hdr_file (str):           path to generated .hdr and .sli files.
          """
         if not hdr_file:
-            raise ValueError("Must provide name for generated ENVI header file.")
+            raise ValueError("Must provide path for generated ENVI header file.")
 
         elif not db_file:
-            raise ValueError("Must provide name for sqlite file.")
+            raise ValueError("Must provide path for sqlite file.")
+
+        if not db_file.endswith(".sqlite"):
+            raise ValueError("Sqlite extension should be '.sqlite'.")
 
         if data_dir:
             spectral.AsterDatabase.create(db_file, data_dir)
