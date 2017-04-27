@@ -99,6 +99,27 @@ def test_classifyImage():
         # verify that every pixel has the same classification
         assert numpy.array_equal(expected.asarray(), actual.asarray())
 
+# verify classification when loading entire images into memory
+@with_setup(None, _test_classifyImage_teardown)
+def test_classifyImageInMemory():
+
+    # create mineral classifier instance with image loading enabled
+    mc = mineral.MineralClassification(libraryFilenames[0], inMemory=True)
+
+    # for each of the test images
+    for imageFilename in test_classifyImage_testFilenames:
+
+        # classify the test image
+        classifiedFilename = imageFilename[:-4] + "_class_test.hdr"
+        mc.classifyImage(imageFilename, classifiedFilename)
+        actual = spectral.open_image(classifiedFilename)
+
+        # classified image for comparison
+        expected = spectral.open_image(imageFilename[:-4] + "_class.hdr")
+
+        # verify that every pixel has the same classification
+        assert numpy.array_equal(expected.asarray(), actual.asarray())
+
 # test files for classify image threshold and subset tests
 test_classifyImage_threshold_subset_imageFilename = 'ang20150420t182808_corr_v1e_img_4200-4210_70-80.hdr'
 test_classifyImage_threshold_subset_testFilename = 'ang20150420t182808_corr_v1e_img_4200-4210_70-80_class_test.hdr'

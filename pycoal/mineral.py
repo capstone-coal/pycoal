@@ -17,7 +17,7 @@ import pycoal
 
 class MineralClassification:
 
-    def __init__(self, libraryFilename, classNames=None, threshold=0.0):
+    def __init__(self, libraryFilename, classNames=None, threshold=0.0, inMemory=False):
         """
         Construct a new MineralClassification object with a spectral library
         in ENVI format such as the `USGS Digital Spectral Library 06
@@ -33,10 +33,14 @@ class MineralClassification:
         and one below which classifications will be discarded, otherwise all
         classifications will be included.
 
+        In order to improve performance on systems with sufficient memory,
+        enable the optional parameter to load entire images.
+
         Args:
             libraryFilename (str):        filename of the spectral library
             classNames (str[], optional): list of names of classes to include
             threshold (float, optional):  classification threshold
+            inMemory (boolean, optional): enable loading entire image
         """
 
         # load and optionally subset the spectral library
@@ -46,6 +50,9 @@ class MineralClassification:
 
         # store the threshold
         self.threshold = threshold
+
+        # store the memory setting
+        self.inMemory = inMemory
 
     def classifyImage(self, imageFilename, classifiedFilename):
         """
@@ -62,7 +69,10 @@ class MineralClassification:
 
         # open the image
         image = spectral.open_image(imageFilename)
-        data = image.asarray()
+        if self.inMemory:
+            data = image.load()
+        else:
+            data = image.asarray()
         M = image.shape[0]
         N = image.shape[1]
 
