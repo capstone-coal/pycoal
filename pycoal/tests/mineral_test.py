@@ -251,6 +251,27 @@ def test_toRGB_AVC():
     assert expected.metadata.get('bbl') == actual.metadata.get('bbl')
     assert expected.metadata.get('smoothing factors') == actual.metadata.get('smoothing factors')
 
+# test files for AVIRIS-NG no data toRGB test
+test_toRGB_noData_imageFilename = 'ang20140912t192359_corr_v1c_img_400-410_10-20.hdr'
+test_toRGB_noData_rgbFilename = 'ang20140912t192359_corr_v1c_img_400-410_10-20_rgb.hdr'
+test_toRGB_noData_testFilename = 'ang20140912t192359_corr_v1c_img_400-410_10-20_rgb_test.hdr'
+test_toRGB_noData_testImage = 'ang20140912t192359_corr_v1c_img_400-410_10-20_rgb_test.img'
+
+# tear down AVIRIS-NG no data toRGB test
+def _test_toRGB_noData_teardown():
+    _remove_files([test_toRGB_noData_testFilename,
+                   test_toRGB_noData_testImage])
+
+# verify that AVIRIS-NG images with no data pixels are converted to RGB
+# TODO test AVIRIS-C
+@with_setup(None, _test_toRGB_noData_teardown)
+def test_toRGB_noData():
+    mineral.MineralClassification.toRGB(test_toRGB_noData_imageFilename, test_toRGB_noData_testFilename)
+    expected = spectral.open_image(test_toRGB_noData_rgbFilename)
+    actual = spectral.open_image(test_toRGB_noData_testFilename)
+    assert actual.metadata.get('data ignore value') == '0'
+    assert numpy.array_equal(expected.asarray(), actual.asarray())
+
 # test files for ASTER conversion test
 _test_AsterConversion_data = 'ASTER/data'
 _test_AsterConversion_db = 'ASTER-2.0.db'
