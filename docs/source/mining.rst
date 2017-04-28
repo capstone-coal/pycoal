@@ -12,7 +12,7 @@
    # See the License for the specific language governing permissions and
    # limitations under the License.
    
-pycoal mining classification API
+Mining Classification API
 ********************************
 
 .. autoclass:: pycoal.mining.MiningClassification
