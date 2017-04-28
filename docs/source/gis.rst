@@ -12,10 +12,8 @@
    # See the License for the specific language governing permissions and
    # limitations under the License.
    
-Environmental Correlation API
-************************************
-
-#.. autoclass:: pycoal.environment.EnvironmentalCorrelation
-#    :special-members:
-#    :members:
-    
+GIS Processing API
+*********************************
+.. autoclass:: pycoal.gis.GISProcessing
+    :special-members:
+    :members:
