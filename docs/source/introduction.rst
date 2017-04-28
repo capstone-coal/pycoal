@@ -25,8 +25,8 @@ pycoal provides a suite of algorithms (written in Python) to identify, classify,
 ================
 Dependencies
 ================
-`Spectral Python <http://www.spectralpython.net/>`_: needed for the mineral classification and mining identification APIs. |
-`NumPy <http://www.numpy.org/>`_: needed for the mineral classification and mining identification APIs. |
-`GDAL <http://www.gdal.org/>`_: needed for the GIS processing API. |
+|`Spectral Python <http://www.spectralpython.net/>`_: needed for the mineral classification and mining identification APIs.
+|`NumPy <http://www.numpy.org/>`_: needed for the mineral classification and mining identification APIs.
+|`GDAL <http://www.gdal.org/>`_: needed for the GIS processing API.
 
 More information on coal can be seen at the `project Website <https://capstone-coal.github.io/>`_ as well as the `docs directory <https://github.com/capstone-coal/pycoal/tree/master/docs>`_.
