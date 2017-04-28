@@ -199,12 +199,6 @@ html_sidebars = {
     ]
 }
 
-html_context = {
-"display_github": False, # Add 'Edit on Github' link instead of 'View page source'
-"last_updated": True,
-"commit": False,
-}
-
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
 #

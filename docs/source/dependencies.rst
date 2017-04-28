@@ -11,27 +11,9 @@
    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    # See the License for the specific language governing permissions and
    # limitations under the License.
-
-Welcome to pycoal's documentation!
-==================================
-
-Contents:
-
-.. toctree::
-   :maxdepth: 4
-
-   introduction
-   dependencies
-   quickstart
-   mineral
-   mining
-   environment
-   gis
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   
+Dependencies
+************************************
+`Spectral Python <http://www.spectralpython.net/>`_: needed for the mineral classification and mining identification APIs.
+`NumPy <http://www.numpy.org/>`_: needed for the mineral classification and mining identification APIs.
+`GDAL <http://www.gdal.org/>`_: needed for the GIS processing API.

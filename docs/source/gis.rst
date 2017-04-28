@@ -11,27 +11,9 @@
    # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    # See the License for the specific language governing permissions and
    # limitations under the License.
-
-Welcome to pycoal's documentation!
-==================================
-
-Contents:
-
-.. toctree::
-   :maxdepth: 4
-
-   introduction
-   dependencies
-   quickstart
-   mineral
-   mining
-   environment
-   gis
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
+   
+GIS Processing API
+*********************************
+.. autoclass:: pycoal.gis.GISProcessing
+    :special-members:
+    :members:
