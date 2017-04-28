@@ -21,7 +21,6 @@ Contents:
    :maxdepth: 4
 
    introduction
-   dependencies
    quickstart
    mineral
    mining
