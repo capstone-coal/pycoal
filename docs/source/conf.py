@@ -30,7 +30,7 @@
 
 import os
 import sys
-import alabaster
+# import alabaster
 sys.path.insert(0, os.path.abspath('../../pycoal'))
 
 # -- General configuration ------------------------------------------------
@@ -142,7 +142,7 @@ html_theme = 'alabaster'
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
-html_theme_path = [alabaster.get_path()]
+# html_theme_path = [alabaster.get_path()]
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
