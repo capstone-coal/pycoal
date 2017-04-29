@@ -31,7 +31,7 @@ _classifiers = [
 ]
 _description = 'COAL mining library for AVIRIS data.'
 _download_url = 'http://pypi.python.org/pypi/pycoal/'
-_requirements = ["numpy", "spectral"]
+_requirements = ["numpy", "spectral", "sphinxcontrib-napoleon"]
 _keywords = ['spectroscopy', 'aviris', 'aviris-ng', 'mining', 'minerals']
 _license = 'Apache License, Version 2.0'
 _long_description = 'A python suite for the identification and characterization of mining activity within AVIRIS data.'
