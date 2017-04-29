@@ -25,7 +25,6 @@ Contents:
    mineral
    mining
    environment
-   gis
 
 Indices and tables
 ==================
