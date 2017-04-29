@@ -129,7 +129,7 @@ class EnvironmentalCorrelation:
 
         # detect errors
         if returncode != 0:
-            raise RuntimeError
+            raise RuntimeError('Could not rasterize vector.')
 
     def proximity(self, featureFilename, proximityFilename):
         """
@@ -148,4 +148,4 @@ class EnvironmentalCorrelation:
 
         # detect errors
         if returncode != 0:
-            raise RuntimeError
+            raise RuntimeError('Could not generate proximity map.')
