@@ -53,13 +53,23 @@ class EnvironmentalCorrelation:
         proximityImageName = proximityHeaderName[:-4] + '.img'
         self.proximity(featureImageName, proximityImageName)
 
-        # intersect features within proximity
+        # load mining and proximity images and initialize environmental correlation array
         miningImage = spectral.open_image(miningFilename)
         proximityImage = spectral.open_image(proximityHeaderName)
         correlatedImage = numpy.zeros(shape=miningImage.shape, dtype=numpy.uint16)
+
+        # get average pixel size
+        if miningImage.metadata.get('map info')[10][-6:].lower() == 'meters':
+            xPixelSize = float(miningImage.metadata.get('map info')[5])
+            yPixelSize = float(miningImage.metadata.get('map info')[6])
+            pixelSize = (xPixelSize + yPixelSize) / 2
+        else:
+            raise ValueError('Mining image units not in meters.')
+
+        # intersect features within proximity
         for x in range(miningImage.shape[0]):
             for y in range(miningImage.shape[1]):
-                if miningImage[x,y,0]==1 and proximityImage[x,y,0]<=proximity:
+                if miningImage[x,y,0]==1 and proximityImage[x,y,0]*pixelSize<=proximity:
                     correlatedImage[x,y,0] = miningImage[x,y,0]
 
         # save the environmental correlation image
@@ -134,8 +144,7 @@ class EnvironmentalCorrelation:
         returncode = call(['gdal_proximity.py',
                            featureFilename,
                            proximityFilename,
-                           '-of', 'envi',
-                           '-distunits' ,'GEO'])
+                           '-of', 'envi'])
 
         # detect errors
         if returncode != 0:
