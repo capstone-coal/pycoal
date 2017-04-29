@@ -35,8 +35,8 @@ class MiningClassification:
     def classifyImage(self, imageFilename, classifiedFilename):
 
         """
-        Classify mines or other features in a Pycoal classified image by copying
-        relevant pixels and discarding the rest in a new file.
+        Classify mines or other features in a PyCOAL mineral classified image by
+        copying relevant pixels and discarding the rest in a new file.
 
         Args:
             imageFilename (str):      filename of the image to be classified

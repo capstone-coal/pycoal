@@ -19,7 +19,7 @@ class MineralClassification:
 
     def __init__(self, libraryFilename, classNames=None, threshold=0.0, inMemory=False):
         """
-        Construct a new MineralClassification object with a spectral library
+        Construct a new ``MineralClassification`` object with a spectral library
         in ENVI format such as the `USGS Digital Spectral Library 06
         <https://speclab.cr.usgs.gov/spectral.lib06/>`_ or the `ASTER Spectral
         Library Version 2.0 <https://speclib.jpl.nasa.gov/>`_ converted with
@@ -306,7 +306,8 @@ class AsterConversion:
         This class method generates an ENVI format spectral library file.
         ``data_dir`` is optional as long as ``db_file`` is provided. Note that
         generating an SQLite database takes upwards of 10 minutes and creating
-        an ENVI format file takes up to 5 minutes.
+        an ENVI format file takes up to 5 minutes. Note: This feature is still
+        experimental.
 
         Args:
             data_dir (str, optional): path to directory containing ASCII data files
