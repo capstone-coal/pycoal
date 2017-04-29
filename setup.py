@@ -23,7 +23,7 @@ _classifiers = [
     'Intended Audience :: Information Technology',
     'Intended Audience :: Science/Research',
     'Topic :: Scientific/Engineering',
-    'Development Status :: 1 - Planning',
+    'Development Status :: 3 - Alpha',
     'License :: OSI Approved :: Apache Software License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
@@ -39,7 +39,7 @@ _name = 'pycoal'
 _namespaces = []
 _test_suite = 'pycoal.tests'
 _url = 'https://github.com/capstone-coal/pycoal'
-_version = '0.3-dev'
+_version = '0.5-dev'
 _zip_safe = False
 
 # Setup Metadata
