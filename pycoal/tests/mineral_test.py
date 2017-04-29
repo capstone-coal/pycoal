@@ -12,56 +12,20 @@
 
 from nose import with_setup
 from nose.tools import assert_raises
+from test import setup_module, teardown_module, _remove_files, libraryFilenames
 
-import os
 import shutil
-import ftplib
 import numpy
 import spectral
 import pycoal
 from pycoal import mineral
 from pycoal import mining
 
-# utility function to remove multiple test files
-def _remove_files(listOfFileNames):
-    for fileName in listOfFileNames:
-        try:
-            os.remove(fileName)
-        except OSError:
-            pass
-
-# file names of USGS Digital Spectral Library 06 in ENVI format
-libraryFilenames = ["s06av95a_envi.hdr", "s06av95a_envi.sli"]
-
-# set up test module before running tests
-def setup_module(module):
-
-    # enter test directory
-    os.chdir('pycoal/tests')
-
-    # download spectral library over FTP if necessary
-    if not os.path.isfile(libraryFilenames[0]) and \
-       not os.path.isfile(libraryFilenames[1]):
-        ftp_url = "ftpext.cr.usgs.gov"
-        ftp_dir = "pub/cr/co/denver/speclab/pub/spectral.library/splib06.library/Convolved.libraries/"
-        ftp = ftplib.FTP(ftp_url)
-        ftp.login()
-        ftp.cwd(ftp_dir)
-        for f in libraryFilenames:
-            with open("" + f, "wb") as lib_f:
-                ftp.retrbinary('RETR %s' % f, lib_f.write)
-
-# tear down test module after running tests
-def teardown_module(module):
-
-    # leave test directory
-    os.chdir('../..')
-
 # test files for classifyImage tests
 # TODO test AVIRIS-C
-test_classifyImage_testFilenames = ["ang20140912t192359_corr_v1c_img_400-410_10-20.hdr",
-                                    "ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr",
-                                    "ang20150422t163638_corr_v1e_img_4000-4010_550-560.hdr"]
+test_classifyImage_testFilenames = ["images/ang20140912t192359_corr_v1c_img_400-410_10-20.hdr",
+                                    "images/ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr",
+                                    "images/ang20150422t163638_corr_v1e_img_4000-4010_550-560.hdr"]
 
 # delete temporary files for classifyImage tests
 def _test_classifyImage_teardown():
@@ -121,10 +85,10 @@ def test_classifyImageInMemory():
         assert numpy.array_equal(expected.asarray(), actual.asarray())
 
 # test files for classify image threshold and subset tests
-test_classifyImage_threshold_subset_imageFilename = 'ang20150420t182808_corr_v1e_img_4200-4210_70-80.hdr'
-test_classifyImage_threshold_subset_testFilename = 'ang20150420t182808_corr_v1e_img_4200-4210_70-80_class_test.hdr'
-test_classifyImage_threshold_subset_testImage = 'ang20150420t182808_corr_v1e_img_4200-4210_70-80_class_test.img'
-test_classifyImage_threshold_subset_classifiedFilename = 'ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
+test_classifyImage_threshold_subset_imageFilename = 'images/ang20150420t182808_corr_v1e_img_4200-4210_70-80.hdr'
+test_classifyImage_threshold_subset_testFilename = 'images/ang20150420t182808_corr_v1e_img_4200-4210_70-80_class_test.hdr'
+test_classifyImage_threshold_subset_testImage = 'images/ang20150420t182808_corr_v1e_img_4200-4210_70-80_class_test.img'
+test_classifyImage_threshold_subset_classifiedFilename = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
 
 # tear down classify image subset test by deleting classified file
 def _test_classifyImage_threshold_subset_teardown():
@@ -175,10 +139,10 @@ def test_classifyImage_subset():
                 or actualClassName == 'No data'
 
 # test files for filterClasses test
-test_filterClasses_Filename = 'ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
-test_filterClasses_Image = 'ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.img'
-test_filterClasses_testFilename = 'ang20150420t182808_corr_v1e_img_class_4200-4210_70-80_filtered.hdr'
-test_filterClasses_testImage = 'ang20150420t182808_corr_v1e_img_class_4200-4210_70-80_filtered.img'
+test_filterClasses_Filename = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
+test_filterClasses_Image = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.img'
+test_filterClasses_testFilename = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80_filtered.hdr'
+test_filterClasses_testImage = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80_filtered.img'
 
 # set up filterClasses test by copying classified image
 def _test_filterClasses_setup():
@@ -204,10 +168,10 @@ def test_filterClasses():
             assert originalClassName == filteredClassName
 
 # test files for AVIRIS-NG toRGB test
-test_toRGB_imageFilename = 'ang20150422t163638_corr_v1e_img_987_654.hdr'
-test_toRGB_rgbFilename = 'ang20150422t163638_corr_v1e_img_987_654_rgb.hdr'
-test_toRGB_testFilename = 'ang20150422t163638_corr_v1e_img_987_654_rgb_test.hdr'
-test_toRGB_testImage = 'ang20150422t163638_corr_v1e_img_987_654_rgb_test.img'
+test_toRGB_imageFilename = 'images/ang20150422t163638_corr_v1e_img_987_654.hdr'
+test_toRGB_rgbFilename = 'images/ang20150422t163638_corr_v1e_img_987_654_rgb.hdr'
+test_toRGB_testFilename = 'images/ang20150422t163638_corr_v1e_img_987_654_rgb_test.hdr'
+test_toRGB_testImage = 'images/ang20150422t163638_corr_v1e_img_987_654_rgb_test.img'
 
 # tear down AVIRIS-NG toRGB test by deleting temporary files
 def _test_toRGB_teardown():
@@ -228,10 +192,10 @@ def test_toRGB():
     assert expected.metadata.get('smoothing factors') == actual.metadata.get('smoothing factors')
 
 # test files for AVIRIS-C toRGB test
-test_toRGB_AVC_imageFilename = 'f080702t01p00r08rdn_c_sc01_ort_img_123_456.hdr'
-test_toRGB_AVC_rgbFilename = 'f080702t01p00r08rdn_c_sc01_ort_img_123_456_rgb.hdr'
-test_toRGB_AVC_testFilename = 'f080702t01p00r08rdn_c_sc01_ort_img_rgb_test.hdr'
-test_toRGB_AVC_testImage = 'f080702t01p00r08rdn_c_sc01_ort_img_rgb_test.img'
+test_toRGB_AVC_imageFilename = 'images/f080702t01p00r08rdn_c_sc01_ort_img_123_456.hdr'
+test_toRGB_AVC_rgbFilename = 'images/f080702t01p00r08rdn_c_sc01_ort_img_123_456_rgb.hdr'
+test_toRGB_AVC_testFilename = 'images/f080702t01p00r08rdn_c_sc01_ort_img_rgb_test.hdr'
+test_toRGB_AVC_testImage = 'images/f080702t01p00r08rdn_c_sc01_ort_img_rgb_test.img'
 
 # tear down AVIRIS-C toRGB test by deleting temporary files
 def _test_toRGB_AVC_teardown():
@@ -252,10 +216,10 @@ def test_toRGB_AVC():
     assert expected.metadata.get('smoothing factors') == actual.metadata.get('smoothing factors')
 
 # test files for AVIRIS-NG no data toRGB test
-test_toRGB_noData_imageFilename = 'ang20140912t192359_corr_v1c_img_400-410_10-20.hdr'
-test_toRGB_noData_rgbFilename = 'ang20140912t192359_corr_v1c_img_400-410_10-20_rgb.hdr'
-test_toRGB_noData_testFilename = 'ang20140912t192359_corr_v1c_img_400-410_10-20_rgb_test.hdr'
-test_toRGB_noData_testImage = 'ang20140912t192359_corr_v1c_img_400-410_10-20_rgb_test.img'
+test_toRGB_noData_imageFilename = 'images/ang20140912t192359_corr_v1c_img_400-410_10-20.hdr'
+test_toRGB_noData_rgbFilename = 'images/ang20140912t192359_corr_v1c_img_400-410_10-20_rgb.hdr'
+test_toRGB_noData_testFilename = 'images/ang20140912t192359_corr_v1c_img_400-410_10-20_rgb_test.hdr'
+test_toRGB_noData_testImage = 'images/ang20140912t192359_corr_v1c_img_400-410_10-20_rgb_test.img'
 
 # tear down AVIRIS-NG no data toRGB test
 def _test_toRGB_noData_teardown():

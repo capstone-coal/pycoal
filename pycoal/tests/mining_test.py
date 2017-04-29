@@ -11,30 +11,22 @@
 # limitations under the License.
 
 from nose import with_setup
+from test import setup_module, teardown_module, _remove_files
 
-import os
 import numpy
 import spectral
 import pycoal
 import pycoal.mining
 
-# filename of 10x10 mineral subimage
-mineralFilename = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
-
-# filename of 10x10 mining subimage
-miningFilename = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80.hdr'
-
-# filenames of temporary files
-testFilename = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.hdr'
-testImage = 'pycoal/tests/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.img'
+# test files for mining classification test
+mineralFilename = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
+miningFilename = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80.hdr'
+testFilename = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.hdr'
+testImage = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.img'
 
 # delete temporary files
 def _test_classifyImage_teardown():
-    try:
-        os.remove(testFilename)
-        os.remove(testImage)
-    except OSError:
-        pass
+    _remove_files([testFilename, testImage])
 
 # verify that the expected mining classifications equal the actual mining classifications
 @with_setup(None, _test_classifyImage_teardown)
