@@ -76,7 +76,7 @@ class EnvironmentalCorrelation:
         spectral.io.envi.save_classification(
             correlatedFilename,
             correlatedImage,
-            class_names=['No data','Data'],
+            class_names=miningImage.metadata.get('class names'),
             metadata={
                 'data ignore value': 0,
                 'description': 'PyCOAL '+pycoal.version+' environmental correlation image.',
