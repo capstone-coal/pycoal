@@ -1,0 +1,16 @@
+ENVI
+description = {
+  PyCOAL 0.5-dev environmental correlation image.}
+samples = 83
+lines = 47
+bands = 1
+header offset = 0
+file type = ENVI Classification
+data type = 12
+interleave = bip
+byte order = 0
+map info = { UTM , 1 , 1 , 728955.798245741 , 4073523.83917033 , 1.10383001357003 , 1.09381377159994 , 12 , North , WGS-84 , units=Meters }
+class names = { No data , Schwertmannite BZ93-1 s06av95a=b , Renyolds_TnlSldgWet SM93-15w s06av95a=a , Renyolds_Tnl_Sludge SM93-15 s06av95a=a }
+classes = 4
+data ignore value = 0
+class lookup = { 0 , 0 , 0 , 255 , 0 , 0 , 0 , 255 , 0 , 0 , 0 , 255 }

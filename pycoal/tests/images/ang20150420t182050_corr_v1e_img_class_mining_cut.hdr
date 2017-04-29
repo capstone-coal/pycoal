@@ -1,0 +1,17 @@
+ENVI
+description = {
+/media/study/OSU/spring17/cs463/coal/pycoal/tests/images/ang20150420t182050_corr_v1e_img_class_mining_cut.img}
+samples = 83
+lines   = 47
+bands   = 1
+header offset = 0
+file type = ENVI Classification
+data type = 12
+interleave = bsq
+byte order = 0
+map info = {UTM, 1, 1, 728955.798245741, 4073523.83917033, 1.10383001357003, 1.09381377159994, 12, North,WGS-84, units=Meters}
+coordinate system string = {PROJCS["WGS_1984_UTM_Zone_12N",GEOGCS["GCS_WGS_1984",DATUM["D_WGS_1984",SPHEROID["WGS_1984",6378137,298.257223563]],PRIMEM["Greenwich",0],UNIT["Degree",0.017453292519943295]],PROJECTION["Transverse_Mercator"],PARAMETER["latitude_of_origin",0],PARAMETER["central_meridian",-111],PARAMETER["scale_factor",0.9996],PARAMETER["false_easting",500000],PARAMETER["false_northing",0],UNIT["Meter",1]]}
+class names = { No data , Schwertmannite BZ93-1 s06av95a=b , Renyolds_TnlSldgWet SM93-15w s06av95a=a , Renyolds_Tnl_Sludge SM93-15 s06av95a=a }
+classes = 4
+data ignore value = 0
+class lookup = { 0 , 0 , 0 , 255 , 0 , 0 , 0 , 255 , 0 , 0 , 0 , 255 }
