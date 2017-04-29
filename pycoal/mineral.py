@@ -208,12 +208,20 @@ class MineralClassification:
         greenBand = image[:,:,greenIndex]
         blueBand = image[:,:,blueIndex]
 
+        # remove no data pixels
+        for band in [redBand, greenBand, blueBand]:
+            for x in range(band.shape[0]):
+                for y in range(band.shape[1]):
+                    if numpy.isclose(band[x,y,0], -0.005) or band[x,y,0]==-50:
+                        band[x,y] = 0
+
         # combine the red, green, and blue bands into a three-band RGB image
         rgb = numpy.concatenate([redBand,greenBand,blueBand], axis=2)
 
         # update the metadata
         rgbMetadata = image.metadata
         rgbMetadata['description'] = 'PyCOAL '+pycoal.version+' three-band RGB image.'
+        rgbMetadata['data ignore value'] = 0
         if wavelengthStrings:
             rgbMetadata['wavelength'] = [
                 wavelengthStrings[redIndex],

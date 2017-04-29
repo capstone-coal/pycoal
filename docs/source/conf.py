@@ -30,7 +30,6 @@
 
 import os
 import sys
-import alabaster
 sys.path.insert(0, os.path.abspath('../../pycoal'))
 
 # -- General configuration ------------------------------------------------
@@ -42,7 +41,7 @@ sys.path.insert(0, os.path.abspath('../../pycoal'))
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ['sphinx.ext.todo', 'sphinx.ext.viewcode', 'sphinx.ext.autodoc', 'alabaster']
+extensions = ['sphinx.ext.todo', 'sphinx.ext.viewcode', 'sphinx.ext.autodoc', 'sphinx.ext.napoleon']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -62,7 +61,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pycoal'
-copyright = u'2017, Lewis John McGibbney, Taylor Alexander Brown, Heidi Clayton, and Xiaomei Wang'
+copyright = u'2017 Lewis John McGibbney, Taylor Alexander Brown, Heidi Clayton, and Xiaomei Wang'
 author = u'Lewis John McGibbney, Taylor Alexander Brown, Heidi Clayton, and Xiaomei Wang'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -142,7 +141,6 @@ html_theme = 'default'
 
 # Add any paths that contain custom themes here, relative to this directory.
 # html_theme_path = []
-html_theme_path = [alabaster.get_path()]
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
