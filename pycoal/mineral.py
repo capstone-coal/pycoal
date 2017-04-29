@@ -120,14 +120,15 @@ class MineralClassification:
                         classified[x,y] = indexOfMax + 1
 
         # save the classified image to a file
-        spectral.io.envi.save_classification(classifiedFilename,
-                                             classified,
-                                             class_names=['No data']+self.library.names,
-                                             metadata={
-                                                 'data ignore value': 0,
-                                                 'description': 'PyCOAL '+pycoal.version+' mineral classified image.',
-                                                 'map info': image.metadata.get('map info')
-                                             })
+        spectral.io.envi.save_classification(
+            classifiedFilename,
+            classified,
+            class_names=['No data']+self.library.names,
+            metadata={
+                'data ignore value': 0,
+                'description': 'PyCOAL '+pycoal.version+' mineral classified image.',
+                'map info': image.metadata.get('map info')
+            })
 
         # remove unused classes from the image
         pycoal.mineral.MineralClassification.filterClasses(classifiedFilename)
@@ -163,11 +164,12 @@ class MineralClassification:
                 copy[x,y] = lookup[data[x,y,0]]
 
         # overwrite the file
-        spectral.io.envi.save_classification(classifiedFilename,
-                                             copy,
-                                             force=True,
-                                             class_names=[classified.metadata.get('class names')[i] for i in classes],
-                                             metadata=classified.metadata)
+        spectral.io.envi.save_classification(
+            classifiedFilename,
+            copy,
+            force=True,
+            class_names=[classified.metadata.get('class names')[i] for i in classes],
+            metadata=classified.metadata)
 
     @staticmethod
     def toRGB(imageFilename, rgbImageFilename, red=680.0, green=532.5, blue=472.5):

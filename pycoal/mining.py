@@ -71,11 +71,12 @@ class MiningClassification:
                     classified[x,y] = 1 + classNums.index(pixel[0])
 
         # save the classified image to a file
-        spectral.io.envi.save_classification(classifiedFilename,
-                                             classified,
-                                             class_names=['No data']+self.classNames,
-                                             metadata={
-                                                 'data ignore value': 0,
-                                                 'description': 'PyCOAL '+pycoal.version+' mining classified image.',
-                                                 'map info': image.metadata.get('map info')
-                                             })
+        spectral.io.envi.save_classification(
+            classifiedFilename,
+            classified,
+            class_names=['No data']+self.classNames,
+            metadata={
+                'data ignore value': 0,
+                'description': 'PyCOAL '+pycoal.version+' mining classified image.',
+                'map info': image.metadata.get('map info')
+            })
