@@ -59,15 +59,11 @@ class MiningClassification:
         classList = image.metadata.get('class names')
         classNums = [classList.index(className) if className in classList else -1 for className in self.classNames]
 
-        # for each pixel in the image
+        # copy pixels of the desired classes
         for y in range(N):
-
             for x in range(M):
-
                 pixel = data[x,y]
-
                 if pixel[0] in classNums:
-
                     classified[x,y] = 1 + classNums.index(pixel[0])
 
         # save the classified image to a file
