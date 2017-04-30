@@ -21,6 +21,11 @@ import pycoal
 from pycoal import mineral
 from pycoal import mining
 
+# To create test images with Spectral Python, run
+# > spectral.envi.save_image('image_x0-xn_y0-yn.hdr', \
+#                            image[x0:xn,y0:yn,:], \
+#                            metadata=image.metadata)
+
 # test files for classifyImage tests
 # TODO test AVIRIS-C
 test_classifyImage_testFilenames = ["images/ang20140912t192359_corr_v1c_img_400-410_10-20.hdr",
