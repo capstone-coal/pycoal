@@ -39,7 +39,7 @@ _name = 'pycoal'
 _namespaces = []
 _test_suite = 'pycoal.tests'
 _url = 'https://github.com/capstone-coal/pycoal'
-_version = '0.5-dev'
+_version = '0.5'
 _zip_safe = False
 
 # Setup Metadata
