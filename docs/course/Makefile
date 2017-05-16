@@ -47,3 +47,6 @@ fall-report.pdf :
 
 winter-progress.pdf :
 	./build.sh winter-progress/winter-progress.ltx winter-progress
+
+spring-midterm.pdf :
+	./build.sh spring-midterm/spring-midterm.ltx spring-midterm

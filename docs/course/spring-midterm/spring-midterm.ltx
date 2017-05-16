@@ -1,0 +1,363 @@
+% assignment: http://eecs.oregonstate.edu/capstone/cs/capstone.cgi?hw=midterm
+
+\documentclass[10pt,draftclsnofoot,onecolumn,journal,compsoc]{IEEEtran}
+% for IEEEtran usage, see http://www.texdoc.net/texmf-dist/doc/latex/IEEEtran/IEEEtran_HOWTO.pdf
+
+\usepackage[margin=0.75in]{geometry}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{enumerate}
+\usepackage{amssymb}
+\usepackage{listings}
+
+\renewcommand{\linespread}{1.0}
+
+\title{COAL: Coal and Open-pit surface mining impacts on American Lands}
+\author{
+  \IEEEauthorblockN{Taylor Alexander Brown, Heidi Ann Clayton, and Xiaomei Wang \\ Group 18} \\
+  \IEEEauthorblockA{CS 463: Senior Capstone Spring 2017 \\ Oregon State University}
+}
+\date{}
+
+\IEEEtitleabstractindextext{
+  \begin{abstract}
+	Mining is known to cause environmental degradation, but software tools to identify mining impacts are lacking. Researchers studying this problem possess large imaging spectroscopy and environmental quality data sets as well as high-performance cloud-computing resources. This project provides a suite of algorithms using these data and resources to identify signatures of mining and correlate them with environmental impacts over time.
+  \end{abstract}
+}
+
+% briefly recaps the project purposes and goals
+% describes where you are currently on the project
+% describes what you have left to do
+% describes any problems that have impeded your progress, with any solutions you have
+% includes particularly interesting pieces of code (if coding is involved)
+% (research only) includes descriptions of experimental design
+% (interface design only) includes description of first user study, hopefully with results
+% includes images of your project -- screen shots, photos, whatever is appropriate
+
+\begin{document}
+
+\maketitle
+\IEEEdisplaynontitleabstractindextext
+\IEEEpeerreviewmaketitle
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+% Taylor
+\section{Purpose and Goals}
+\label{sec:purposegoal}
+The overall purpose of the COAL capstone project was to develop a suite of Free and Open Source Software algorithms to process remote-sensing images from the Airborne Visible/InfraRed Imaging Spectrometer (AVIRIS). The goal was to help scientists at the Jet Propulsion Laboratory study the environmental impacts of coal mining. The COAL library \verb!pycoal! was successfully used to detect probable coal mining waste impacts on water resources at the San Juan Coal Mine and Generating Station in New Mexico. The implementation is fairly generalized so COAL may be applicable to study not only other coal mines but other kinds of environmental impacts as well.
+
+% Heidi
+\section{Current Status}
+\label{sec:status}
+\subsection{What Has Been Done}
+We are in a good spot right now in terms of satisfying the requirements. We have completed implementations of mineral classification, mining identification, and environmental correlation which can be viewed on our GitHub repository \cite{repo}. Our client implemented a science data system that processes AVIRIS imagery as it comes in which satisfies the temporal analysis requirement. As is discussed later, satisfying this requirement was challenging because there are no datasets that contain flightlines over the same areas over time, so this was the next best thing. We also have a website \cite{website} which was very important to our client. The website links to our GitHub, has developer profiles, and a description of our project. The API documentation \cite{api} requirement has been satisfied and is hosted on readthedocs.io and is linked to from the website. We have a wiki \cite{wiki} on GitHub with our weekly updates, a short page on mineral classification, our development process, and pages with software resources. We worked down to the last minute to get everything done before the code freeze but we managed to satisfy all of the requirements. Images were processed on our Amazon Web Services machine continuously for days in April until we had a set of mineral classified images that we could use for mining identification and environmental correlation.
+
+\subsection{What is Left}
+One requirement that we have is to write a research paper, and that is currently not finished. This was specified in the requirements document to be something we do after Expo, so we are on track but behind schedule. At the moment we have an outline with some bullet points and introductory material.
+
+Another thing we have left to do is to make the data and results from our case study more accessible. We also need to publish our final code to PyPi. There is an error somewhere that makes PyPi installation not work at the moment \cite{issue} and our client has stated he is debugging it to see what the problem is. Our project can still be used successfully, but that is something we think is important to have fixed. 
+
+% Xiaomei
+\section{Challenges}
+\label{sec:challenges}
+There are several major problems that we encountered throughout the entire project. We already addressed some of them in our previous presentations and reports.
+
+First, this project is partly a research project. At least from the start of the project, all members had to read numerous research papers about mining, image processing, and other related materials. Apart from the background information that was provided for us, we needed to search heavily for most of our resources. It was an important part of the process, so there is no real solution, just doing it.
+
+Second, the project itself is challenging. We encountered different challenges in different time. One example is that we tried to use neural networks as the main algorithm. The neural networks approach turned out time-consuming and occupied a lot of our resources. Plus, our data was not structured correctly. We later switched to a different method for the image processing.
+
+Third, we have the unexpectedly long runtime, so that means we had to wait days for the results to then analyze. A high performance algorithm is always desired, but we couldn't optimize it much. We just had to wait and do our best.
+
+Finally, the project is time-consuming, especially with all the course work we have to do. We had difficulties during the start trying to balance our schedules. As the project continues, the role of each member has changed. Combined with heavy work from the course (various papers and presentations), scheduling is a major problem for us. However, we managed to get through it. 
+
+% Taylor
+\section{Code Snippets}
+\label{sec:code}
+The following code snippets are from commit \verb!f81e492c! which was the final version submitted for class. They demonstrate the most important methods for mineral classification, mining identification, and environmental correlation.
+
+\subsection{Mineral Classification}
+
+The \verb!MineralClassification.classifyImage! method in \verb!mineral.py! takes an orthocorrected, scaled reflectance imaging spectrometer file and classifies each pixel using spectral angle mapper classification.
+
+\begin{lstlisting}[language=Python,showspaces=false,showstringspaces=false,numbers=left,firstnumber=57,breaklines=true]
+def classifyImage(self, imageFilename, classifiedFilename):
+    """
+    Classify minerals in an AVIRIS image using spectral angle mapper (SAM)
+    classification and save the results to a file.
+
+    Args:
+        imageFilename (str):      filename of the image to be classified
+        classifiedFilename (str): filename of the classified image
+
+    Returns:
+        None
+    """
+
+    # open the image
+    image = spectral.open_image(imageFilename)
+    if self.inMemory:
+        data = image.load()
+    else:
+        data = image.asarray()
+    M = image.shape[0]
+    N = image.shape[1]
+
+    # define a resampler
+    # TODO detect and scale units
+    # TODO band resampler should do this
+    resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
+                                      self.library.bands.centers)
+
+    # allocate a zero-initialized MxN array for the classified image
+    classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+
+    # for each pixel in the image
+    for x in range(M):
+
+        for y in range(N):
+
+            # read the pixel from the file
+            pixel = data[x,y]
+
+            # if it is not a no data pixel
+            if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
+
+                # resample the pixel ignoring NaNs from target bands that don't overlap
+                # TODO fix spectral library so that bands are in order
+                resampledPixel = numpy.nan_to_num(resample(pixel))
+
+                # calculate spectral angles
+                angles = spectral.spectral_angles(resampledPixel[numpy.newaxis,
+                                                                 numpy.newaxis,
+                                                                 ...],
+                                                  self.library.spectra)
+
+                # normalize confidence values from [pi,0] to [0,1]
+                for z in range(angles.shape[2]):
+                    angles[0,0,z] = 1-angles[0,0,z]/math.pi
+
+                # get index of class with largest confidence value
+                indexOfMax = numpy.argmax(angles)
+
+                # classify pixel if confidence above threshold
+                if angles[0,0,indexOfMax] > self.threshold:
+
+                    # index from one (after zero for no data)
+                    classified[x,y] = indexOfMax + 1
+
+    # save the classified image to a file
+    spectral.io.envi.save_classification(
+        classifiedFilename,
+        classified,
+        class_names=['No data']+self.library.names,
+        metadata={
+            'data ignore value': 0,
+            'description': 'PyCOAL '+pycoal.version+' mineral classified image.',
+            'map info': image.metadata.get('map info')
+        })
+
+    # remove unused classes from the image
+    pycoal.mineral.MineralClassification.filterClasses(classifiedFilename)
+\end{lstlisting}
+
+\subsection{Mining Identification}
+
+The \verb!MiningClassification.classifyImage! method in \verb!mining.py! takes a mineral classified image and selects pixels with classes that are proxies for coal mining waste.
+
+\begin{lstlisting}[language=Python,showspaces=false,showstringspaces=false,numbers=left,firstnumber=36,breaklines=true]
+def classifyImage(self, imageFilename, classifiedFilename):
+
+    """
+    Classify mines or other features in a PyCOAL mineral classified image by
+    copying relevant pixels and discarding the rest in a new file.
+
+    Args:
+        imageFilename (str):      filename of the image to be classified
+        classifiedFilename (str): filename of the classified image
+
+    Returns:
+        None
+    """
+
+    # open the image
+    image = spectral.open_image(imageFilename)
+    data = image.asarray()
+    M = image.shape[0]
+    N = image.shape[1]
+
+    # allocate a zero-initialized MxN array for the classified image
+    classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+
+    # get class numbers from names
+    classList = image.metadata.get('class names')
+    classNums = [classList.index(className) if className in classList else -1 for className in self.classNames]
+
+    # copy pixels of the desired classes
+    for y in range(N):
+        for x in range(M):
+            pixel = data[x,y]
+            if pixel[0] in classNums:
+                classified[x,y] = 1 + classNums.index(pixel[0])
+
+    # save the classified image to a file
+    spectral.io.envi.save_classification(
+        classifiedFilename,
+        classified,
+        class_names=['No data']+self.classNames,
+        metadata={
+            'data ignore value': 0,
+            'description': 'PyCOAL '+pycoal.version+' mining classified image.',
+            'map info': image.metadata.get('map info')
+        })
+\end{lstlisting}
+
+\subsection{Environmental Correlation}
+
+The \verb!EnvironmentalCorrelation.intersectProximity! method in \verb!environment.py! takes a mining classified file and a GIS file such as hydrography data to find mining waste classifications a given distance from streams and water bodies.
+
+\begin{lstlisting}[language=Python,showspaces=false,showstringspaces=false,numbers=left,firstnumber=27,breaklines=true]
+def intersectProximity(self, miningFilename, vectorFilename, proximity, correlatedFilename):
+    """
+    Generate an environmental correlation image containing pixels from the
+    mining classified image detected within a given distance of features
+    within a vector layer.
+
+    Args:
+        miningImage (str):     filename of the mining classified image
+        vectorLayer (str):     filename of vector layer
+        proximity (float):     distance in meters
+        correlatedImage (str): filename of the correlated image
+    """
+
+    # get path and file names
+    outputDirectory = dirname(abspath(correlatedFilename))
+    miningName = splitext(basename(abspath(miningFilename)))[0]
+    vectorName = splitext(basename(abspath(vectorFilename)))[0]
+
+    # rasterize the vector features to the same dimensions as the mining image
+    featureHeaderName = outputDirectory + '/' + miningName + '_' + vectorName + '.hdr'
+    self.createEmptyCopy(miningFilename, featureHeaderName)
+    featureImageName = featureHeaderName[:-4] + '.img'
+    self.rasterize(vectorFilename, featureImageName)
+
+    # generate a proximity map from the features
+    proximityHeaderName = outputDirectory + '/' + miningName + '_' + vectorName + '_proximity.hdr'
+    proximityImageName = proximityHeaderName[:-4] + '.img'
+    self.proximity(featureImageName, proximityImageName)
+
+    # load mining and proximity images and initialize environmental correlation array
+    miningImage = spectral.open_image(miningFilename)
+    proximityImage = spectral.open_image(proximityHeaderName)
+    correlatedImage = numpy.zeros(shape=miningImage.shape, dtype=numpy.uint16)
+
+    # get average pixel size
+    if miningImage.metadata.get('map info')[10][-6:].lower() == 'meters':
+        xPixelSize = float(miningImage.metadata.get('map info')[5])
+        yPixelSize = float(miningImage.metadata.get('map info')[6])
+        pixelSize = (xPixelSize + yPixelSize) / 2
+    else:
+        raise ValueError('Mining image units not in meters.')
+
+    # intersect features within proximity
+    for x in range(miningImage.shape[0]):
+        for y in range(miningImage.shape[1]):
+            if miningImage[x,y,0]==1 and proximityImage[x,y,0]*pixelSize<=proximity:
+                correlatedImage[x,y,0] = miningImage[x,y,0]
+
+    # save the environmental correlation image
+    spectral.io.envi.save_classification(
+        correlatedFilename,
+        correlatedImage,
+        class_names=miningImage.metadata.get('class names'),
+        metadata={
+            'data ignore value': 0,
+            'description': 'PyCOAL '+pycoal.version+' environmental correlation image.',
+            'map info': miningImage.metadata.get('map info')
+        })
+\end{lstlisting}
+
+%% % Xiaomei
+%% \section{Write-up}
+%% We plan to dive into our research paper after the Engineering Expo, but we already have an excellent skeleton of the paper. 
+
+%% \includegraphics{researchpaper1.png}
+
+%% The image above is the contents of the paper; it illustrates the basic ideas that are going to be filled. Among all, the Core Toolkit Functionality part is the most important part because this part contains all the details of the algorithm design, running time, and how it functions in general.
+
+\section{Research Paper}
+\label{sec:paper}
+The research paper is currently behind schedule. The following outline contains the structure of our draft.
+
+\begin{enumerate}
+\item Abstract
+\item Introduction
+\item Development
+\item Identification and Classification Workflow
+\item Core Toolkit Functionality
+\item GIS Product Generation
+  \begin{enumerate}
+  \item Intermediate Mineral Products
+  \item Intermediate Mining Products
+  \item Intermediate Environmental Products
+  \item GIS Products
+  \end{enumerate}
+\item Example Scientific Workflow
+  \begin{enumerate}
+  \item Analyzing the AVIRIS-NG Flight ang20150420t Airborne Campaign
+  \item The COAL Science Data System (COAL-SDS)
+  \end{enumerate}
+\item Conclusions and Summary
+\item Code Availability
+\item References
+\end{enumerate}
+
+% Taylor
+\section{Images}
+\label{sec:images}
+The following images display an example flightline classified with COAL as viewed within the geographic information system QGIS. A wide variety of \href{https://drive.google.com/open?id=0BxysdOuBmaIGancyeG01QlUtZ0E}{additional screenshots} can be viewed on Google Drive.
+
+\begin{figure}
+  \includegraphics[width=1.0\textwidth]{visible-light.png}
+  \caption{Visible-light image of a reservoir and stream near the San Juan Coal Mine.}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=1.0\textwidth]{mineral-classified.png}
+  \caption{Mineral classified image showing pixel classifications.}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=1.0\textwidth]{mining-classified.png}
+  \caption{Mining classified image showing presence of coal mining waste proxy classifications.}
+\end{figure}
+\begin{figure}
+  \includegraphics[width=1.0\textwidth]{environmental-correlation.png}
+  \caption{Environmental correlation image showing coal mining waste within ten meters of a stream.}
+\end{figure}
+
+\newpage
+
+\begin{thebibliography}{7}
+\bibitem{repo}
+\url{https://github.com/capstone-coal}
+
+\bibitem{website}
+\url{https://capstone-coal.github.io/}
+
+\bibitem{api}
+\url{https://pycoal.readthedocs.io/en/latest/}
+
+\bibitem{wiki}
+\url{https://github.com/capstone-coal/coal/wiki/}
+
+\bibitem{issue}
+\url{https://github.com/capstone-coal/pycoal/issues/82}
+
+
+\end{thebibliography}
+
+\end{document}
