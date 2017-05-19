@@ -57,18 +57,17 @@ or from source
 Tests
 -----
 
-| pycoal uses the popular
-  `nose <http://nose.readthedocs.org/en/latest/>`__ testing suite for
-  unit tests.
-| You can run the podaacpy tests simply by running
+pycoal uses the popular `nose <http://nose.readthedocs.org/en/latest/>`__ 
+testing suite for unit tests.
+
+You can run the pycoal tests simply by running
 
 ::
 
     nosetests
 
 Additonally, click on the build sticker at the top of this readme to be
-directed to the most recent build on
-`travis-ci <https://travis-ci.org/nasa/podaacpy>`__.
+directed to the most recent build on `travis-ci <https://travis-ci.org/capstone-coal/pycoal>`__.
 
 Quickstart
 ----------
