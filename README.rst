@@ -38,16 +38,19 @@ Installation
 From the cheeseshop
 
 ::
+
 	pip install pycoal
     
 or from conda
 
 ::
+
 	conda install -c conda-forge pycoal
 
 or from source
 
 ::
+
 	git clone https://github.com/capstone-coal/pycoal.git && cd pycoal
 	python setup.py install
 
@@ -77,6 +80,7 @@ Documentation
 -------------
 
 PyCOAL documentation can be found at `Readthedocs <http://pycoal.readthedocs.io>`__ however you can also build documentation manually.
+
 ::
 
 	$ cd docs/source && make html
