@@ -52,7 +52,7 @@ def _read(*rnames):
 _header = '*' * len(_name) + '\n' + _name + '\n' + '*' * len(_name)
 _longDescription = '\n\n'.join([
     _header,
-    _read('README.md')
+    _read('README.rst')
 ])
 open('doc.txt', 'w').write(_longDescription)
 
