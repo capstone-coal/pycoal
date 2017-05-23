@@ -1,4 +1,4 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
+t # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
@@ -39,7 +39,7 @@ _name = 'pycoal'
 _namespaces = []
 _test_suite = 'pycoal.tests'
 _url = 'https://github.com/capstone-coal/pycoal'
-_version = '0.5'
+_version = '0.5.0'
 _zip_safe = False
 
 # Setup Metadata
