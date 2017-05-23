@@ -35,7 +35,7 @@ class MiningClassification:
     def classifyImage(self, imageFilename, classifiedFilename):
 
         """
-        Classify mines or other features in a PyCOAL mineral classified image by
+        Classify mines or other features in a COAL mineral classified image by
         copying relevant pixels and discarding the rest in a new file.
 
         Args:
@@ -73,6 +73,6 @@ class MiningClassification:
             class_names=['No data']+self.classNames,
             metadata={
                 'data ignore value': 0,
-                'description': 'PyCOAL '+pycoal.version+' mining classified image.',
+                'description': 'COAL '+pycoal.version+' mining classified image.',
                 'map info': image.metadata.get('map info')
             })

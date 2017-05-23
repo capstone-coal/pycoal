@@ -12,7 +12,7 @@
    # See the License for the specific language governing permissions and
    # limitations under the License.
 
-Welcome to pycoal's documentation!
+Welcome to the COAL documentation!
 ==================================
 
 Contents:

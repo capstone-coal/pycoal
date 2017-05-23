@@ -1,13 +1,13 @@
 ======
-pycoal
+COAL
 ======
 
 | |license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads|
 
-pycoal is a Python library for processing hyperspectral imagery from remote sensing devices such as the 
+COAL is a Python library for processing hyperspectral imagery from remote sensing devices such as the
 `Airborne Visible/InfraRed Imaging Spectrometer (AVIRIS) <https://aviris.jpl.nasa.gov/>`__ and 
 `AVIRIS-Next Generation <https://avirisng.jpl.nasa.gov/>`__ enabling scientific analysis of Coal and 
-Open-pit surface mining impacts on American Lands (COAL).
+Open-pit surface mining impacts on American Lands.
 
 Introduction and Context
 ------------------------
@@ -25,7 +25,7 @@ a similar understanding on the national and continental levels are very much lac
 
 Project Motivation & Statement 
 ------------------------------
-pycoal provides a suite of algorithms (written in Python) to identify, classify, characterize, 
+COAL provides a suite of algorithms (written in Python) to identify, classify, characterize,
 and quantify (by reporting a number of key metrics) the direct and indirect impacts of 
 MTM and related destructive surface mining activities across the continental U.S.A (and further afield). 
 
@@ -35,7 +35,7 @@ as well as the **docs** directory.
 Installation
 ------------
 
-From the cheeseshop
+The Python COAL package ``pycoal` can be installed from the cheeseshop
 
 ::
 
@@ -57,10 +57,10 @@ or from source
 Tests
 -----
 
-pycoal uses the popular `nose <http://nose.readthedocs.org/en/latest/>`__ 
+COAL uses the popular `nose <http://nose.readthedocs.org/en/latest/>`__
 testing suite for unit tests.
 
-You can run the pycoal tests simply by running
+You can run the COAL tests simply by running
 
 ::
 
@@ -78,7 +78,7 @@ with specific applications of coal.
 Documentation
 -------------
 
-PyCOAL documentation can be found at `Readthedocs <http://pycoal.readthedocs.io>`__ however you can also build documentation manually.
+COAL documentation can be found at `Readthedocs <http://pycoal.readthedocs.io>`__ however you can also build documentation manually.
 
 ::
 
@@ -104,7 +104,7 @@ If you have issue using COAL, please log a ticket in our `Github issue tracker <
 License
 -------
 
-pycoal is licensed under the |license| a copy of which ships with this source code.
+COAL is licensed under the |license| a copy of which ships with this source code.
 
 .. |license| image:: https://img.shields.io/github/license/capstone-coal/pycoal.svg?maxAge=2592000
    :target: http://www.apache.org/licenses/LICENSE-2.0

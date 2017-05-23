@@ -126,7 +126,7 @@ class MineralClassification:
             class_names=['No data']+self.library.names,
             metadata={
                 'data ignore value': 0,
-                'description': 'PyCOAL '+pycoal.version+' mineral classified image.',
+                'description': 'COAL '+pycoal.version+' mineral classified image.',
                 'map info': image.metadata.get('map info')
             })
 
@@ -222,7 +222,7 @@ class MineralClassification:
 
         # update the metadata
         rgbMetadata = image.metadata
-        rgbMetadata['description'] = 'PyCOAL '+pycoal.version+' three-band RGB image.'
+        rgbMetadata['description'] = 'COAL '+pycoal.version+' three-band RGB image.'
         rgbMetadata['data ignore value'] = 0
         if wavelengthStrings:
             rgbMetadata['wavelength'] = [
