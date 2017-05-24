@@ -79,13 +79,13 @@ class EnvironmentalCorrelation:
             class_names=miningImage.metadata.get('class names'),
             metadata={
                 'data ignore value': 0,
-                'description': 'PyCOAL '+pycoal.version+' environmental correlation image.',
+                'description': 'COAL '+pycoal.version+' environmental correlation image.',
                 'map info': miningImage.metadata.get('map info')
             })
 
     def createEmptyCopy(self, sourceFilename, destinationFilename):
         """
-        Create an empty copy of a PyCOAL classified image with the same size.
+        Create an empty copy of a COAL classified image with the same size.
 
         Args:
             sourceFilename (str):      filename of the source image

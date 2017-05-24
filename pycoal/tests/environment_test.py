@@ -70,6 +70,6 @@ def test_intersectProximity():
     expected = spectral.open_image(correlatedFilename)
     actual = spectral.open_image(testFilename)
     assert numpy.array_equal(expected.asarray(), actual.asarray())
-    assert actual.metadata.get('description') == 'PyCOAL '+pycoal.version+' environmental correlation image.'
+    assert actual.metadata.get('description') == 'COAL '+pycoal.version+' environmental correlation image.'
     assert expected.metadata.get('class names') == actual.metadata.get('class names')
     assert expected.metadata.get('map info') == actual.metadata.get('map info')

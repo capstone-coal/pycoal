@@ -15,6 +15,6 @@
 Quickstart
 *****************
 
-In the `examples directory <https://github.com/capstone-coal/pycoal/tree/master/examples>`_ you can find several Jupyter notebooks with specific applications of coal. You can launch a cloud Jupyter server using binder to edit the notebooks without installing anything. `Try it out <http://mybinder.org/repo/capstone-coal/pycoal>`_!
+In the `examples directory <https://github.com/capstone-coal/pycoal/tree/master/examples>`_ you can find several Jupyter notebooks with specific applications of COAL. You can launch a cloud Jupyter server using binder to edit the notebooks without installing anything. `Try it out <http://mybinder.org/repo/capstone-coal/pycoal>`_!
 
 

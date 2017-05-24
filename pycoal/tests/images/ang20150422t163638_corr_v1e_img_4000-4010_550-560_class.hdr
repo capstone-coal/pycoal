@@ -1,6 +1,6 @@
 ENVI
 description = {
-  PyCOAL 0.2 mineral classified image.}
+  COAL 0.2 mineral classified image.}
 samples = 10
 lines = 10
 bands = 1
