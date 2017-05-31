@@ -150,11 +150,11 @@ Criteria being evaluated include the time needed to research and develop each me
 This table compares each option based on the criteria. Because the options are general approaches to algorithm design and not specific libraries, it was necessary to estimate the costs and benefits.
 
 \subsubsection{Discussion}
-Mineral classification by itself can be a sophisticated method of identifying traces of mining activity. Minerals with low natural concentrations can be used to identify mining activity, as jarosite was used to map active mining operations in the Ray Mine in Arizona \cite{raymine}. In this case, simply mapping the presence of a mineral may be sufficient to locate mines. In other cases, minerals associated with mining cannot be detected by imaging spectroscopy, such as pyrite in the California Gulch Superfund Site \cite{leadville}. The solution, in this case, was to search for patterns of secondary minerals weathered from pyrite that is detectable by the sensors. Therefore the mineral classification method can be simple or complex depending on the chemistry of the minerals of interest and the logic required to find them.
+Mineral classification by itself can be a sophisticated method of identifying traces of mining activity. Minerals with low natural concentrations can be used to identify mining activity, as jarosite was used to map active mining operations in the Ray Mine in Arizona \cite{raymine}. In this case, simply mapping the presence of a mineral may be sufficient to locate mines. In other cases, minerals associated with mining cannot be detected by imaging spectroscopy, such as pyrite in the California Gulch Superfund Site \cite{leadville}. The solution in this case was to search for patterns of secondary minerals weathered from pyrite that are detectable by the sensors. Therefore the mineral classification method can be simple or complex depending on the chemistry of the minerals of interest and the logic required to find them.
 
 GIS comparison can also provide useful insights for identifying mines. One approach that has been used to successfully visualize mining activity is to overlay permit boundaries on top of classified spectroscopy data \cite{movingmountaintops}. This provided a visual comparison of known mines and their spectroscopic signatures. Another approach is to compare geologic maps with the observed minerals and look for discrepancies \cite{raymine}. This allowed naturally-occurring deposits to be distinguished from artificial ones. The comparisons between processed data and known geographic information could be made programmatically or simply displayed for human inspection.
 
-A combination of mineral classification with GIS comparison would provide the most extensive analysis but would require the most research and development time and computational cost. Using both methods would require design choices such as whether to automate or display each result. For example, GIS comparison of geologic maps with observed minerals could be used to eliminate deposits that are thought to be naturally-occurring automatically; alternatively, both the geologic maps and the observations could be combined so that more data is displayed and less is lost. Similar choices would be necessary for mineral pattern detection or permit boundary mapping. Combining multiple data sources would be challenging and could make the results more or less accurate depending on the circumstances.
+A combination of mineral classification with GIS comparison would provide the most extensive analysis but would require the most research and development time and computational cost. Using both methods would require design choices such as whether to automate or display each result. For example, GIS comparison of geologic maps with observed minerals could be used to automatically eliminate deposits that are thought to be naturally-occurring; alternatively, both the geologic maps and the observations could be combined so that more data is displayed and less is lost. Similar choices would be necessary for mineral pattern detection or permit boundary mapping. Combining multiple data sources would be challenging and could make the results more or less accurate depending on the circumstances.
 
 \subsubsection{Selection}
 Based on these criteria, it is recommended to pursue the mineral classification methods first in order to locate regions with mineral deposits that indicate mining. If this can be completed successfully, then evolving a combination of mineral classification and GIS comparison methods would provide an opportunity to improve the analysis.
@@ -398,10 +398,10 @@ Our site should look professional and have a simple, user-friendly interface tha
 \end{tabular}
 
 \subsubsection{Discussion}
-Skeleton is fairly bare-bones, so it is not ideal for when developers want many themes to choose from \cite{bootfoundskeleton}. Skeleton is also a much less active project. At the time of writing this document, the last update made on the official GitHub page for Skeleton was made in December of 2014. Bootstrap and Foundation are both very popular and active projects that compare pretty evenly. Bootstrap has a slightly different approach to the mobile version of a site than Foundation does. Foundation was developed under the assumption that "anything not under a media query is considered mobile \cite{bootstrapvsfoundation}." Bootstrap will only design something for mobile if specified. This is not very important to COAL's homepage, though. Both are compatible with Jekyll, our choice for a static site generator. The deciding factor between Bootstrap and Foundation comes down to the preferences and experiences of the team members. We have experience with Bootstrap and enjoy the look and feel of it, so it is our choice for COAL's homepage's front-end.
+Skeleton is fairly bare-bones, so it isn't ideal for when developers want many themes to choose from \cite{bootfoundskeleton}. Skeleton is also a much less active project. At the time of writing this document, the last update made on the official GitHub page for Skeleton was made in December of 2014. Bootstrap and Foundation are both very popular and active projects that compare pretty evenly. Bootstrap has a slightly different approach to the mobile version of a site than Foundation does. Foundation was developed under the assumption that "anything not under a media query is considered mobile \cite{bootstrapvsfoundation}." Bootstrap will only design something for mobile if specified. This is not very important to COAL's homepage though. Both are compatible with Jekyll, our choice for a static site generator. The deciding factor between Bootstrap and Foundation comes down to the preferences and experiences of the team members. We have experience with Bootstrap and enjoy the look and feel of it, so it is our choice for COAL's homepage's front-end.
 
 \subsubsection{Selection}
-We will be using skeleton with Bootstrap for the front-end framework of COAL's homepage.
+We will be using Bootstrap for the front-end framework of COAL's homepage.
 
 \section{Conclusion}
 In this paper we described and compared technologies for implementing the COAL algorithm suite and associated documentation. The core functionality consists of a data processing pipeline that transforms raw imagery and data into meaningful relationships. We have become familiar with relevant literature, developed detailed sketches of our algorithms, and implemented a framework for most of the modules using the libraries we have chosen. In addition to the algorithms, our project will be supported by API documentation for programmers and a homepage for end users. A discussion of implementation choices for each component was provided along with a recommendation based on a comparison of costs and benefits. The team members responsible for each component were identified in the introduction \ref{sec:intro}. We hope that this discussion has provided the reader with a better understanding of the design choices that have been and have yet to be made as we continue to collaborate with our client on research and development.
@@ -428,22 +428,22 @@ Scrapped neural network libraries and compared classification methods in Spectra
 Revisions to Section \ref{subsec:identifymining}: Since we have not really started the mining identification part, there aren't many changes except for some grammar fix.
 
 \subsection{Preprocessing Data to Correlate Mining with Environmental Impact}
-Revisions to Section \ref{subsec:preprocessing}: No revisions.
+Revisions to Section \ref{subsec:preprocessing}: Revised to document our choice to convert GIS to raster data.
 
 \subsection{Feature Extraction to Correlate Mining with Environmental Impact}
-Revisions to Section \ref{subsec:correlate}: No revisions.
+Revisions to Section \ref{subsec:correlate}: Revised to describe the simple case study chosen by client.
 
 \subsection{Rank and Document Changes Over Time}
-Revisions to Section \ref{subsec:changesovertime}: No revisions.
+Revisions to Section \ref{subsec:changesovertime}: Revised to describe expectation that end user will choose data sets, and updated the selection to be a combination of manual and batch processing.
 
 \subsection{API Documentation}
 Revisions to Section \ref{subsec:apidoc}: No revisions.
 
 \subsection{Static site generator}
-Revisions to Section \ref{subsec:staticsitegenerator}: Add an explanation to what kind of static site generator we are actually going to use and what kind of functions it would provide to us.
+Revisions to Section \ref{subsec:staticsitegenerator}: .
 
 \subsection{Front-end framework}
-Revisions to Section \ref{subsec:frontendframework}: Nothing much changed. We are still using Bootstrap as our front-end framework as planned. Add the use of skeleton.
+Revisions to Section \ref{subsec:frontendframework}: .
 
 \begin{thebibliography}{9}
 % for IEEE citation reference, see https://www.ieee.org/documents/ieeecitationref.pdf
