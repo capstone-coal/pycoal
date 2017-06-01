@@ -50,32 +50,34 @@ Each section was authored by the corresponding team member responsible for each 
 % heidi: requirement 3.4.1 part 1: choose technology for mineral identification and classification
 \subsection{Feature extraction in AVIRIS data}
 \label{subsec:featureextraction}
-All minerals have their own unique spectral signature, or relationship between wavelength and reflectance. The process of feature extraction will be done via a neural network using Spectral Python. Spectral Python can be installed via Pip or directly from the GitHub repository. The only dependency is NumPy. Spectral Python works with Python 2 and is compatible with Python 3 minus the functions "view\_cube" and "view\_nd", which will not be used in COAL.
+The process of feature extraction will be done using Spectral Python and spectral libraries. Spectral Python can be installed via Pip or directly from the GitHub repository. The only dependency is NumPy. Spectral Python works with Python 2 and is compatible with Python 3 minus the functions "view\_cube" and "view\_nd", which will not be used in COAL. All minerals have their own unique spectral signature, or relationship between wavelength and reflectance, various samples of which are found in spectral libraries. These will then be used for comparison on each pixel in the classification \ref{subsec:classification} section.
 
-The first step is to load the training data. Spectral Python has different methods of opening files containing hyperspectral data and COAL will be opening the training data in ENVI format. After the data is opened, it will be normalized. This is so that when it is classified later, there is consistency in the number of spectral bands and wavelength range of the trained neural network and the data to be classified. This is done with the methods belonging to the PrincipalComponents class in Spectral Python. 
+COAL will support using any spectral library that is in the ENVI file format. These can then be passed to the feature extraction and classification modules in COAL to be opened using the "open\_image" function in Spectral Python. This function is relatively general-purpose and will detect what class will represent the file. The spectral library in ENVI format should be detected as a SpectralLibrary object. There will also be an option to only use a subset of the mineral classes in the spectral library. 
 
-In order to make a neural network functional, there needs to be a training stage. The data for the training stage will include the United States Geologic Survey Digital Spectral Library. This library is available for free in different formats, however it is important to use the format that is compatible with AVIRIS. The United States Geologic Survey Digital Spectral Library contains observed spectral signatures of minerals, combinations of minerals, and other land surfaces such as snow. Other data included will be the ASTER spectral library, which functions the same as the USGS library. The training stage will be done with the methods belonging to the PerceptronClassifier class in Spectral Python. Neural networks require a large sample size to be highly accurate. These libraries contain over one thousand spectral signatures each, so training will be considered sufficient with USGS and ASTER. 
+The main spectral library that will be used in the case study is the United States Geological Survey (USGS) Digital Spectral Library 06. This spectral library is already provided in ENVI format on an FTP server by USGS. The USGS library has 1365 classes provided with one sample per class. The spectral signatures are found in the "spectra" attribute and the names of the classes are found in the "names" attribute. Classes of interest provided in the USGS spectral library are the "Renyolds\_TnlSldgWet SM93-15w" and "Renyolds\_Tnl\_Sludge SM93-15" classes. These represent sludge produced by coal mining. Other classes may also end up being of interest as the case study goes on.
 
-After the neural network has been trained, it will need to be saved to a file for reuse later, as it is undesirable to have to retrain a neural network every time COAL is used. There will be a function in the COAL library that makes use of Python’s pickle library in order to save the trained neural network to a file. 
+Along with the USGS Digital Spectral Library 06, COAL should be able to support the ASTER Spectral Library, a compilation of various spectral libraries including USGS provided by JPL. The ASTER Spectral Library is made up of 2400 classes which are taken from the Johns Hopkins Spectral Library, the Jet Propulsion Laboratory Spectral Library, and the USGS Digital Spectral Library 06. What makes using the ASTER library tricky is the format in which it is provided. ASTER is provided as a folder full of ASCII text files with one per mineral class. Luckily, ASTER can be converted into ENVI format using Spectral Python using a SQLite file.
 
-Some important points to consider during feature extraction is consistency between training data sets. Besides normalizing, units need to be considered. For example, USGS and AVIRIS record wavelength in different units (USGS in micrometers and AVIRIS in nanometers). If this is not addressed, the classification stage could possibly yield highly inaccurate results. This warning should also be noted in the Sphinx documentation, as the COAL library is developed for the purpose of this project as well as for use by others. Time is also a factor that could come into play here, as the nature of neural networks requires large data sets for maximum usefulness. The training stage could take a long time, as just the USGS data contains millions of lines and some users may want to input even more training data than we will be doing for the mining analysis. 
+First, a directory containing the ASTER files must be provided along with the name the user wishes to call the generated SQLite file. Then, the "create" method of Spectral Python's "AsterDatabase" class can be used to generate a SQLite file containing all of the information on the individual mineral classes in the ASCII files. The SQLite file will then be queried for the names of the mineral classes and a "BandInfo" object will be created using the wavelength range and number of layers per pixel for an AVIRIS image. These will then be used with the "AsterDatabase" class' "create\_envi\_spectral\_library" method to create an ENVI spectral library.
+
+
 
 
 
 % heidi
 \subsection{Classification of AVIRIS data}
 \label{subsec:classification}
+After obtaining a functioning spectral library in the feature extraction step, the next step is mineral classification. Essentially, this means that each pixel of the provided AVIRIS image will be analyzed and assigned to the most likely match in the provided spectral library.
 
-Once a trained neural network is created, as described in the description of the feature extraction phase, classification can be performed on hyperspectral data with unknown mineral concentrations. This will create the basis for later stages of the analysis of AVIRIS data for the effects of mining by identifying the minerals and land surfaces in an image which will then be analyzed for any patterns associated with mining. This be done with Spectral Python. Information on Spectral Python can be found in section \ref{subsec:featureextraction}. 
+First, the AVIRIS image to be classified will be opened with Spectral Python's "open\_image" function. Then, the image will be loaded into memory if the machine COAL is being run on has enough memory to do so. This will increase the efficiency of the classification process, which can take a long time. The bands of the image will then be resampled with the spectra of the spectral library. This will basically normalize the data and take care of discrepancies with units. The discrepancies with units can render the results of the classification process unusable, so this step is very important. 
 
-The first step for classification is to load the trained neural network from a file. This is done with Python’s pickle library. Next comes the images to be classified. For each image to be used in classification, the file name of the image and the file name of the newly classified image must be provided as parameters. The library will take the trained neural network and the file names and iterate through each pixel in each image in order to complete the classification. 
+After resampling the spectral bands, an empty M x N NumPy array will be created, with M and N representing the length and width of the original AVIRIS image. Then, the image will be looped through and each pixel will be processed. The first thing to consider when looking at a pixel is if that pixel actually has data or not. AVIRIS flightlines are surrounded by many "No data" pixels that are represented by either "-.005" or "-50" in their spectral bands. "-.005" is used in images taken by the original AVIRIS device and “-50” is used in images used by AVIRIS-NG, or AVIRIS New Generation.
 
-The AVIRIS image will be iterated over with the “ImageIterator” class in Spectral Python. An M x N array will be allocated with NumPy in order to store the classified data of each pixel. Each pixel will be normalized as per the feature extraction phase. The same function should be used for normalizing the training data and normalizing pixels. The normalized pixel will then be used as input into the neural network to be classified as a particular type of mineral or land surface identified in the training data. This is done with the methods of the “PerceptronClassifier” class. The classified pixel is then stored in the M x N array mentioned above. Once all pixels have been classified, the array of classified pixels will be written to a file using the “save\_classifier” method of the “envi” class.
+The pixel will be resampled to get rid of "NaN" values from target bands that do not overlap. Next, the pixel will be run through Spectral Python's "spectral\_angles" function. This computes the angle between the pixel’s spectra and each class in the spectral library. This is where most of the processing time will come from.
 
-Something to consider when using this classifier for analysis is spectral separability. Some types of minerals and other land surfaces have very similar relationships between reflectance and wavelength and can be cause the neural network’s accuracy to suffer if they are separated into different classes \cite{separability}. It is up to the developers to determine if the particular minerals or other land surfaces that are not very separable should be put into the same class or kept separate depending on if the minerals or other land surfaces in question are important enough by themselves in some way to warrant a slightly lower accuracy.
+Once the list of spectral angles are computed, the argmax will be taken to find the class in the spectral library that most closely matched the current pixel. This can be done easily by using NumPy's "argmax" function. Then, the class number that most closely matches the pixel will be written to the above mentioned M x N NumPy array. One functionality that will be added is the ability to set a threshold for the spectral angles. That is, the ability to set a minimum confidence value for the pixel classification. If the class that most closely matches the pixel has a very low confidence value, it should be written as a "No data" value.
 
-As with the feature extraction phase, attention needs to be paid to the units in the images to be classified and the timing. None of the Spectral Python functions will pay attention to any discrepancies between units, so it is imperative that it is addressed before classification begins. Hyperspectral images tend to be very large files that are multiple gigabytes in size and it is possible that using a long list of images as input will result in a wait time that is several minutes per image. It is important that this is considered before use. 
-
+After the all pixels in the image have been successfully processed, the classified array will be saved to a file using the "save\_classification" method from Spectral Python's "ENVI" class. Then, that file can be run through a filter to get rid of all unused classes from the spectral library to clean up the data. Once the data has been classified, it can be further analyzed by the mining identification and environmental correlation steps and opened in a GIS program to get a full visual of all classifications. 
 
 
 % xiaomei: requirement 3.4.2: identify mining
@@ -285,10 +287,20 @@ This document has outlined the design of the COAL project and the suite of algor
 \label{sec:revisions}
 
 \subsection{Feature extraction in AVIRIS data}
-Revisions to Section \ref{subsec:featureextraction}: Scrapped blob detection and wrote about training neural networks.
+Revisions to Section \ref{subsec:featureextraction}: 
+\subsubsection{Revision 1}
+Scrapped blob detection and wrote about training neural networks.
+
+\subsubsection{Revision 2}
+Scrapped neural networks and wrote about spectral libraries.
 
 \subsection{Classification of AVIRIS data}
-Revisions to Section \ref{subsec:classification}: Rewrote most of the section and made it more specific to the development at this time. 
+Revisions to Section \ref{subsec:classification}: 
+\subsubsection{Revision 1}
+Rewrote most of the section and made it more specific to the development at this time.
+
+\subsubsection{Revision 2}
+Scrapped neural networks and wrote about the spectral angle mapper.
 
 \subsection{Identify Mining}
 Revisions to Section \ref{subsec:identifymining}: No revisions.
@@ -312,16 +324,4 @@ Revisions to Section \ref{subsec:staticsitegenerator}: To clarify what kind of f
 Revisions to Section \ref{subsec:frontendframework}: Add details about what is on the navigation bar. Add the details of what changes of the website.
 
 
-\begin{thebibliography}{6}
-  
-\bibitem{separability}
-  W. Amidon. (2014, March 17). \emph{v26 evaluating spectral separability in ENVI} [YouTube video]. Available: \url{https://www.youtube.com/watch?v=y685Km9njys}
-
-\bibitem{introarcmap}
-  W. Amidon. (2014, March 17). \emph{v25 introduction to classification in ArcMap and ENVI} [YouTube video]. Available: \url{https://www.youtube.com/watch?v=OBJKGWocM6Q}
-  
-
-
-
-\end{thebibliography}
 \end{document}
