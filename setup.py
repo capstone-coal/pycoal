@@ -28,7 +28,7 @@ _classifiers = [
     'Intended Audience :: Science/Research',
     'Topic :: Scientific/Engineering',
     'Development Status :: 4 - Beta',
-    'License :: OSI Approved :: GNU GENERAL PUBLIC LICENSE v2',
+    'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Topic :: Software Development :: Libraries :: Python Modules',
