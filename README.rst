@@ -107,7 +107,7 @@ License
 COAL is licensed under the |license| a copy of which ships with this source code.
 
 .. |license| image:: https://img.shields.io/github/license/capstone-coal/pycoal.svg?maxAge=2592000
-   :target: http://www.apache.org/licenses/LICENSE-2.0
+   :target: https://www.gnu.org/licenses/gpl-2.0.html
 .. |Python3| image:: https://img.shields.io/badge/python-3-blue.svg
    :target: https://www.python.org/downloads/
 .. |PyPI| image:: https://img.shields.io/pypi/v/pycoal.svg?maxAge=2592000?style=plastic
