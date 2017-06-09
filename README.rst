@@ -72,8 +72,7 @@ directed to the most recent build on `travis-ci <https://travis-ci.org/capstone-
 Quickstart
 ----------
 
-See the **examples** directory for some `Jupyter notebook examples  <https://jupyter.org/>`__ 
-with specific applications of coal.
+See the `quickstart documentation <https://capstone-coal.github.io/docs#usage>`_.
 
 Documentation
 -------------
