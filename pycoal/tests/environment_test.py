@@ -45,34 +45,34 @@ from pycoal import environment
 # Clip and choose the input, clip, and output layers.
 
 # test files for proximity intersection test
-miningFilename = 'images/ang20150420t182050_corr_v1e_img_class_mining_cut.hdr'
-vectorFilename = 'images/NHDFlowline_cut.shp'
+mining_filename = 'images/ang20150420t182050_corr_v1e_img_class_mining_cut.hdr'
+vector_filename = 'images/NHDFlowline_cut.shp'
 proximity = 10.0
-correlatedFilename = 'images/ang20150420t182050_corr_v1e_img_class_mining_cut_NHDFlowline_corr.hdr'
-testFilename = 'images/ang20150420t182050_corr_v1e_img_class_mining_cut_NHDFlowline_corr_test.hdr'
+correlated_filename = 'images/ang20150420t182050_corr_v1e_img_class_mining_cut_NHDFlowline_corr.hdr'
+test_filename = 'images/ang20150420t182050_corr_v1e_img_class_mining_cut_NHDFlowline_corr_test.hdr'
 
 # remove generated files
-def _test_intersectProximity_teardown():
-    miningName = splitext(basename(abspath(miningFilename)))[0]
-    vectorName = splitext(basename(abspath(vectorFilename)))[0]
-    outputDirectory = 'images'
-    featureHeaderName = outputDirectory + '/' + miningName + '_' + vectorName + '.hdr'
-    featureImageName = featureHeaderName[:-4] + '.img'
-    proximityHeaderName = outputDirectory + '/' + miningName + '_' + vectorName + '_proximity.hdr'
-    proximityImageName = proximityHeaderName[:-4] + '.img'
-    testImageName = testFilename[:-4] + '.img'
-    _remove_files([featureHeaderName, featureImageName,
-                   proximityHeaderName, proximityImageName,
-                   testFilename, testImageName])
+def _test_intersect_proximity_teardown():
+    mining_name = splitext(basename(abspath(mining_filename)))[0]
+    vector_name = splitext(basename(abspath(vector_filename)))[0]
+    output_directory = 'images'
+    feature_header_name = output_directory + '/' + mining_name + '_' + vector_name + '.hdr'
+    feature_image_name = feature_header_name[:-4] + '.img'
+    proximity_header_name = output_directory + '/' + mining_name + '_' + vector_name + '_proximity.hdr'
+    proximity_image_name = proximity_header_name[:-4] + '.img'
+    test_image_name = test_filename[:-4] + '.img'
+    _remove_files([feature_header_name, feature_image_name,
+                   proximity_header_name, proximity_image_name,
+                   test_filename, test_image_name])
 
 # verify that proximity intersection produces expected results
-@with_setup(None, _test_intersectProximity_teardown)
+@with_setup(None, _test_intersect_proximity_teardown)
 @skipIf(environ.get('CONTINUOUS_INTEGRATION'), 'Skip test because GDAL not installed on server.')
-def test_intersectProximity():
+def test_intersect_proximity():
     ec = environment.EnvironmentalCorrelation()
-    ec.intersectProximity(miningFilename, vectorFilename, proximity, testFilename)
-    expected = spectral.open_image(correlatedFilename)
-    actual = spectral.open_image(testFilename)
+    ec.intersect_proximity(mining_filename, vector_filename, proximity, test_filename)
+    expected = spectral.open_image(correlated_filename)
+    actual = spectral.open_image(test_filename)
     assert numpy.array_equal(expected.asarray(), actual.asarray())
     assert actual.metadata.get('description') == 'COAL '+pycoal.version+' environmental correlation image.'
     assert expected.metadata.get('class names') == actual.metadata.get('class names')
