@@ -35,7 +35,7 @@ as well as the **docs** directory.
 Installation
 ------------
 
-The Python COAL package ``pycoal` can be installed from the cheeseshop
+The Python COAL package **pycoal** can be installed from the cheeseshop
 
 ::
 
