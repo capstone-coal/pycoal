@@ -14,12 +14,13 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth 
 # Floor, Boston, MA 02110-1301, USA.
 
-strictness : medium
+strictness : veryhigh
 pylint:
   run: false
 python-targets:
+   - 3
    - 2
-test-warnings: no
+test-warnings: yes
 pep8:
    full: true 
 ignore-paths:
