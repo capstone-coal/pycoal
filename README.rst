@@ -2,7 +2,7 @@
 COAL
 ======
 
-| |license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads|
+| |license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads| |Docker Pulls| |microbadger|
 
 COAL is a Python library for processing hyperspectral imagery from remote sensing devices such as the
 `Airborne Visible/InfraRed Imaging Spectrometer (AVIRIS) <https://aviris.jpl.nasa.gov/>`__ and 
@@ -35,17 +35,26 @@ as well as the **docs** directory.
 Installation
 ------------
 
+pip
+^^^
+
 The Python COAL package **pycoal** can be installed from the cheeseshop
 
 ::
 
 	pip install pycoal
     
+conda
+^^^^^
+
 or from conda
 
 ::
 
 	conda install -c conda-forge pycoal
+
+Source
+^^^^^^
 
 or from source
 
@@ -53,6 +62,16 @@ or from source
 
 	git clone https://github.com/capstone-coal/pycoal.git && cd pycoal
 	python setup.py install
+
+Docker
+^^^^^^
+
+`Docker <https://www.docker.com/>`_ greatly simplifies installation of pycoal and the environment. 
+The image can be installed from `Dockerhub <https://hub.docker.com/>`_ as follows
+
+::
+
+	docker run -p 4000:8000 lewismc/coal:latest
 
 Tests
 -----
@@ -127,3 +146,7 @@ COAL is licensed under the |license| a copy of which ships with this source code
    :target: https://anaconda.org/conda-forge/pycoal
 .. |Anaconda-Server Downloads| image:: https://anaconda.org/conda-forge/pycoal/badges/downloads.svg
    :target: https://anaconda.org/conda-forge/pycoal
+.. |Docker Pulls| image:: https://img.shields.io/docker/pulls/lewismc/coal.svg?maxAge=2592000?style=plastic
+   :target: https://hub.docker.com/r/lewismc/coal/
+.. |microbadger| image:: https://images.microbadger.com/badges/image/lewismc/coal.svg
+   :target: https://microbadger.com/images/lewismc/coal
