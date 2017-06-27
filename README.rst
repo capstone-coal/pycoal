@@ -71,7 +71,7 @@ The image can be installed from `Dockerhub <https://hub.docker.com/>`_ as follow
 
 ::
 
-	docker run -p 4000:8000 lewismc/coal:latest
+	docker pull capstonecoal/coal:latest
 
 Tests
 -----
@@ -146,7 +146,7 @@ COAL is licensed under the |license| a copy of which ships with this source code
    :target: https://anaconda.org/conda-forge/pycoal
 .. |Anaconda-Server Downloads| image:: https://anaconda.org/conda-forge/pycoal/badges/downloads.svg
    :target: https://anaconda.org/conda-forge/pycoal
-.. |Docker Pulls| image:: https://img.shields.io/docker/pulls/lewismc/coal.svg?maxAge=2592000?style=plastic
-   :target: https://hub.docker.com/r/lewismc/coal/
-.. |microbadger| image:: https://images.microbadger.com/badges/image/lewismc/coal.svg
-   :target: https://microbadger.com/images/lewismc/coal
+.. |Docker Pulls| image:: https://img.shields.io/docker/pulls/capstonecoal/coal.svg?maxAge=2592000?style=plastic
+   :target: https://cloud.docker.com/swarm/capstonecoal/repository/docker/capstonecoal/coal/general
+.. |microbadger| image:: https://images.microbadger.com/badges/image/capstonecoal/coal.svg
+   :target: https://microbadger.com/images/capstonecoal/coal
