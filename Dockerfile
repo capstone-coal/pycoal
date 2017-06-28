@@ -26,7 +26,51 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key 073D307A618E5811
 # Install the dependencies
 RUN apt-get update && \
 	apt-get upgrade -y --force-yes && \
-	apt-get install -y apache2 bash-completion bison checkinstall cmake devscripts doxygen flex git graphviz grass-dev libexpat1-dev libfcgi-dev libgdal-dev libgeos-dev libgsl0-dev libopenscenegraph-dev libosgearth-dev libpq-dev libproj-dev libqt4-dev libqt4-opengl-dev libqtwebkit-dev libqwt-dev libspatialindex-dev libspatialite-dev libsqlite3-dev pkg-config pkg-kde-tools pyqt4-dev-tools python-all python-all-dev python-qgis python-qt4 python-qt4-dev python-sip python-sip-dev qgis qgis-plugin-grass txt2tags xauth xfonts-100dpi xfonts-75dpi xfonts-base xfonts-scalable xvfb
+	apt-get install -y apache2 \
+		bash-completion \
+		bison \
+		checkinstall \
+		cmake \
+		devscripts \
+		doxygen \
+		flex \
+		git \
+		graphviz \
+		grass-dev \
+		libexpat1-dev \
+		libfcgi-dev \
+		libgdal-dev \
+		libgeos-dev \
+		libgsl0-dev \
+		libopenscenegraph-dev \
+		libosgearth-dev \
+		libpq-dev \
+		libproj-dev \
+		libqt4-dev \
+		libqt4-opengl-dev \
+		libqtwebkit-dev \
+		libqwt-dev \
+		libspatialindex-dev \
+		libspatialite-dev \
+		libsqlite3-dev \
+		pkg-config \
+		pkg-kde-tools \
+		pyqt4-dev-tools \
+		python-all \
+		python-all-dev \
+		python-qgis \
+		python-qt4 \
+		python-qt4-dev \
+		python-sip \
+		python-sip-dev \
+		qgis \
+		qgis-plugin-grass \
+		txt2tags \
+		xauth \
+		xfonts-100dpi \
+		xfonts-75dpi \
+		xfonts-base \
+		xfonts-scalable xvfb
 
 # Build GDAL from source with minimized drivers
 WORKDIR /usr/local
@@ -47,7 +91,6 @@ RUN git clone https://github.com/OSGeo/gdal.git && \
     	--without-cfitsio \
     	--without-cryptopp \
     	--without-curl \
-    	--without-dwgdirect \
     	--without-ecw \
     	--without-expat \
     	--without-fme \
@@ -94,7 +137,6 @@ RUN git clone https://github.com/OSGeo/gdal.git && \
 	export LD_LIBRARY_PATH=$GDAL_PREFIX/lib:$LD_LIBRARY_PATH && \
 	export GDAL_DATA=$GDAL_PREFIX/share/gdal && \
 	# Test
-	gdalinfo --version && \
 	gdalwarp --version
 
 # Set the working directory to /coal
@@ -105,8 +147,3 @@ ADD . /coal
 
 # Install pycoal from source, ensures we always use the latest development branch
 RUN python setup.py install
-
-
-
-
-
