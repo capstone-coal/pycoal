@@ -9,6 +9,10 @@ Please report any issues you find here over at the `pycoal issue tracker <https:
 Prerequisites
 -------------
 
+Build and Test pycoal
+^^^^^^^^^^^^^^^^^^^^^
+Please `build the pycoal source <https://github.com/capstone-coal/pycoal/#source>`__ and then `test <https://github.com/capstone-coal/pycoal/#tests>`__ it. This fetches and stages the **USGS Digital Spectral Library** we will be using in this example.
+
 AVIRIS-NG Data
 ^^^^^^^^^^^^^^
 pycoal does not come packaged with absolutely everything e.g. spectral library(ies), input hyperspectral spectroscopy data, etc. In order to run the following examples, you need to download AVIRIS data to the **examples** directory. N.B. This data may take a significant amount of time to download depending on your network... go and make yourself a cup of tea or two!
@@ -21,7 +25,7 @@ A full description of what this data actually is, is detailed in the `AVIRIS-NG 
 
 USGS Digital Spectral Library splib06a
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-In this directory, you will also notice a file named **s06av95a_envi.hdr**. This, as explained in the example, is the `USGS Digital Spectral Library splib06a <https://speclab.cr.usgs.gov/spectral.lib06/ds231/index.html>`__ we use to characterize and classify AVIRIS pixel spectral signatures.
+If you have built and tested pycoal, if you navigate to *pycoal/tests/* you will see two files named **s06av95a_envi.hdr** and *s06av95a_envi.sli*. These files, as explained in the example code, are the `USGS Digital Spectral Library splib06a <https://speclab.cr.usgs.gov/spectral.lib06/ds231/index.html>`__ header and digital spectral index files respectively. We use these to characterize and classify AVIRIS pixel spectral signatures. Please DO NOT move these files are they are read in a relative fashion.
 
 Mineral Classification
 ----------------------

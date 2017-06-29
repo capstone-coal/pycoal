@@ -41,6 +41,7 @@ from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
 import pycoal
+from pycoal import mineral
 
 __all__ = []
 
@@ -48,7 +49,7 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-def run_mineral(input_filename="ang20150420t182050_corr_v1e_img.hdr", library_filename="s06av95a_envi.hdr"):
+def run_mineral(input_filename="avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr", library_filename="../pycoal/tests/s06av95a_envi.hdr"):
     '''
     ...
     '''
