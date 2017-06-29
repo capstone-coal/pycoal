@@ -41,7 +41,6 @@ from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
 import pycoal
-from pycoal import mineral
 
 __all__ = []
 
@@ -49,15 +48,25 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-class CLIError(Exception):
-    '''Generic exception to raise and log different fatal errors.'''
-    def __init__(self, msg):
-        super(CLIError).__init__(type(self))
-        self.msg = "E: %s" % msg
-    def __str__(self):
-        return self.msg
-    def __unicode__(self):
-        return self.msg
+def run_mineral(input_filename="ang20150420t182050_corr_v1e_img.hdr", library_filename="s06av95a_envi.hdr"):
+    '''
+    ...
+    '''
+
+    # path to save RGB image
+    rgb_filename = "ang20150420t182050_corr_v1e_img_rgb.hdr"
+
+    # path to save mineral classified image
+    classified_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
+
+    # create a new mineral classification instance
+    mineral_classification = pycoal.mineral.MineralClassification(library_filename, in_memory=True)
+
+    # generate a georeferenced visible-light image
+    mineral_classification.to_rgb(input_filename, rgb_filename)
+
+    # generate a mineral classified image
+    mineral_classification.classify_image(input_filename, classified_filename)
 
 def main(argv=None):
     '''Command line options.'''
@@ -70,6 +79,8 @@ def main(argv=None):
     program_name = os.path.basename(sys.argv[0])
     program_shortdesc = __import__('__main__').__doc__.split("\n")[1]
     program_license = '''%s
+
+  VERSION %s
 
   Copyright 2017 COAL Developers. All rights reserved.
 
@@ -88,41 +99,23 @@ def main(argv=None):
   Floor, Boston, MA 02110-1301, USA.
 
 USAGE
-''' % (program_shortdesc)
+''' % (program_shortdesc, pycoal.version)
 
     try:
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-r", "--recursive", dest="recurse", action="store_true", help="recurse into subfolders [default: %(default)s]")
-        parser.add_argument("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %(default)s]")
-        parser.add_argument("-i", "--include", dest="include", help="only include paths matching this regex pattern. Note: exclude is given preference over include. [default: %(default)s]", metavar="RE" )
-        parser.add_argument("-e", "--exclude", dest="exclude", help="exclude paths matching this regex pattern. [default: %(default)s]", metavar="RE" )
-        parser.add_argument('-V', '--version', action='version', version=pycoal.version)
-        parser.add_argument(dest="paths", help="paths to folder(s) with source file(s) [default: %(default)s]", metavar="path", nargs='+')
+        parser.add_argument("-i", "--image", dest="image", default='ang20150420t182050_corr_v1e_img.hdr', help="Input file to be processed [default: ang20150420t182050_corr_v1e_img.hdr]")
+        parser.add_argument("-s", "--slib", dest="slib", default='s06av95a_envi.hdr', help="Spectral Library filename [default: s06av95a_envi.hdr]")
 
         # Process arguments
-        args = parser.parse_args()
+        args = parser.parse_args(['-i', 'ang20150420t182050_corr_v1e_img.hdr', '-s', 's06av95a_envi.hdr'])
+        #args = parser.parse_args()
 
-        paths = args.paths
-        verbose = args.verbose
-        recurse = args.recurse
-        inpat = args.include
-        expat = args.exclude
+        image = args.image
+        slib = args.slib
+        
+        run_mineral(image, slib)
 
-        if verbose > 0:
-            print("Verbose mode on")
-            if recurse:
-                print("Recursive mode on")
-            else:
-                print("Recursive mode off")
-
-        if inpat and expat and inpat == expat:
-            raise CLIError("include and exclude pattern are equal! Nothing will be processed.")
-
-        for inpath in paths:
-            ### do something with inpath ###
-            print(inpath)
-        return 0
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###
         return 0

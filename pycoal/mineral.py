@@ -21,7 +21,7 @@ import pycoal
 
 class MineralClassification:
 
-    def __init__(self, libraryFilename, classNames=None, threshold=0.0, inMemory=False):
+    def __init__(self, library_file_name, class_names=None, threshold=0.0, in_memory=False):
         """
         Construct a new ``MineralClassification`` object with a spectral library
         in ENVI format such as the `USGS Digital Spectral Library 06
@@ -41,39 +41,39 @@ class MineralClassification:
         enable the optional parameter to load entire images.
 
         Args:
-            libraryFilename (str):        filename of the spectral library
-            classNames (str[], optional): list of names of classes to include
+            library_file_name (str):        filename of the spectral library
+            class_names (str[], optional): list of names of classes to include
             threshold (float, optional):  classification threshold
-            inMemory (boolean, optional): enable loading entire image
+            in_memory (boolean, optional): enable loading entire image
         """
 
         # load and optionally subset the spectral library
-        self.library = spectral.open_image(libraryFilename)
-        if classNames is not None:
-            self.library = self.subsetSpectralLibrary(self.library, classNames)
+        self.library = spectral.open_image(library_file_name)
+        if class_names is not None:
+            self.library = self.subset_spectral_library(self.library, class_names)
 
         # store the threshold
         self.threshold = threshold
 
         # store the memory setting
-        self.inMemory = inMemory
+        self.in_memory = in_memory
 
-    def classifyImage(self, imageFilename, classifiedFilename):
+    def classify_image(self, image_file_name, classified_file_name):
         """
         Classify minerals in an AVIRIS image using spectral angle mapper
         classification and save the results to a file.
 
         Args:
-            imageFilename (str):      filename of the image to be classified
-            classifiedFilename (str): filename of the classified image
+            image_file_name (str):      filename of the image to be classified
+            classified_file_name (str): filename of the classified image
 
         Returns:
             None
         """
 
         # open the image
-        image = spectral.open_image(imageFilename)
-        if self.inMemory:
+        image = spectral.open_image(image_file_name)
+        if self.in_memory:
             data = image.load()
         else:
             data = image.asarray()
@@ -102,10 +102,10 @@ class MineralClassification:
 
                     # resample the pixel ignoring NaNs from target bands that don't overlap
                     # TODO fix spectral library so that bands are in order
-                    resampledPixel = numpy.nan_to_num(resample(pixel))
+                    resampled_pixel = numpy.nan_to_num(resample(pixel))
 
                     # calculate spectral angles
-                    angles = spectral.spectral_angles(resampledPixel[numpy.newaxis,
+                    angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
                                                                      numpy.newaxis,
                                                                      ...],
                                                       self.library.spectra)
@@ -115,17 +115,17 @@ class MineralClassification:
                         angles[0,0,z] = 1-angles[0,0,z]/math.pi
 
                     # get index of class with largest confidence value
-                    indexOfMax = numpy.argmax(angles)
+                    index_of_max = numpy.argmax(angles)
 
                     # classify pixel if confidence above threshold
-                    if angles[0,0,indexOfMax] > self.threshold:
+                    if angles[0,0,index_of_max] > self.threshold:
 
                         # index from one (after zero for no data)
-                        classified[x,y] = indexOfMax + 1
+                        classified[x,y] = index_of_max + 1
 
         # save the classified image to a file
         spectral.io.envi.save_classification(
-            classifiedFilename,
+            classified_file_name,
             classified,
             class_names=['No data']+self.library.names,
             metadata={
@@ -135,22 +135,22 @@ class MineralClassification:
             })
 
         # remove unused classes from the image
-        pycoal.mineral.MineralClassification.filterClasses(classifiedFilename)
+        pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
 
     @staticmethod
-    def filterClasses(classifiedFilename):
+    def filter_classes(classified_file_name):
         """
         Modify a classified image to remove unused classes.
 
         Args:
-            classifiedFilename (str): file of the classified image
+            classified_file_name (str): file of the classified image
 
         Returns:
             None
         """
 
         # open the image
-        classified = spectral.open_image(classifiedFilename)
+        classified = spectral.open_image(classified_file_name)
         data = classified.asarray()
         M = classified.shape[0]
         N = classified.shape[1]
@@ -169,20 +169,20 @@ class MineralClassification:
 
         # overwrite the file
         spectral.io.envi.save_classification(
-            classifiedFilename,
+            classified_file_name,
             copy,
             force=True,
             class_names=[classified.metadata.get('class names')[i] for i in classes],
             metadata=classified.metadata)
 
     @staticmethod
-    def toRGB(imageFilename, rgbImageFilename, red=680.0, green=532.5, blue=472.5):
+    def to_rgb(image_file_name, rgb_image_file_name, red=680.0, green=532.5, blue=472.5):
         """
         Generate a three-band RGB image from an AVIRIS image and save it to a file.
 
         Args:
-            imageFilename (str):     filename of the source image
-            rgbImageFilename (str):  filename of the three-band RGB image
+            image_file_name (str):     filename of the source image
+            rgb_image_file_name (str):  filename of the three-band RGB image
             red (float, optional):   wavelength in nanometers of the red band
             green (float, optional): wavelength in nanometers of the green band
             blue (float, optional):  wavelength in nanometers of the blue band
@@ -192,73 +192,73 @@ class MineralClassification:
         """
 
         # find the index of the first element in a list greater than the value
-        def indexOfGreaterThan(elements, value):
+        def index_of_greater_than(elements, value):
             for index,element in enumerate(elements):
                 if element > value:
                     return index
 
         # open the image
-        image = spectral.open_image(imageFilename)
+        image = spectral.open_image(image_file_name)
 
         # load the list of wavelengths as floats
-        wavelengthStrings = image.metadata.get('wavelength')
-        wavelengthFloats = list(map(float, wavelengthStrings))
+        wavelength_strings = image.metadata.get('wavelength')
+        wavelength_floats = list(map(float, wavelength_strings))
 
         # find the index of the red, green, and blue bands
-        redIndex = indexOfGreaterThan(wavelengthFloats, red)
-        greenIndex = indexOfGreaterThan(wavelengthFloats, green)
-        blueIndex = indexOfGreaterThan(wavelengthFloats, blue)
+        red_index = index_of_greater_than(wavelength_floats, red)
+        green_index = index_of_greater_than(wavelength_floats, green)
+        blue_index = index_of_greater_than(wavelength_floats, blue)
 
         # read the red, green, and blue bands from the image
-        redBand = image[:,:,redIndex]
-        greenBand = image[:,:,greenIndex]
-        blueBand = image[:,:,blueIndex]
+        red_band = image[:,:,red_index]
+        green_band = image[:,:,green_index]
+        blue_band = image[:,:,blue_index]
 
         # remove no data pixels
-        for band in [redBand, greenBand, blueBand]:
+        for band in [red_band, green_band, blue_band]:
             for x in range(band.shape[0]):
                 for y in range(band.shape[1]):
                     if numpy.isclose(band[x,y,0], -0.005) or band[x,y,0]==-50:
                         band[x,y] = 0
 
         # combine the red, green, and blue bands into a three-band RGB image
-        rgb = numpy.concatenate([redBand,greenBand,blueBand], axis=2)
+        rgb = numpy.concatenate([red_band,green_band,blue_band], axis=2)
 
         # update the metadata
-        rgbMetadata = image.metadata
-        rgbMetadata['description'] = 'COAL '+pycoal.version+' three-band RGB image.'
-        rgbMetadata['data ignore value'] = 0
-        if wavelengthStrings:
-            rgbMetadata['wavelength'] = [
-                wavelengthStrings[redIndex],
-                wavelengthStrings[greenIndex],
-                wavelengthStrings[blueIndex]]
+        rgb_metadata = image.metadata
+        rgb_metadata['description'] = 'COAL '+pycoal.version+' three-band RGB image.'
+        rgb_metadata['data ignore value'] = 0
+        if wavelength_strings:
+            rgb_metadata['wavelength'] = [
+                wavelength_strings[red_index],
+                wavelength_strings[green_index],
+                wavelength_strings[blue_index]]
         if image.metadata.get('correction factors'):
-            rgbMetadata['correction factors'] = [
-                image.metadata.get('correction factors')[redIndex],
-                image.metadata.get('correction factors')[greenIndex],
-                image.metadata.get('correction factors')[blueIndex]]
+            rgb_metadata['correction factors'] = [
+                image.metadata.get('correction factors')[red_index],
+                image.metadata.get('correction factors')[green_index],
+                image.metadata.get('correction factors')[blue_index]]
         if image.metadata.get('fwhm'):
-            rgbMetadata['fwhm'] = [
-                image.metadata.get('fwhm')[redIndex],
-                image.metadata.get('fwhm')[greenIndex],
-                image.metadata.get('fwhm')[blueIndex]]
+            rgb_metadata['fwhm'] = [
+                image.metadata.get('fwhm')[red_index],
+                image.metadata.get('fwhm')[green_index],
+                image.metadata.get('fwhm')[blue_index]]
         if image.metadata.get('bbl'):
-            rgbMetadata['bbl'] = [
-                image.metadata.get('bbl')[redIndex],
-                image.metadata.get('bbl')[greenIndex],
-                image.metadata.get('bbl')[blueIndex]]
+            rgb_metadata['bbl'] = [
+                image.metadata.get('bbl')[red_index],
+                image.metadata.get('bbl')[green_index],
+                image.metadata.get('bbl')[blue_index]]
         if image.metadata.get('smoothing factors'):
-            rgbMetadata['smoothing factors'] = [
-                image.metadata.get('smoothing factors')[redIndex],
-                image.metadata.get('smoothing factors')[greenIndex],
-                image.metadata.get('smoothing factors')[blueIndex]]
+            rgb_metadata['smoothing factors'] = [
+                image.metadata.get('smoothing factors')[red_index],
+                image.metadata.get('smoothing factors')[green_index],
+                image.metadata.get('smoothing factors')[blue_index]]
 
         # save the three-band RGB image to a file
-        spectral.envi.save_image(rgbImageFilename, rgb, metadata=rgbMetadata)
+        spectral.envi.save_image(rgb_image_file_name, rgb, metadata=rgb_metadata)
 
     @staticmethod
-    def subsetSpectralLibrary(spectralLibrary, classNames):
+    def subset_spectral_library(spectral_library, classNames):
 
         # adapted from https://git.io/v9ThM
 
@@ -266,7 +266,7 @@ class MineralClassification:
         Create a copy of the spectral library containing only the named classes.
 
         Args:
-            spectralLibrary (SpectralLibrary): ENVI spectral library
+            spectral_library (SpectralLibrary): ENVI spectral library
             classNames (str[]):                list of names of classes to include
 
         Returns:
@@ -274,21 +274,21 @@ class MineralClassification:
         """
 
         # empty array for spectra
-        spectra = numpy.empty((len(classNames), len(spectralLibrary.bands.centers)))
+        spectra = numpy.empty((len(classNames), len(spectral_library.bands.centers)))
 
         # empty list for names
         names = []
 
         # copy class spectra and names
-        for newIndex, className in enumerate(classNames):
-            oldIndex = spectralLibrary.names.index(className)
-            spectra[newIndex] = spectralLibrary.spectra[oldIndex]
-            names.append(className)
+        for new_index, class_name in enumerate(classNames):
+            old_index = spectral_library.names.index(class_name)
+            spectra[new_index] = spectral_library.spectra[old_index]
+            names.append(class_name)
 
         # copy metadata
-        metadata = {'wavelength units': spectralLibrary.metadata.get('wavelength units'),
+        metadata = {'wavelength units': spectral_library.metadata.get('wavelength units'),
                     'spectra names': names,
-                    'wavelength': spectralLibrary.bands.centers }
+                    'wavelength': spectral_library.bands.centers }
 
         # return new spectral library
         return spectral.io.envi.SpectralLibrary(spectra, metadata, {})
@@ -332,14 +332,14 @@ class AsterConversion:
         if data_dir:
             spectral.AsterDatabase.create(db_file, data_dir)
 
-        asterDatabase = spectral.AsterDatabase(db_file)
-        spectrumIDs = [x[0] for x in asterDatabase.query('SELECT SampleID FROM Samples').fetchall()]
-        bandMin = 0.38315
-        bandMax = 2.5082
-        bandNum = 128
-        bandInfo = spectral.BandInfo()
-        bandInfo.centers = numpy.arange(bandMin, bandMax, (bandMax - bandMin) / bandNum)
-        bandInfo.band_unit = 'micrometer'
-        library = asterDatabase.create_envi_spectral_library(spectrumIDs, bandInfo)
+        aster_database = spectral.AsterDatabase(db_file)
+        spectrum_ids = [x[0] for x in aster_database.query('SELECT SampleID FROM Samples').fetchall()]
+        band_min = 0.38315
+        band_max = 2.5082
+        band_num = 128
+        band_info = spectral.BandInfo()
+        band_info.centers = numpy.arange(band_min, band_max, (band_max - band_min) / band_num)
+        band_info.band_unit = 'micrometer'
+        library = aster_database.create_envi_spectral_library(spectrum_ids, band_info)
 
         library.save(hdr_file)
