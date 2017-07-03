@@ -38,6 +38,8 @@ import os
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
+import logging
+
 import pycoal
 from pycoal import mining
 
@@ -47,19 +49,25 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-class CLIError(Exception):
-    '''Generic exception to raise and log different fatal errors.'''
-    def __init__(self, msg):
-        super(CLIError).__init__(type(self))
-        self.msg = "E: %s" % msg
-    def __str__(self):
-        return self.msg
-    def __unicode__(self):
-        return self.msg
+def run_mining(mineral_filename="ang20150420t182050_corr_v1e_img_class.hdr", mining_filename="ang20150420t182050_corr_v1e_img_class_mining.hdr"):
+    '''
+    ...
+    '''
+    # path to mineral classified image
+    mineral_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
+
+    # path to save mining classified image
+    mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
+
+    # create a new mining classification instance
+    mining_classification = pycoal.mining.MiningClassification()
+
+    # generate a mining classified image
+    mining_classification.classify_image(mineral_filename, mining_filename)
 
 def main(argv=None): # IGNORE:C0111
     '''Command line options.'''
-
+    logging.basicConfig(filename='pycoal.log',level=logging.INFO, format='%(asctime)s %(message)s')
     if argv is None:
         argv = sys.argv
     else:
@@ -68,6 +76,8 @@ def main(argv=None): # IGNORE:C0111
     program_name = os.path.basename(sys.argv[0])
     program_shortdesc = __import__('__main__').__doc__.split("\n")[1]
     program_license = '''%s
+
+  VERSION %s
 
   Copyright 2017 COAL Developers. All rights reserved.
 
@@ -86,41 +96,22 @@ def main(argv=None): # IGNORE:C0111
   Floor, Boston, MA 02110-1301, USA.
 
 USAGE
-''' % (program_shortdesc)
+''' % (program_shortdesc, pycoal.version)
 
     try:
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-r", "--recursive", dest="recurse", action="store_true", help="recurse into subfolders [default: %(default)s]")
-        parser.add_argument("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %(default)s]")
-        parser.add_argument("-i", "--include", dest="include", help="only include paths matching this regex pattern. Note: exclude is given preference over include. [default: %(default)s]", metavar="RE" )
-        parser.add_argument("-e", "--exclude", dest="exclude", help="exclude paths matching this regex pattern. [default: %(default)s]", metavar="RE" )
-        parser.add_argument('-V', '--version', action='version', version=pycoal.version)
-        parser.add_argument(dest="paths", help="paths to folder(s) with source file(s) [default: %(default)s]", metavar="path", nargs='+')
+        parser.add_argument("-mi", "--mineral_input", dest="input", default='ang20150420t182050_corr_v1e_img_class.hdr', help="Input classified mineral file to be processed [default: ang20150420t182050_corr_v1e_img_class.hdr]")
+        parser.add_argument("-mo", "--mining_output", dest="output", default='ang20150420t182050_corr_v1e_img_class_mining.hdr', help="Output mining classified image filename [default: ang20150420t182050_corr_v1e_img_class_mining.hdr]")
 
         # Process arguments
-        args = parser.parse_args()
+        args = parser.parse_args(['-mi', 'ang20150420t182050_corr_v1e_img_class.hdr', '-mo', 'ang20150420t182050_corr_v1e_img_class_mining.hdr'])
+        #args = parser.parse_args()
 
-        paths = args.paths
-        verbose = args.verbose
-        recurse = args.recurse
-        inpat = args.include
-        expat = args.exclude
-
-        if verbose > 0:
-            print("Verbose mode on")
-            if recurse:
-                print("Recursive mode on")
-            else:
-                print("Recursive mode off")
-
-        if inpat and expat and inpat == expat:
-            raise CLIError("include and exclude pattern are equal! Nothing will be processed.")
-
-        for inpath in paths:
-            ### do something with inpath ###
-            print(inpath)
-        return 0
+        mineral_filename = args.input
+        mining_filename = args.output
+        
+        run_mining(mineral_filename, mining_filename)
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###
         return 0

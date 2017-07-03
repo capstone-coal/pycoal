@@ -14,10 +14,12 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth 
 # Floor, Boston, MA 02110-1301, USA.
 
+import logging
 import math
 import numpy
-import spectral
 import pycoal
+import spectral
+import time
 
 class MineralClassification:
 
@@ -46,7 +48,6 @@ class MineralClassification:
             threshold (float, optional):  classification threshold
             in_memory (boolean, optional): enable loading entire image
         """
-
         # load and optionally subset the spectral library
         self.library = spectral.open_image(library_file_name)
         if class_names is not None:
@@ -57,6 +58,9 @@ class MineralClassification:
 
         # store the memory setting
         self.in_memory = in_memory
+        logging.info("Instantiated Mineral Classifier with following specification: " \
+         "-spectral library '%s', -class names '%s', -threshold '%s', -in_memory '%s'" 
+            %(library_file_name, class_names, threshold, in_memory))
 
     def classify_image(self, image_file_name, classified_file_name):
         """
@@ -70,7 +74,9 @@ class MineralClassification:
         Returns:
             None
         """
-
+        start = time.time()
+        logging.info("Starting Mineral Classification for image '%s', saving classified image to '%s'" 
+            %(image_file_name, classified_file_name))
         # open the image
         image = spectral.open_image(image_file_name)
         if self.in_memory:
@@ -136,6 +142,11 @@ class MineralClassification:
 
         # remove unused classes from the image
         pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
+        end = time.time()
+        seconds_elapsed = end - start
+        m, s = divmod(seconds_elapsed, 60)
+        h, m = divmod(m, 60)
+        logging.info("Completed Mineral Classification. Time elapsed: '%d:%02d:%02d'" % (h, m, s))
 
     @staticmethod
     def filter_classes(classified_file_name):
@@ -192,6 +203,8 @@ class MineralClassification:
         """
 
         # find the index of the first element in a list greater than the value
+        start = time.time()
+        logging.info("Starting generation of three-band RGB image from input file: '%s' with following RGB values R: '%s', G: '%s', B: '%s'" %(image_file_name, red, green, blue))
         def index_of_greater_than(elements, value):
             for index,element in enumerate(elements):
                 if element > value:
@@ -255,10 +268,16 @@ class MineralClassification:
                 image.metadata.get('smoothing factors')[blue_index]]
 
         # save the three-band RGB image to a file
+        logging.info("Saving RGB image as '%s'" % rgb_image_file_name)
         spectral.envi.save_image(rgb_image_file_name, rgb, metadata=rgb_metadata)
+        end = time.time()
+        seconds_elapsed = end - start
+        m, s = divmod(seconds_elapsed, 60)
+        h, m = divmod(m, 60)
+        logging.info("Completed RGB image generation. Time elapsed: '%d:%02d:%02d'" % (h, m, s))
 
     @staticmethod
-    def subset_spectral_library(spectral_library, classNames):
+    def subset_spectral_library(spectral_library, class_names):
 
         # adapted from https://git.io/v9ThM
 
@@ -267,20 +286,20 @@ class MineralClassification:
 
         Args:
             spectral_library (SpectralLibrary): ENVI spectral library
-            classNames (str[]):                list of names of classes to include
+            class_names (str[]):                list of names of classes to include
 
         Returns:
             SpectralLibrary: subset of ENVI spectral library
         """
 
         # empty array for spectra
-        spectra = numpy.empty((len(classNames), len(spectral_library.bands.centers)))
+        spectra = numpy.empty((len(class_names), len(spectral_library.bands.centers)))
 
         # empty list for names
         names = []
 
         # copy class spectra and names
-        for new_index, class_name in enumerate(classNames):
+        for new_index, class_name in enumerate(class_names):
             old_index = spectral_library.names.index(class_name)
             spectra[new_index] = spectral_library.spectra[old_index]
             names.append(class_name)

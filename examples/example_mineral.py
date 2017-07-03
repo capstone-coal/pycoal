@@ -40,8 +40,10 @@ import os
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
-import pycoal
+import logging
+
 from pycoal import mineral
+import pycoal
 
 __all__ = []
 
@@ -49,11 +51,14 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-def run_mineral(input_filename="avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr", library_filename="../pycoal/tests/s06av95a_envi.hdr"):
+input_filename = './avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
+library_filename='../pycoal/tests/s06av95a_envi.hdr'
+
+def run_mineral(input_filename, library_filename):
     '''
     ...
     '''
-
+    logging.info("Starting mineral classification with input file '%s' and spectral library '%s'." %(input_filename, library_filename))
     # path to save RGB image
     rgb_filename = "ang20150420t182050_corr_v1e_img_rgb.hdr"
 
@@ -61,7 +66,7 @@ def run_mineral(input_filename="avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2
     classified_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
 
     # create a new mineral classification instance
-    mineral_classification = pycoal.mineral.MineralClassification(library_filename, in_memory=True)
+    mineral_classification = pycoal.mineral.MineralClassification(library_filename, in_memory=False)
 
     # generate a georeferenced visible-light image
     mineral_classification.to_rgb(input_filename, rgb_filename)
@@ -71,7 +76,7 @@ def run_mineral(input_filename="avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2
 
 def main(argv=None):
     '''Command line options.'''
-
+    logging.basicConfig(filename='pycoal.log',level=logging.INFO, format='%(asctime)s %(message)s')
     if argv is None:
         argv = sys.argv
     else:

@@ -37,6 +37,8 @@ import os
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
+import logging
+
 import pycoal
 from pycoal import environment
 
@@ -46,19 +48,25 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-class CLIError(Exception):
-    '''Generic exception to raise and log different fatal errors.'''
-    def __init__(self, msg):
-        super(CLIError).__init__(type(self))
-        self.msg = "E: %s" % msg
-    def __str__(self):
-        return self.msg
-    def __unicode__(self):
-        return self.msg
+def run_environment(mining_filename, vector_filename, correlation_filename):
+    # path to mining classified image
+    mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
+
+    # path to hydrography data
+    vector_filename = "NHDNM/Shape/NHDFlowline.shp"
+
+    # path to save environmental correlation image
+    correlation_filename = "ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr"
+
+    # create a new environmental correlation instance
+    environmental_correlation = pycoal.environment.EnvironmentalCorrelation()
+
+    # generate an environmental correlation image of mining pixels within 10 meters of a stream
+    environmental_correlation.intersect_proximity(mining_filename, vector_filename, 10.0, correlation_filename)
 
 def main(argv=None): # IGNORE:C0111
     '''Command line options.'''
-
+    logging.basicConfig(filename='pycoal.log',level=logging.INFO, format='%(asctime)s %(message)s')
     if argv is None:
         argv = sys.argv
     else:
@@ -67,6 +75,8 @@ def main(argv=None): # IGNORE:C0111
     program_name = os.path.basename(sys.argv[0])
     program_shortdesc = __import__('__main__').__doc__.split("\n")[1]
     program_license = '''%s
+
+  VERSION %s
 
   Copyright 2017 COAL Developers. All rights reserved.
 
@@ -90,36 +100,20 @@ USAGE
     try:
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-r", "--recursive", dest="recurse", action="store_true", help="recurse into subfolders [default: %(default)s]")
-        parser.add_argument("-v", "--verbose", dest="verbose", action="count", help="set verbosity level [default: %(default)s]")
-        parser.add_argument("-i", "--include", dest="include", help="only include paths matching this regex pattern. Note: exclude is given preference over include. [default: %(default)s]", metavar="RE" )
-        parser.add_argument("-e", "--exclude", dest="exclude", help="exclude paths matching this regex pattern. [default: %(default)s]", metavar="RE" )
-        parser.add_argument('-V', '--version', action='version', version=pycoal.version)
-        parser.add_argument(dest="paths", help="paths to folder(s) with source file(s) [default: %(default)s]", metavar="path", nargs='+')
+        parser.add_argument("-m", "--mining", dest="mining_filename", default='ang20150420t182050_corr_v1e_img_class_mining.hdr', help="Input mining classified file to be processed [default: ang20150420t182050_corr_v1e_img_class_mining.hdr]")
+        parser.add_argument("-h", "--hydrography", dest="vector_filename", default='NHDNM/Shape/NHDFlowline.shp', help="Path to hydrography data [default: NHDNM/Shape/NHDFlowline.shp]")
+        parser.add_argument("-e", "--environment", dest="correlation_filename", default='ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr', help="Output environmental correlation image [default: ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr]")
 
         # Process arguments
-        args = parser.parse_args()
+        args = parser.parse_args(['-i', 'ang20150420t182050_corr_v1e_img.hdr', '-s', 's06av95a_envi.hdr'])
+        #args = parser.parse_args()
 
-        paths = args.paths
-        verbose = args.verbose
-        recurse = args.recurse
-        inpat = args.include
-        expat = args.exclude
+        mining_filename = args.mining_filename
+        vector_filename = args.vector_filename
+        correlation_filename = args.correlation_filename
+        
+        run_environment(mining_filename, vector_filename, correlation_filename)
 
-        if verbose > 0:
-            print("Verbose mode on")
-            if recurse:
-                print("Recursive mode on")
-            else:
-                print("Recursive mode off")
-
-        if inpat and expat and inpat == expat:
-            raise CLIError("include and exclude pattern are equal! Nothing will be processed.")
-
-        for inpath in paths:
-            ### do something with inpath ###
-            print(inpath)
-        return 0
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###
         return 0

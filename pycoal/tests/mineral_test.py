@@ -132,7 +132,7 @@ def test_classify_image_threshold():
 def test_classify_image_subset():
 
     # create mineral classification instance with mining subset
-    mc = mineral.MineralClassification(libraryFilenames[0], class_names=mining.proxyClassNames)
+    mc = mineral.MineralClassification(libraryFilenames[0], class_names=mining.proxy_class_names)
 
     # classify image
     mc.classify_image(test_classifyImage_threshold_subset_imageFilename, \
@@ -144,7 +144,7 @@ def test_classify_image_subset():
         for y in range(actual.shape[1]):
             actual_class_id = actual[x,y,0]
             actual_class_name = actual.metadata.get('class names')[actual_class_id]
-            assert actual_class_name in mining.proxyClassNames \
+            assert actual_class_name in mining.proxy_class_names \
                 or actual_class_name == 'No data'
 
 # test files for filter_classes test
