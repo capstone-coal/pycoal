@@ -93,6 +93,8 @@ Quickstart
 
 See the `quickstart documentation <https://capstone-coal.github.io/docs#usage>`_.
 
+If you would like to run the examples yourself, head over to the **examples** module.
+
 Documentation
 -------------
 

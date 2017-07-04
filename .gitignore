@@ -90,3 +90,17 @@ ENV/
 
 # documentation build
 docs/source/_build
+
+# PyDev
+.project
+.pydevproject
+.settings/
+
+# Build artifacts
+doc.txt
+
+# Test artifacts
+pycoal/tests/s06av95a_envi.hdr
+pycoal/tests/s06av95a_envi.sli
+s06av95a_envi.hdr
+s06av95a_envi.sli

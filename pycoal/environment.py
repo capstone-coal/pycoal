@@ -19,6 +19,8 @@ import spectral
 import numpy
 from os.path import abspath, dirname, basename, splitext
 import pycoal
+import logging
+import time
 
 class EnvironmentalCorrelation:
 
@@ -27,7 +29,7 @@ class EnvironmentalCorrelation:
         """
         Construct a new ``EnvironmentalCorrelation`` object.
         """
-        pass
+        logging.info("Instantiated Environmental Correlation module with following specification: ")
 
     def intersect_proximity(self, mining_filename, vector_filename, proximity, correlated_filename):
         """
@@ -41,7 +43,9 @@ class EnvironmentalCorrelation:
             proximity (float):     distance in meters
             correlated_filename (str): filename of the correlated image
         """
-
+        start = time.time()
+        logging.info("Starting Environmental Correlation for mining image '%s', with vector layer '%s' and proximity distance of '%s' meters." 
+            %(mining_filename, vector_filename, proximity))
         # get path and file names
         output_directory = dirname(abspath(correlated_filename))
         mining_name = splitext(basename(abspath(mining_filename)))[0]
@@ -87,7 +91,14 @@ class EnvironmentalCorrelation:
                 'description': 'COAL '+pycoal.version+' environmental correlation image.',
                 'map info': mining_image.metadata.get('map info')
             })
+        logging.info("Successfully saved Environmental Correlation image to '%s'." % correlated_filename)
+        end = time.time()
+        seconds_elapsed = end - start
+        m, s = divmod(seconds_elapsed, 60)
+        h, m = divmod(m, 60)
+        logging.info("Completed Environmental Correlation. Time elapsed: '%d:%02d:%02d'" % (h, m, s))
 
+    #@staticmethod
     def create_empty_copy(self, source_filename, destination_filename):
         """
         Create an empty copy of a COAL classified image with the same size.
@@ -96,7 +107,7 @@ class EnvironmentalCorrelation:
             source_filename (str):      filename of the source image
             destination_filename (str): filename of the destination image
         """
-
+        logging.info("Creating an empty copy of classified image '%s' with the same size. Saving to '%s'" %(source_filename, destination_filename))
         # open the source image
         source = spectral.open_image(source_filename)
 
@@ -121,14 +132,14 @@ class EnvironmentalCorrelation:
             vector_filename (str):  filename of the vector image
             feature_filename (str): filename of the raster image
         """
-
+        logging.info("Burning features from vector file: '%s' to raster file: '%s'" %(vector_filename, feature_filename))
         # assume the layer has the same name as the image
-        layerName = splitext(basename(vector_filename))[0]
+        layer_name = splitext(basename(vector_filename))[0]
 
         # convert vector features into nonzero pixels of the output file
         returncode = call(['gdal_rasterize',
                            '-burn', '1',
-                           '-l', layerName,
+                           '-l', layer_name,
                            vector_filename,
                            feature_filename])
 
@@ -144,7 +155,7 @@ class EnvironmentalCorrelation:
             feature_filename (str):   filename of the feature image
             proximity_filename (str): filename of the proximity image
         """
-
+        logging.info("Generating a proximity map from features of '%s', writing them to '%s'" %(feature_filename, proximity_filename))
         # generate an ENVI proximity map with georeferenced units
         returncode = call(['gdal_proximity.py',
                            feature_filename,

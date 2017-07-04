@@ -23,26 +23,26 @@ import pycoal
 import pycoal.mining
 
 # test files for mining classification test
-mineralFilename = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
-miningFilename = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80.hdr'
-testFilename = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.hdr'
-testImage = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.img'
+mineral_file_name = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
+mining_file_name = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80.hdr'
+test_file_name = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.hdr'
+test_image = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.img'
 
 # delete temporary files
-def _test_classifyImage_teardown():
-    _remove_files([testFilename, testImage])
+def _test_classify_image_teardown():
+    _remove_files([test_file_name, test_image])
 
 # verify that the expected mining classifications equal the actual mining classifications
-@with_setup(None, _test_classifyImage_teardown)
-def test_classifyImage():
+@with_setup(None, _test_classify_image_teardown)
+def test_classify_image():
 
     # classify mining and and save to temporary file
     mc = pycoal.mining.MiningClassification()
-    mc.classifyImage(mineralFilename, testFilename)
+    mc.classify_image(mineral_file_name, test_file_name)
 
     # open the mining and temporary files
-    expected = spectral.open_image(miningFilename)
-    actual = spectral.open_image(testFilename)
+    expected = spectral.open_image(mining_file_name)
+    actual = spectral.open_image(test_file_name)
 
     # verify that every pixel has the same classification
     assert numpy.array_equal(expected.asarray(), actual.asarray())
