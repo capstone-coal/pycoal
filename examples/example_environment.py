@@ -53,7 +53,7 @@ def run_environment(mining_filename, vector_filename, correlation_filename):
     mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
 
     # path to hydrography data
-    vector_filename = "NHDNM/Shape/NHDFlowline.shp"
+    vector_filename = "Shape/NHDFlowline.shp"
 
     # path to save environmental correlation image
     correlation_filename = "ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr"
@@ -95,17 +95,17 @@ def main(argv=None): # IGNORE:C0111
   Floor, Boston, MA 02110-1301, USA.
 
 USAGE
-''' % (program_shortdesc)
+''' % (program_shortdesc, pycoal.version)
 
     try:
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-m", "--mining", dest="mining_filename", default='ang20150420t182050_corr_v1e_img_class_mining.hdr', help="Input mining classified file to be processed [default: ang20150420t182050_corr_v1e_img_class_mining.hdr]")
-        parser.add_argument("-h", "--hydrography", dest="vector_filename", default='NHDNM/Shape/NHDFlowline.shp', help="Path to hydrography data [default: NHDNM/Shape/NHDFlowline.shp]")
+        parser.add_argument("-hy", "--hydrography", dest="vector_filename", default='Shape/NHDFlowline.shp', help="Path to hydrography data [default: Shape/NHDFlowline.shp]")
         parser.add_argument("-e", "--environment", dest="correlation_filename", default='ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr', help="Output environmental correlation image [default: ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr]")
 
         # Process arguments
-        args = parser.parse_args(['-i', 'ang20150420t182050_corr_v1e_img.hdr', '-s', 's06av95a_envi.hdr'])
+        args = parser.parse_args(['-m', 'ang20150420t182050_corr_v1e_img_class_mining.hdr', '-hy', 'Shape/NHDFlowline.shp', '-e', 'ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr'])
         #args = parser.parse_args()
 
         mining_filename = args.mining_filename
