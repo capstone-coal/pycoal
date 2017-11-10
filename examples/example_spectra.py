@@ -20,7 +20,7 @@
 '''
 example_spectra -- Reflectance of Coal Mining Proxy Classes
 
-The image ``spectra.png`` is saved in the current directory.
+The images ``spectra.png`` and ``spectra.svg`` are saved in the current directory.
 
 @author:     COAL Developers
 
@@ -45,9 +45,10 @@ bands = [1000*band for band in library.bands.centers]
 
 # customize figure
 plt.rcParams['font.size'] = 8
-plt.rcParams['legend.fontsize'] = 6
-plt.rcParams['xtick.labelsize'] = 6
-plt.rcParams['ytick.labelsize'] = 6
+plt.rcParams['legend.fontsize'] = 8
+plt.rcParams['xtick.labelsize'] = 8
+plt.rcParams['ytick.labelsize'] = 8
+plt.rcParams['lines.linewidth'] = 2
 plt.rcParams['text.color'] = 'white'
 plt.rcParams['xtick.color'] = 'white'
 plt.rcParams['ytick.color'] = 'white'
@@ -64,12 +65,13 @@ plt.rcParams['grid.color'] = 'white'
 
 # generate figure
 plt.plot(bands, library.spectra[schwert_index], 'orange', label=u'Schwertmannite BZ93-1 s06av95a=b')
-plt.plot(bands, library.spectra[sldgwet_index], 'yellow', label=u'Renyolds_TnlSldgWet SM93-15w s06av95a=a')
 plt.plot(bands, library.spectra[sludge_index], 'red', label=u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a')
+plt.plot(bands, library.spectra[sldgwet_index], 'yellow', label=u'Renyolds_TnlSldgWet SM93-15w s06av95a=a')
 plt.title('Reflectance of Coal Mining Proxy Classes')
 plt.ylabel('Reflectance')
 plt.xlabel('Wavelength (nm)')
 plt.legend()
-plt.axis([min(bands),max(bands),0,0.75])
+plt.axis([min(bands),max(bands),0,0.8])
 plt.grid()
 plt.savefig('spectra.png')
+plt.savefig('spectra.svg')
