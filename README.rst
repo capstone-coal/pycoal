@@ -92,7 +92,7 @@ Anaconda3
 -----
 
 In order to get the examples to run 
-In Anaconda3\\anaconda\\Lib\\site-packages\\spectral\\io\\envi.py
+You must download Anaconda3 and in Anaconda3\\anaconda\\Lib\\site-packages\\spectral\\io\\envi.py
 You must change like 387 of envi.py
 From
 
