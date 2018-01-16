@@ -41,7 +41,7 @@ from argparse import RawDescriptionHelpFormatter
 import logging
 
 import pycoal
-from pycoal import mining
+import mining
 
 __all__ = []
 
@@ -60,7 +60,7 @@ def run_mining(mineral_filename="ang20150420t182050_corr_v1e_img_class.hdr", min
     mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
 
     # create a new mining classification instance
-    mining_classification = pycoal.mining.MiningClassification()
+    mining_classification = mining.MiningClassification()
 
     # generate a mining classified image
     mining_classification.classify_image(mineral_filename, mining_filename)

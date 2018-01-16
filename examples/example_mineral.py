@@ -36,14 +36,20 @@ https://capstone-coal.github.io/docs#usage
 
 import sys
 import os
+from sys import path
+from os import getcwd
+import inspect
 
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
 import logging
 
-from pycoal import mineral
+import sys
+import os
 import pycoal
+#from pycoal import mineral
+import mineral
 
 __all__ = []
 
@@ -51,7 +57,7 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-input_filename = './avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
+input_filename = '../avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
 library_filename='../pycoal/tests/s06av95a_envi.hdr'
 
 def run_mineral(input_filename, library_filename):
@@ -66,7 +72,7 @@ def run_mineral(input_filename, library_filename):
     classified_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
 
     # create a new mineral classification instance
-    mineral_classification = pycoal.mineral.MineralClassification(library_filename, in_memory=False)
+    mineral_classification = mineral.MineralClassification(library_filename)
 
     # generate a georeferenced visible-light image
     mineral_classification.to_rgb(input_filename, rgb_filename)
@@ -110,11 +116,11 @@ USAGE
     try:
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-i", "--image", dest="image", default='ang20150420t182050_corr_v1e_img.hdr', help="Input file to be processed [default: ang20150420t182050_corr_v1e_img.hdr]")
-        parser.add_argument("-s", "--slib", dest="slib", default='s06av95a_envi.hdr', help="Spectral Library filename [default: s06av95a_envi.hdr]")
+        parser.add_argument("-i", "--image", dest="image", default=input_filename, help="Input file to be processed [default: ang20150420t182050_corr_v1e_img.hdr]")
+        parser.add_argument("-s", "--slib", dest="slib", default=library_filename, help="Spectral Library filename [default: s06av95a_envi.hdr]")
 
         # Process arguments
-        args = parser.parse_args(['-i', 'ang20150420t182050_corr_v1e_img.hdr', '-s', 's06av95a_envi.hdr'])
+        args = parser.parse_args(['-i', input_filename, '-s', library_filename])
         #args = parser.parse_args()
 
         image = args.image
