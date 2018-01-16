@@ -88,26 +88,6 @@ You can run the COAL tests simply by running
 Additonally, click on the build sticker at the top of this readme to be
 directed to the most recent build on `travis-ci <https://travis-ci.org/capstone-coal/pycoal>`__.
 
-Anaconda3
------
-
-In order to get the examples to run 
-You must download Anaconda3 and in Anaconda3\\anaconda\\Lib\\site-packages\\spectral\\io\\envi.py
-You must change like 387 of envi.py
-From
-
-::
-
-	h['bbl'] = [int(b) for b in h['bbl']]
-	
-To
-
-::
-
-	h['bbl'] = [int(float(b)) for b in h['bbl']]
-	
-More information on this here `issue <https://github.com/spectralpython/spectral/issues/67>`__
-
 Quickstart
 ----------
 
