@@ -88,8 +88,11 @@ You can run the COAL tests simply by running
 Additonally, click on the build sticker at the top of this readme to be
 directed to the most recent build on `travis-ci <https://travis-ci.org/capstone-coal/pycoal>`__.
 
+Anaconda3
+-----
+
 In order to get the examples to run 
-In Anaconda3\anaconda\Lib\site-packages\spectral\io\envi.py
+In Anaconda3\\anaconda\\Lib\\site-packages\\spectral\\io\\envi.py
 You must change like 387 of envi.py
 From
 
