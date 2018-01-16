@@ -91,8 +91,18 @@ directed to the most recent build on `travis-ci <https://travis-ci.org/capstone-
 In order to get the examples to run 
 In Anaconda3\anaconda\Lib\site-packages\spectral\io\envi.py
 You must change like 387 of envi.py
-From "h['bbl'] = [int(b) for b in h['bbl']]"
-To "h['bbl'] = [int(float(b)) for b in h['bbl']]"
+From
+
+::
+
+	h['bbl'] = [int(b) for b in h['bbl']]
+	
+To
+
+::
+
+	h['bbl'] = [int(float(b)) for b in h['bbl']]
+	
 More information on this here `issue <https://github.com/spectralpython/spectral/issues/67>`__
 
 Quickstart
