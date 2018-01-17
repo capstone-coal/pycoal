@@ -44,7 +44,10 @@ from argparse import RawDescriptionHelpFormatter
 import logging
 
 import pycoal
-from pycoal import environment
+sys.path.insert(0, '../pycoal')
+import mineral
+import mining
+import environment
 
 __all__ = []
 
@@ -61,11 +64,10 @@ def run_environment(mining_filename, vector_filename, correlation_filename):
     vector_filename = "Shape/NHDFlowline.shp"
 
     # path to save environmental correlation image
-    correlation_filename = 
-        "ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr"
+    correlation_filename = "ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr"
 
     # create a new environmental correlation instance
-    environmental_correlation = pycoal.environment.EnvironmentalCorrelation()
+    environmental_correlation = environment.EnvironmentalCorrelation()
 
     # generate an environmental correlation image of mining
     # pixels within 10 meters of a stream
