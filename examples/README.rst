@@ -34,6 +34,26 @@ The `National Hydrography Dataset <https://nhd.usgs.gov/NHD_High_Resolution.html
 ::
 
 	wget -m "ftp://rockyftp.cr.usgs.gov/vdelivery/Datasets/Staged/Hydrography/NHD/State/HighResolution/Shape/NHD_H_New_Mexico_Shape.zip" && unzip rockyftp.cr.usgs.gov/vdelivery/Datasets/Staged/Hydrography/NHD/State/HighResolution/Shape/NHD_H_New_Mexico_Shape.zip
+	
+Anaconda3
+-----
+
+In order to get the examples to run 
+You must download Anaconda3 and in Anaconda3\\anaconda\\Lib\\site-packages\\spectral\\io\\envi.py
+You must change like 387 of envi.py
+From
+
+::
+
+	h['bbl'] = [int(b) for b in h['bbl']]
+	
+To
+
+::
+
+	h['bbl'] = [int(float(b)) for b in h['bbl']]
+	
+More information on this here `issue <https://github.com/spectralpython/spectral/issues/67>`__
 
 Mineral Classification
 ----------------------
