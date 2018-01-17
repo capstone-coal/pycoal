@@ -48,14 +48,17 @@ import logging
 import sys
 import os
 import pycoal
-#from pycoal import mineral
+sys.path.insert(0, '../pycoal')
 import mineral
+import mining
+import environment
 
 __all__ = []
 
 DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
+
 
 input_filename = '../avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
 library_filename='../pycoal/tests/s06av95a_envi.hdr'

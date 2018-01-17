@@ -41,7 +41,10 @@ from argparse import RawDescriptionHelpFormatter
 import logging
 
 import pycoal
+sys.path.insert(0, '../pycoal')
+import mineral
 import mining
+import environment
 
 __all__ = []
 

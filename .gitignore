@@ -100,6 +100,7 @@ docs/source/_build
 doc.txt
 
 # Test artifacts
+pycoal/tests/images/ang20140912t192359_corr_v1c_img_400-410_10-20_rgb_test.img
 pycoal/tests/s06av95a_envi.hdr
 pycoal/tests/s06av95a_envi.sli
 s06av95a_envi.hdr
