@@ -26,7 +26,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key 073D307A618E5811
 # Install the dependencies
 RUN apt-get update && \
 	apt-get upgrade -y --force-yes && \
-	apt-get install -y apache2 \
+	apt-get install -y --force-yes apache2 \
 		bash-completion \
 		bison \
 		checkinstall \
