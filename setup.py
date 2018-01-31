@@ -45,8 +45,6 @@ _test_suite = 'pycoal.tests'
 _url = 'https://github.com/capstone-coal/pycoal'
 _version = '0.5.2'
 _zip_safe = False
-_entry_points = {'console_scripts' : ['pycoal-mineral = pycoal.cli.mineral:main', 'pycoal-mining = pycoal.cli.mining:main', 'pycoal-environment = pycoal.cli.environment:main']}
-
 # Setup Metadata
 # --------------
 
@@ -80,5 +78,4 @@ setup(
     url=_url,
     version=_version,
     zip_safe=_zip_safe,
-    _entry_points = entry_points
 )
