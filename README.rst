@@ -73,6 +73,13 @@ The image can be installed from `Dockerhub <https://hub.docker.com/>`_ as follow
 
 	docker pull capstonecoal/coal:latest
 
+Additionally, if you are developing the image and wish to build it locally, you can run the following
+
+::
+
+	docker build .
+
+
 Tests
 -----
 
