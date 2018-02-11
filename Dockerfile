@@ -15,6 +15,7 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 # Use an official Python runtime as a base image (host debian:jessie)
+FROM python:2-slim
 FROM python:3-slim
 
 MAINTAINER pycoal developers <coal-capstone@googlegroups.com>
