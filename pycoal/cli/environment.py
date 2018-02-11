@@ -1,4 +1,4 @@
-# Copyright (C) 2017 COAL Developers
+# Copyright (C) 2018 COAL-FO Developers
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -14,28 +14,18 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
-'''
-example_environment -- an example script which demonstrates COAL 
-environmental classification
-example_environment provides a CLI which demonstrates how the 
-COAL Environmental Classification API finds pixels in a mining
-classified image that are within a certain number of meters
-from features in a vector layer such as flow lines in the
-National Hydrography Dataset (NHD).
-More reading an this example can be seen at 
+''' 
 https://capstone-coal.github.io/docs#usage
 @author:     COAL Developers
-@copyright:  2017 COAL Developers. All rights reserved.
+@copyright:  2018 COAL Developers. All rights reserved.
 @license:    GNU General Public License version 2
 @contact:    coal-capstone@googlegroups.com
 '''
 
 import sys
 import os
-
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-
 import logging
 from subprocess import call
 import spectral
@@ -54,9 +44,6 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-from pycoal.write import Writer
-from pycoal.read_netcdf import NetCDFReader as Reader
-
 def main(argv=None):
     '''Command line options.'''
     logging.basicConfig(filename='pycoal.log', level=logging.INFO, 
@@ -70,7 +57,7 @@ def main(argv=None):
     program_shortdesc = __import__('__main__').__doc__.split("\n")[1]
     program_license = '''%s
   VERSION %s
-  Copyright 2017 COAL Developers. All rights reserved.
+  Copyright 2018 COAL Developers. All rights reserved.
   This program is free software; you can redistribute it and/or
   modify it under the terms of the GNU General Public License
   as published by the Free Software Foundation; version 2.
@@ -93,30 +80,27 @@ USAGE
         parser.add_argument(
             "-m", "--mining",
             dest="mining_filename",
-            default='ang20150420t182050_corr_v1e_img_class_mining.hdr',
-            help="Input mining classified file to be processed [default: ang20150420t182050_corr_v1e_img_class_mining.hdr]")
+            help="Input mining classified file to be processed")
         parser.add_argument(
             "-hy", "--hydrography",
             dest="vector_filename",
-            default='Shape/NHDFlowline.shp',
-            help="Path to hydrography data [default: Shape/NHDFlowline.shp]")
+            help="Path to hydrography data")
         parser.add_argument(
             "-e", "--environment",
             dest="correlation_filename",
-            default='ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr',
-            help="Output environmental correlation image [default: ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr]")
+            help="Output environmental correlation image")
 
         # Process arguments
-        args = parser.parse_args(
-            ['-m', 'ang20150420t182050_corr_v1e_img_class_mining.hdr',
-            '-hy', 'Shape/NHDFlowline.shp',
-            '-e', 'ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr'])
+        args = parser.parse_args(['-m','-hy','-e'])
 
         mining_filename = args.mining_filename
         vector_filename = args.vector_filename
         correlation_filename = args.correlation_filename
-
-        run_environment(mining_filename, vector_filename, correlation_filename)
+        # create a new environmental correlation instance
+        environmental_correlation = environment.EnvironmentalCorrelation()
+        # generate an environmental correlation image of mining
+        # pixels within 10 meters of a stream
+        environmental_correlation.intersect_proximity(mining_filename, vector_filename, 10.0, correlation_filename)
 
     except KeyboardInterrupt:
         return 0
@@ -129,4 +113,22 @@ USAGE
         return 2
 
 if __name__ == '__main__':
-    main()
+    if DEBUG:
+        sys.argv.append("-h")
+        sys.argv.append("-v")
+        sys.argv.append("-r")
+    if TESTRUN:
+        import doctest
+        doctest.testmod()
+    if PROFILE:
+        import cProfile
+        import pstats
+        profile_filename = 'environment_profile.txt'
+        cProfile.run('main()', profile_filename)
+        statsfile = open("profile_stats.txt", "wb")
+        p = pstats.Stats(profile_filename, stream=statsfile)
+        stats = p.strip_dirs().sort_stats('cumulative')
+        stats.print_stats()
+        statsfile.close()
+        sys.exit(0)
+    sys.exit(main())

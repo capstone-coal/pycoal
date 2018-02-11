@@ -79,5 +79,5 @@ setup(
     url=_url,
     version=_version,
     zip_safe=_zip_safe,
-    _entry_points = {'console_scripts' : ['pycoal-mineral = pycoal.cli.mineral:main', 'pycoal-mining = pycoal.cli.mining:main', 'pycoal-environment = pycoal.cli.environment:main']}
+    entry_points = {'console_scripts' : ['pycoal-mineral = pycoal.cli.mineral:main', 'pycoal-mining = pycoal.cli.mining:main', 'pycoal-environment = pycoal.cli.environment:main']}
 )
