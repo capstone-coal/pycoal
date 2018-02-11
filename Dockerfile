@@ -15,7 +15,8 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 # Use an official Python runtime as a base image (host debian:jessie)
-FROM python:2-slim
+FROM debian:jessie-slim
+ENV PYTHON_VERSION 3.6.4
 
 MAINTAINER pycoal developers <coal-capstone@googlegroups.com>
 
@@ -23,7 +24,7 @@ RUN echo "deb     http://qgis.org/debian jessie main" >> /etc/apt/sources.list
 RUN echo "deb-src http://qgis.org/debian jessie main" >> /etc/apt/sources.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key 073D307A618E5811
 # dput breaks Docker build
-#RUN printf "Package: dput\nPin: origin \"\"\nPin-Priority: -1" >> /etc/apt/preferences
+RUN printf "Package: dput\nPin: origin \"\"\nPin-Priority: -1" >> /etc/apt/preferences
 
 # Install the dependencies
 RUN apt-get update && \
