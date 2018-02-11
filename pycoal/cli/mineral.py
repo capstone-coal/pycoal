@@ -34,8 +34,6 @@ import os
 import pycoal
 sys.path.insert(0, '../pycoal')
 import mineral
-import mining
-import environment
 import logging
 import math
 import numpy
