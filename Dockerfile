@@ -15,7 +15,7 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 # Use an official Python runtime as a base image (host debian:jessie)
-FROM python:3-slim
+FROM debian:jessie-slim
 
 MAINTAINER pycoal developers <coal-capstone@googlegroups.com>
 
@@ -73,6 +73,8 @@ RUN apt-get update && \
 		xfonts-75dpi \
 		xfonts-base \
 		xfonts-scalable xvfb
+
+ENV PYTHON_VERSION 3.5-slim
 
 # Build GDAL from source with minimized drivers
 WORKDIR /usr/local
