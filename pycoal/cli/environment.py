@@ -24,6 +24,7 @@ https://capstone-coal.github.io/docs#usage
 
 import sys
 import os
+import re
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 import logging
@@ -33,7 +34,7 @@ import numpy
 from os.path import abspath, dirname, basename, splitext
 import pycoal
 import time
-sys.path.insert(0, '../pycoal')
+sys.path.insert(0, '../')
 import mineral
 import mining
 import environment
@@ -75,20 +76,20 @@ USAGE
     try:
         # Setup argument parser
         parser = ArgumentParser(
-            description=program_license,
-            formatter_class=RawDescriptionHelpFormatter)
+           description=program_license,
+           formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument(
             "-m", "--mining",
             dest="mining_filename",
-            help="Input mining classified file to be processed")
+           help="Input mining classified file to be processed")
         parser.add_argument(
-            "-hy", "--hydrography",
-            dest="vector_filename",
-            help="Path to hydrography data")
+           "-hy", "--hydrography",
+           dest="vector_filename",
+           help="Path to hydrography data")
         parser.add_argument(
-            "-e", "--environment",
-            dest="correlation_filename",
-            help="Output environmental correlation image")
+           "-e", "--environment",
+           dest="correlation_filename",
+           help="Output environmental correlation image")
 
         # Process arguments
         args = parser.parse_args(['-m','-hy','-e'])
@@ -96,6 +97,11 @@ USAGE
         mining_filename = args.mining_filename
         vector_filename = args.vector_filename
         correlation_filename = args.correlation_filename
+
+        #mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
+        #vector_filename = "Shape/NHDFlowline.shp"
+        #correlation_filename = "ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr"
+
         # create a new environmental correlation instance
         environmental_correlation = environment.EnvironmentalCorrelation()
         # generate an environmental correlation image of mining
