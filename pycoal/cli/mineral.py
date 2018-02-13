@@ -23,6 +23,7 @@ https://capstone-coal.github.io/docs#usage
 '''
 import sys
 import os
+import re
 from sys import path
 from os import getcwd
 import inspect
@@ -32,7 +33,7 @@ import logging
 import sys
 import os
 import pycoal
-sys.path.insert(0, '../pycoal')
+sys.path.insert(0, '../')
 import mineral
 import logging
 import math
@@ -46,9 +47,7 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-import argparse
-
-def main():
+def main(argv=None):
     '''Command line options.'''
     logging.basicConfig(filename='pycoal.log',level=logging.INFO, format='%(asctime)s %(message)s')
     if argv is None:
@@ -80,22 +79,24 @@ USAGE
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-i", "--image", dest="image", help="Input file to be processed")
         parser.add_argument("-s", "--slib", dest="slib", help="Spectral Library filename")
+        parser.add_argument("-r", "--rgb", dest="rgb_filename", help="RGB File Name")
+        parser.add_argument("-c", "--classImage", dest="classified_filename", help="Classified File Name")
 
         # Process arguments
-        args = parser.parse_args(['-i', input_filename, '-s', library_filename])
+        args = parser.parse_args(['-i', '-s'])
         #args = parser.parse_args()
 
         image = args.image
         slib = args.slib
         
         # create a new mineral classification instance
-        mineral_classification = mineral.MineralClassification(library_filename)
+        mineral_classification = mineral.MineralClassification(slib)
 
         # generate a georeferenced visible-light image
-        #mineral_classification.to_rgb(input_filename, rgb_filename)
+        mineral_classification.to_rgb(image, rgb_filename)
 
         # generate a mineral classified image
-        #mineral_classification.classify_image(input_filename, classified_filename)
+        mineral_classification.classify_image(image, classified_filename)
 
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###
