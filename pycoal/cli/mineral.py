@@ -79,15 +79,22 @@ USAGE
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-i", "--image", dest="image", help="Input file to be processed")
         parser.add_argument("-s", "--slib", dest="slib", help="Spectral Library filename")
-        parser.add_argument("-r", "--rgb", dest="rgb_filename", help="RGB File Name")
-        parser.add_argument("-c", "--classImage", dest="classified_filename", help="Classified File Name")
+        parser.add_argument("-r", "--rgb_filename", dest="rgb_filename", help="RGB File Name")
+        parser.add_argument("-c", "--classified_filename", dest="classified_filename", help="Classified File Name")
 
         # Process arguments
-        args = parser.parse_args(['-i', '-s'])
-        #args = parser.parse_args()
+        args = parser.parse_args(['-i', '-s', 'r', 'c'])
+        args = parser.parse_args()
 
         image = args.image
         slib = args.slib
+        rgb_filename = args.rgb_filename
+        classified_filename = args.classified_filename
+        
+        #image = "ang20150420t182050_corr_v1e_img.hdr"
+        #slib = "s06av95a_envi.hdr"
+        #rgb_filename = "ang20150420t182050_corr_v1e_img_rgb.hdr"
+        #classified_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
         
         # create a new mineral classification instance
         mineral_classification = mineral.MineralClassification(slib)
