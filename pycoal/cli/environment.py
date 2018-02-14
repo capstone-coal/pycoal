@@ -1,3 +1,5 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
 # Copyright (C) 2018 COAL-FO Developers
 #
 # This program is free software; you can redistribute it and/or
@@ -14,6 +16,7 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
+
 ''' 
 https://capstone-coal.github.io/docs#usage
 @author:     COAL Developers
@@ -22,41 +25,8 @@ https://capstone-coal.github.io/docs#usage
 @contact:    coal-capstone@googlegroups.com
 '''
 
-import sys
-import os
-import re
-from argparse import ArgumentParser
-from argparse import RawDescriptionHelpFormatter
-import logging
-from subprocess import call
-import spectral
-import numpy
-from os.path import abspath, dirname, basename, splitext
-import pycoal
-import time
-sys.path.insert(0, '../')
-import mineral
-import mining
-import environment
-
-__all__ = []
-
-DEBUG = 1
-TESTRUN = 0
-PROFILE = 0
-
-def main(argv=None):
-    '''Command line options.'''
-    logging.basicConfig(filename='pycoal.log', level=logging.INFO, 
-        format='%(asctime)s %(message)s')
-    if argv is None:
-        argv = sys.argv
-    else:
-        sys.argv.extend(argv)
-
-    program_name = os.path.basename(sys.argv[0])
-    program_shortdesc = __import__('__main__').__doc__.split("\n")[1]
-    program_license = '''%s
+program_license = \
+    '''%s
   VERSION %s
   Copyright 2018 COAL Developers. All rights reserved.
   This program is free software; you can redistribute it and/or
@@ -71,70 +41,46 @@ def main(argv=None):
   Software Foundation, Inc., 51 Franklin Street, Fifth
   Floor, Boston, MA 02110-1301, USA.
 USAGE
-''' % (program_shortdesc, pycoal.version)
+'''
+import sys
+import os
+from argparse import ArgumentParser
+from argparse import RawDescriptionHelpFormatter
+from pycoal.environment import EnvironmentalCorrelation
 
-    try:
-        # Setup argument parser
-        parser = ArgumentParser(
-           description=program_license,
-           formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument(
-            "-m", "--mining",
-            dest="mining_filename",
-           help="Input mining classified file to be processed")
-        parser.add_argument(
-           "-hy", "--hydrography",
-           dest="vector_filename",
-           help="Path to hydrography data")
-        parser.add_argument(
-           "-e", "--environment",
-           dest="correlation_filename",
-           help="Output environmental correlation image")
 
-        # Process arguments
-        args = parser.parse_args(['-m','-hy','-e'])
+def main(argv=None):
 
-        mining_filename = args.mining_filename
-        vector_filename = args.vector_filename
-        correlation_filename = args.correlation_filename
+      # Setup argument parser
 
-        #mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
-        #vector_filename = "Shape/NHDFlowline.shp"
-        #correlation_filename = "ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr"
+    parser = ArgumentParser(description=program_license,
+                            formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument('-m', '--mining', dest='mining_filename',
+                        help='Input mining classified file to be processed'
+                        )
+    parser.add_argument('-hy', '--hydrography', dest='vector_filename',
+                        help='Path to hydrography data')
+    parser.add_argument('-e', '--environment',
+                        dest='correlation_filename',
+                        help='Output environmental correlation image')
 
-        # create a new environmental correlation instance
-        environmental_correlation = environment.EnvironmentalCorrelation()
-        # generate an environmental correlation image of mining
-        # pixels within 10 meters of a stream
-        environmental_correlation.intersect_proximity(mining_filename, vector_filename, 10.0, correlation_filename)
+      # Process arguments
 
-    except KeyboardInterrupt:
-        return 0
-    except Exception as e:
-        if DEBUG or TESTRUN:
-            raise e
-        indent = len(program_name) * " "
-        sys.stderr.write(program_name + ": " + repr(e) + "\n")
-        sys.stderr.write(indent + "  for help use --help")
-        return 2
+    args = parser.parse_args()
+    mining_filename = args.mining_filename
+    vector_filename = args.vector_filename
+    correlation_filename = args.correlation_filename
+
+       # create a new environmental correlation instance
+
+    environmental_correlation = environment.EnvironmentalCorrelation()
+
+    # generate an environmental correlation image of mining
+    # pixels within 10 meters of a stream
+
+    environmental_correlation.intersect_proximity(mining_filename,
+            vector_filename, 10.0, correlation_filename)
+
 
 if __name__ == '__main__':
-    if DEBUG:
-        sys.argv.append("-h")
-        sys.argv.append("-v")
-        sys.argv.append("-r")
-    if TESTRUN:
-        import doctest
-        doctest.testmod()
-    if PROFILE:
-        import cProfile
-        import pstats
-        profile_filename = 'environment_profile.txt'
-        cProfile.run('main()', profile_filename)
-        statsfile = open("profile_stats.txt", "wb")
-        p = pstats.Stats(profile_filename, stream=statsfile)
-        stats = p.strip_dirs().sort_stats('cumulative')
-        stats.print_stats()
-        statsfile.close()
-        sys.exit(0)
-    sys.exit(main())
+    main()
