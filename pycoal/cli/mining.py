@@ -55,12 +55,7 @@ sys.path.insert(0, '../')
 import mineral
 import mining
 import environment
-
-__all__ = []
-
-DEBUG = 1
-TESTRUN = 0
-PROFILE = 0
+from pycoal.mineral import MineralClassification
 
 def main(argv=None):  # IGNORE:C0111
 
@@ -68,11 +63,8 @@ def main(argv=None):  # IGNORE:C0111
 
     parser = ArgumentParser(description=program_license,
                             formatter_class=RawDescriptionHelpFormatter)
-    parser.add_argument('-mi', '--mineral_input', dest='input',
-                        help='Input classified mineral file to be processed'
-                        )
-    parser.add_argument('-mo', '--mining_output', dest='output',
-                        help='Output mining classified image filename ')
+    parser.add_argument("-mi", "--mineral_input", dest="input", help="Input classified mineral file to be processed")
+    parser.add_argument("-mo", "--mining_output", dest="output", help="Output mining classified image filename")
 
     # Process arguments
 
@@ -80,17 +72,13 @@ def main(argv=None):  # IGNORE:C0111
     mineral_filename = args.input
     mining_filename = args.output
 
-    # mineral_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
-    # mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
-
     # create a new mining classification instance
 
     mining_classification = mining.MiningClassification()
 
     # generate a mining classified image
 
-    mining_classification.classify_image(mineral_filename,
-            mining_filename)
+    mining_classification.classify_image(mineral_filename, mining_filename)
 
 
 if __name__ == '__main__':

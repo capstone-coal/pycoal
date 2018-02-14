@@ -55,22 +55,17 @@ sys.path.insert(0, '../')
 import mineral
 import mining
 import environment
+from environment import EnvironmentalCorrelation
 
 
 def main(argv=None):
 
       # Setup argument parser
 
-    parser = ArgumentParser(description=program_license,
-                            formatter_class=RawDescriptionHelpFormatter)
-    parser.add_argument('-m', '--mining', dest='mining_filename',
-                        help='Input mining classified file to be processed'
-                        )
-    parser.add_argument('-hy', '--hydrography', dest='vector_filename',
-                        help='Path to hydrography data')
-    parser.add_argument('-e', '--environment',
-                        dest='correlation_filename',
-                        help='Output environmental correlation image')
+    parser = ArgumentParser(description=program_license,formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument("-m", "--mining", dest="mining_filename", help="Input mining classified file to be processed")
+    parser.add_argument("-hy", "--hydrography", dest="vector_filename", help="Path to hydrography data")
+    parser.add_argument("-e", "--environment", dest="correlation_filename", help="Output environmental correlation image")
 
       # Process arguments
 
