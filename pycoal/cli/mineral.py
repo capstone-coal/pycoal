@@ -15,7 +15,7 @@
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
 
-program_license ='''
+program_description ='''
 pycoal-mineral -- a CLI for COAL mineral classification
 
 pycoal-mineral provides a CLI which demonstrates how the COAL Mineral Classification 
@@ -36,15 +36,11 @@ https://capstone-coal.github.io/docs#usage
 
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-import sys
-import pycoal
-sys.path.insert(0, '../')
-import mineral
-from mineral import MineralClassification
+from pycoal.mineral import MineralClassification
 
 def main(argv=None):
     # Setup argument parser
-    parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
+    parser = ArgumentParser(description=program_description, formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("-i", "--image", dest="image", help="Input file to be processed")
     parser.add_argument("-s", "--slib", dest="slib", help="Spectral Library filename")
     parser.add_argument("-r", "--rgb_filename", dest="rgb_filename", help="RGB File Name")

@@ -15,12 +15,12 @@
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
 
-program_license = '''
+program_description = '''
 pycoal-mining -- a CLI for COAL mining classification
-    
+
 pycoal-mining provides a CLI which demonstrates how the COAL Mining Classification
 API provides methods for generating mining classified images.
-Mining classification can 2-10 minutes depending on the size of the spectral
+Mining classification runtime depends largely on the size of the spectral
 library and the available computing resources. More reading an this example can be seen at
 https://capstone-coal.github.io/docs#usage
 
@@ -35,15 +35,11 @@ https://capstone-coal.github.io/docs#usage
 
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-import sys
-import pycoal
-sys.path.insert(0, '../')
-import mining
-from mining import MiningClassification
+from pycoal.mining import MiningClassification
 
 def main(argv=None):  # IGNORE:C0111
     # Setup argument parser
-    parser = ArgumentParser(description=program_license,formatter_class=RawDescriptionHelpFormatter)
+    parser = ArgumentParser(description=program_description,formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("-mi", "--mineral_input", dest="input", help="Input classified mineral file to be processed")
     parser.add_argument("-mo", "--mining_output", dest="output", help="Output mining classified image filename")
 
@@ -54,7 +50,7 @@ def main(argv=None):  # IGNORE:C0111
     mining_filename = args.output
 
     # create a new mining classification instance
-    mining_classification = mining.MiningClassification()
+    mining_classification = MiningClassification()
 
     # generate a mining classified image
     mining_classification.classify_image(mineral_filename, mining_filename)

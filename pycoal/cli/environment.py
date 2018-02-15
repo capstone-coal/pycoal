@@ -15,36 +15,32 @@
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
 
-program_license = '''
-    pycoal-environment -- a CLI for COAL environment classification
-    
-    pycoal-environment provides a CLI which demonstrates how the COAL Environment Classification
-    API provides methods for generating environment classified images.
-    Environment classification can 2-10 minutes depending on the size of the spectral
-    library and the available computing resources. More reading an this example can be seen at
-    https://capstone-coal.github.io/docs#usage
-    
-    @author:     COAL Developers
-    
-    @copyright:  2018 COAL Developers. All rights reserved.
-    
-    @license:    GNU General Public License version 2
-    
-    @contact:    coal-capstone@googlegroups.com
+program_description = '''
+pycoal-environment -- a CLI for COAL environment classification
+
+pycoal-environment provides a CLI which demonstrates how the COAL Environment Classification
+API provides methods for generating environment classified images.
+Environment classification runtime depends largely on the size of the spectral
+library and the available computing resources. More reading an this example can be seen at
+https://capstone-coal.github.io/docs#usage
+
+@author:     COAL Developers
+
+@copyright:  2018 COAL Developers. All rights reserved.
+
+@license:    GNU General Public License version 2
+
+@contact:    coal-capstone@googlegroups.com
 '''
 
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-import sys
-import pycoal
-sys.path.insert(0, '../')
-import environment
-from environment import EnvironmentalCorrelation
+from pycoal.environment import EnvironmentalCorrelation
 
 
 def main(argv=None):
     # Setup argument parser
-    parser = ArgumentParser(description=program_license,formatter_class=RawDescriptionHelpFormatter)
+    parser = ArgumentParser(description=program_description,formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("-m", "--mining", dest="mining_filename", help="Input mining classified file to be processed")
     parser.add_argument("-hy", "--hydrography", dest="vector_filename", help="Path to hydrography data")
     parser.add_argument("-e", "--environment", dest="correlation_filename", help="Output environmental correlation image")
@@ -57,7 +53,7 @@ def main(argv=None):
     correlation_filename = args.correlation_filename
 
     # create a new environmental correlation instance
-    environmental_correlation = environment.EnvironmentalCorrelation()
+    environmental_correlation = EnvironmentalCorrelation()
 
     # generate an environmental correlation image of mining
     # pixels within 10 meters of a stream
