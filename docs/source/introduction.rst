@@ -24,7 +24,7 @@ COAL is a Python library for processing hyperspectral imagery from remote sensin
 ================
 What is COAL?
 ================
-COAL provides a suite of algorithms (written in Python) to identify, classify, characterize, and quantify (by reporting a number of key metrics) the direct and indirect impacts of MTM and related destructive surface mining activities across the continental U.S.A (and further afield).
+COAL provides a suite of algorithms and a command line interface (all written in Python) to identify, classify, characterize, and quantify (by reporting a number of key metrics) the direct and indirect impacts of MTM and related destructive surface mining activities across the continental U.S.A (and further afield).
 
 ================
 Dependencies
