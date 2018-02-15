@@ -138,6 +138,7 @@ RUN git clone https://github.com/OSGeo/gdal.git && \
 	export PATH=$GDAL_PREFIX/bin:$PATH && \
 	export LD_LIBRARY_PATH=$GDAL_PREFIX/lib:$LD_LIBRARY_PATH && \
 	export GDAL_DATA=$GDAL_PREFIX/share/gdal && \
+	export PYTHONPATH=/usr/local/gdal_build/lib/python3.6/site-packages
 	# Test
 	gdalwarp --version
 
