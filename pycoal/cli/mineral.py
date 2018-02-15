@@ -36,7 +36,11 @@ https://capstone-coal.github.io/docs#usage
 
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
-from pycoal.mineral import MineralClassification
+import sys
+import pycoal
+sys.path.insert(0, '../')
+import mineral
+from mineral import MineralClassification
 
 def main(argv=None):
     # Setup argument parser
