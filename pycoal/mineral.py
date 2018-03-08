@@ -1,4 +1,4 @@
-# Copyright (C) 2017 COAL Developers
+# Copyright (C) COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 
@@ -317,8 +317,8 @@ class AsterConversion:
 
     def __init__(self):
         """
-        This class provides a method for converting the ASTER Spectral
-        Library Version 2.0 into ENVI format.
+        This class provides a method for converting the `ASTER Spectral
+        Library Version 2.0 <https://speclib.jpl.nasa.gov/>`_ into ENVI format.
 
         Args:
             None
