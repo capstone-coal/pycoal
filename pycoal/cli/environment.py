@@ -1,4 +1,4 @@
-# Copyright (C) 2018 COAL-FO Developers
+# Copyright (C) 2017-2018 COAL-FO Developers
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -26,7 +26,7 @@ https://capstone-coal.github.io/docs#usage
 
 @author:     COAL Developers
 
-@copyright:  2018 COAL Developers. All rights reserved.
+@copyright:  2017-2018 COAL Developers. All rights reserved.
 
 @license:    GNU General Public License version 2
 
