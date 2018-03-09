@@ -1,4 +1,4 @@
-# Copyright (C) 2017 COAL Developers
+# Copyright (C) 2017-2018 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 
@@ -126,7 +126,7 @@ RUN git clone https://github.com/OSGeo/gdal.git && \
     	--without-perl \
     	--without-pg \
     	--without-php \
-   		--without-png \
+   	--without-png \
     	--without-qhull \
     	--without-sde \
     	--without-sqlite3 \
@@ -138,7 +138,7 @@ RUN git clone https://github.com/OSGeo/gdal.git && \
 	export PATH=$GDAL_PREFIX/bin:$PATH && \
 	export LD_LIBRARY_PATH=$GDAL_PREFIX/lib:$LD_LIBRARY_PATH && \
 	export GDAL_DATA=$GDAL_PREFIX/share/gdal && \
-	export PYTHONPATH=/usr/local/gdal_build/lib/python3.6/site-packages
+	export PYTHONPATH=/usr/local/gdal_build/lib/python3.6/site-packages && \
 	# Test
 	gdalwarp --version
 
