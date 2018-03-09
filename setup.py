@@ -19,7 +19,7 @@ from setuptools import find_packages, setup
 
 # Package data
 # ------------
-_author = 'COAL Capstone Develeopers'
+_author = 'COAL Capstone Developers'
 _author_email = 'coal-capstone@googlegroups.com'
 _classifiers = [
     'Environment :: Console',
