@@ -17,7 +17,7 @@
 # Use an official Python runtime as a base image (host debian:jessie)
 FROM python:3-slim
 
-MAINTAINER pycoal developers <coal-capstone@googlegroups.com>
+MAINTAINER COAL Developers <coal-capstone@googlegroups.com>
 
 RUN echo "deb     http://qgis.org/debian jessie main" >> /etc/apt/sources.list
 RUN echo "deb-src http://qgis.org/debian jessie main" >> /etc/apt/sources.list
