@@ -24,7 +24,7 @@ The image ``s06av95a_envi.png`` is saved in the current directory. It shows that
 
 @author:     COAL Developers
 
-@copyright:  2017-2018 COAL Developers. All rights reserved.
+@copyright:  Copyright (C) 2017-2018 COAL Developers
 
 @license:    GNU General Public License version 2
 

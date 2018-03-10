@@ -45,7 +45,7 @@ pycoal-mineral
 
    @author:     COAL Developers
 
-   @copyright:  2018 COAL Developers. All rights reserved.
+   @copyright:  Copyright (C) 2018 COAL Developers
 
    @license:    GNU General Public License version 2
 
@@ -80,7 +80,7 @@ pycoal-mining
 
    @author:     COAL Developers
 
-   @copyright:  2018 COAL Developers. All rights reserved.
+   @copyright:  Copyright (C) 2018 COAL Developers
 
    @license:    GNU General Public License version 2
 
@@ -113,7 +113,7 @@ pycoal-environment
 
    @author:     COAL Developers
 
-   @copyright:  2018 COAL Developers. All rights reserved.
+   @copyright:  Copyright (C) 2018 COAL Developers
 
    @license:    GNU General Public License version 2
 

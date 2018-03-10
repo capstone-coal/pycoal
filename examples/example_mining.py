@@ -25,7 +25,7 @@ https://capstone-coal.github.io/docs#usage
 
 @author:     COAL Developers
 
-@copyright:  2017-2018 COAL Developers. All rights reserved.
+@copyright:  Copyright (C) 2017-2018 COAL Developers
 
 @license:    GNU General Public License version 2
 
@@ -82,7 +82,7 @@ def main(argv=None): # IGNORE:C0111
 
   VERSION %s
 
-  Copyright 2017 COAL Developers. All rights reserved.
+  Copyright (C) 2017-2018 COAL Developers
 
   This program is free software; you can redistribute it and/or 
   modify it under the terms of the GNU General Public License 
