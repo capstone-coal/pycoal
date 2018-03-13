@@ -82,8 +82,8 @@ RUN wget http://download.osgeo.org/gdal/CURRENT/gdal-2.2.3.tar.gz && \
 	cd gdal-2.2.3 && \
 	./configure && \
 	make && \
-	sudo -c "make install" && \
-	sudo -c "ldconfig" && \
+	make install && \
+	ldconfig && \
 	# Test
 	gdalwarp --version
 
