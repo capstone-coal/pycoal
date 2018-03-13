@@ -2,7 +2,11 @@
 COAL
 ======
 
-| |license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads| |Docker Pulls| |microbadger|
+**Development**
+| |license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads|
+
+**Docker**
+|Docker Pulls| |microbadger|
 
 COAL is a Python library for processing hyperspectral imagery from remote sensing devices such as the
 `Airborne Visible/InfraRed Imaging Spectrometer (AVIRIS) <https://aviris.jpl.nasa.gov/>`__ and 
@@ -37,6 +41,7 @@ Installation
 
 pip
 ^^^
+|PyPI|
 
 The Python COAL package **pycoal** can be installed from the cheeseshop
 
@@ -46,6 +51,7 @@ The Python COAL package **pycoal** can be installed from the cheeseshop
     
 conda
 ^^^^^
+|Anaconda-Server Version| |Anaconda-Server Downloads|
 
 or from conda
 
@@ -65,6 +71,7 @@ or from source
 
 Docker
 ^^^^^^
+|Docker Pulls| |microbadger|
 
 `Docker <https://www.docker.com/>`_ greatly simplifies installation of pycoal and the environment. 
 The image can be installed from `Dockerhub <https://hub.docker.com/>`_ as follows
