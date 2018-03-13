@@ -71,14 +71,34 @@ The image can be installed from `Dockerhub <https://hub.docker.com/>`_ as follow
 
 ::
 
-	docker pull capstonecoal/coal:latest
+   docker pull capstonecoal/coal:latest
 
 Additionally, if you are developing the image and wish to build it locally, you can run the following
 
+**Installation**
+
+1. Install `Docker <https://www.docker.com/>`_.
+
+2. Build from files in this directory:
+
 ::
 
-	docker build .
+   $(boot2docker shellinit | grep export)
+   docker build -t capstonecoal/coal .
 
+## Usage
+
+Start docker
+
+   boot2docker up
+   $(boot2docker shellinit | grep export)
+
+Start up an image and attach to it
+
+    docker run -t -i -d --name coalcontainer capstonecoal/coal /bin/bash
+    docker attach --sig-proxy=false coalcontainer
+
+Nutch is located in ~/coal and is almost ready to run. You just need to grab some data.
 
 Tests
 -----

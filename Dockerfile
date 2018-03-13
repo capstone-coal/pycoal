@@ -24,6 +24,7 @@ RUN echo "deb-src http://qgis.org/debian jessie main" >> /etc/apt/sources.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key 073D307A618E5811
 # dput breaks Docker build
 RUN printf "Package: dput\nPin: origin \"\"\nPin-Priority: -1" >> /etc/apt/preferences
+#RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 
 # Install the dependencies
 RUN apt-get update && \
@@ -68,77 +69,21 @@ RUN apt-get update && \
 		qgis \
 		qgis-plugin-grass \
 		txt2tags \
+		wget \
 		xauth \
 		xfonts-100dpi \
 		xfonts-75dpi \
 		xfonts-base \
 		xfonts-scalable xvfb
 
-# Build GDAL from source with minimized drivers
-WORKDIR /usr/local
-ENV GDAL_PREFIX /usr/local/gdal_build
-RUN git clone https://github.com/OSGeo/gdal.git && \
-	cd gdal/gdal && \
-	git checkout --track origin/2.2 && \
-	./configure \
-    	--prefix=$GDAL_PREFIX \
-    	--with-geos \
-    	--with-geotiff=internal \
-    	--with-hide-internal-symbols \
-    	--with-libtiff=internal \
-    	--with-libz=no \
-    	--with-python \
-    	--with-threads \
-    	--without-bsb \
-    	--without-cfitsio \
-    	--without-cryptopp \
-    	--without-curl \
-    	--without-ecw \
-    	--without-expat \
-    	--without-fme \
-    	--without-freexl \
-    	--without-gif \
-    	--without-gif \
-    	--without-gnm \
-    	--without-grass \
-    	--without-grib \
-    	--without-hdf4 \
-    	--without-hdf5 \
-    	--without-idb \
-    	--without-ingres \
-    	--without-jasper \
-    	--without-jp2mrsid \
-    	--without-jpeg \
-    	--without-kakadu \
-    	--without-libgrass \
-    	--without-libkml \
-    	--without-libtool \
-    	--without-mrf \
-    	--without-mrsid \
-    	--without-mysql \
-    	--without-netcdf \
-    	--without-odbc \
-    	--without-ogdi \
-    	--without-openjpeg \
-    	--without-pcidsk \
-    	--without-pcraster \
-    	--without-pcre \
-    	--without-perl \
-    	--without-pg \
-    	--without-php \
-   		--without-png \
-    	--without-qhull \
-    	--without-sde \
-    	--without-sqlite3 \
-    	--without-webp \
-    	--without-xerces \
-    	--without-xml2 && \
+# Download GDAL
+RUN wget http://download.osgeo.org/gdal/CURRENT/gdal-2.2.3.tar.gz && \
+	tar zxvf gdal-2.2.3.tar.gz && \
+	cd gdal-2.2.3 && \
+	./configure && \
 	make && \
-	checkinstall && \
-	export PATH=$GDAL_PREFIX/bin:$PATH && \
-	export LD_LIBRARY_PATH=$GDAL_PREFIX/lib:$LD_LIBRARY_PATH && \
-	export GDAL_DATA=$GDAL_PREFIX/share/gdal && \
-	export PYTHONPATH=${PYTHONPATH}:/usr/local/gdal_build/lib/python3.6/site-packages && \
+	make install && \
+	ldconfig && \
 	# Test
 	gdalwarp --version
 
