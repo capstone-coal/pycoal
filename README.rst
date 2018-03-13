@@ -3,9 +3,11 @@ COAL
 ======
 
 **Development**
-| |license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads|
+
+|license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads|
 
 **Docker**
+
 |Docker Pulls| |microbadger|
 
 COAL is a Python library for processing hyperspectral imagery from remote sensing devices such as the
