@@ -19,6 +19,19 @@ FROM python:3-slim
 
 MAINTAINER COAL Developers <coal-capstone@googlegroups.com>
 
+# Build-time metadata as defined at http://label-schema.org
+# This means we get badges through MicroBadger
+ARG BUILD_DATE
+ARG VCS_REF
+LABEL org.label-schema.build-date=$BUILD_DATE \
+	org.label-schema.name="Coal and Open-pit surface mining impacts on American Lands (COAL)" \
+	org.label-schema.description="Python library for processing hyperspectral imagery from the Airborne Visible/InfraRed Imaging Spectrometer (AVIRIS). COAL provides a suite of algorithms for classifying land cover, identifying mines and other geographic features, and correlating them with environmental data sets." \
+	org.label-schema.url="https://capstone-coal.github.io/" \
+	org.label-schema.vcs-ref=$VCS_REF \
+	org.label-schema.vcs-url="https://github.com/capstone-coal/pycoal" \
+	org.label-schema.vendor="Capstone Coal" \
+	org.label-schema.schema-version="1.0"
+
 RUN echo "deb     http://qgis.org/debian jessie main" >> /etc/apt/sources.list
 RUN echo "deb-src http://qgis.org/debian jessie main" >> /etc/apt/sources.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key 073D307A618E5811
