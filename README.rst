@@ -116,6 +116,8 @@ pycoal is located in ~/coal and is almost ready to run. You just need to grab so
 Tests
 -----
 
+|Travis| |Coveralls|
+
 COAL uses the popular `nose <http://nose.readthedocs.org/en/latest/>`__
 testing suite for unit tests.
 
@@ -137,6 +139,8 @@ If you would like to run the examples yourself, head over to the **examples** mo
 
 Documentation
 -------------
+
+|documentation|
 
 COAL documentation can be found at `Readthedocs <http://pycoal.readthedocs.io>`__ however you can also build documentation manually.
 
