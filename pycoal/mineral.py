@@ -362,3 +362,44 @@ class AsterConversion:
         library = aster_database.create_envi_spectral_library(spectrum_ids, band_info)
 
         library.save(hdr_file)
+
+class SpectralConversion:
+    
+    def __init__(self):
+        """
+            This class provides a method for converting the ASTER Spectral
+            Library Version 2.0 into ENVI format.
+            
+            Args:
+            None
+            """
+        pass
+    
+    @classmethod
+    def convert(cls, hdr_file="", spectral_library_file=""):
+        """
+            This class method generates an ENVI format spectral library file.
+            From Spectral Version 7 and takes upwards of 10 minutes and creating
+            an ENVI format file takes up to 5 minutes. Note: This feature is still
+            experimental.
+            
+            Args:
+            hdr_file (str):           name of the ENVI spectral library to generate
+            (without the ``.hdr`` or ``.sli`` extension)
+            """
+        if not hdr_file:
+            raise ValueError("Must provide path for generated ENVI header file.")
+        
+        if not spectral_library_file:
+            raise ValueError("Must provide path to Spectral Library Version 7 Data base file")
+        
+        spectrum_ids = [x[0] for x in spectral_library_file.query('SELECT Values').fetchall()]
+        band_min = 0.38315
+        band_max = 2.5082
+        band_num = 128
+        band_info = spectral.BandInfo()
+        band_info.centers = numpy.arange(band_min, band_max, (band_max - band_min) / band_num)
+        band_info.band_unit = 'micrometer'
+        library = aster_database.create_envi_spectral_library(spectrum_ids, band_info)
+        
+        library.save(hdr_file)

@@ -50,12 +50,11 @@ import numpy
 import spectral
 
 # load library
-library_filename = '../pycoal/tests/usgs_splib07/ASCIIdata/ASCIIdata_splib07b_cvASD/ChapterA_ArtificialMaterials'
-data_dir = "dataSqlite07"
+spectral_library_file = '../pycoal/tests/usgs_splib07/ASCIIdata/splib07a_Bandpass_(FWHM)_ASDFR_StandardResolution.db'
 header_name = "s07av95a_envi"
 
 # create a new mineral aster conversion instance
-spectral_envi = mineral.AsterConversion()
+spectral_envi = mineral.SpectralConversion()
 # Generate .sli and .hdr
-spectral_envi.convert(library_filename,data_dir,header_name)
+spectral_envi.convert(header_name,spectral_library_file)
 
