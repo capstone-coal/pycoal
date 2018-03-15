@@ -70,7 +70,7 @@ Command Line Interface
 
 	VERSION 0.5.2
 
-	Copyright 2017 COAL Developers. All rights reserved.
+	Copyright (C) 2017-2018 COAL Developers
 
 	This program is free software; you can redistribute it and/or 
 	modify it under the terms of the GNU General Public License 
@@ -115,7 +115,7 @@ Command Line Interface
 
   	VERSION 0.5.2
 
-  	Copyright 2017 COAL Developers. All rights reserved.
+  	Copyright (C) 2017-2018 COAL Developers
 
   	This program is free software; you can redistribute it and/or
   	modify it under the terms of the GNU General Public License
@@ -159,7 +159,7 @@ Command Line Interface
 
   	VERSION 0.5.2
 
-  	Copyright 2017 COAL Developers. All rights reserved.
+  	Copyright (C) 2017-2018 COAL Developers
 
   	This program is free software; you can redistribute it and/or
   	modify it under the terms of the GNU General Public License

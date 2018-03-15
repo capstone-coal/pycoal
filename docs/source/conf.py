@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
-
-# Copyright (C) 2017 COAL Developers
+# Copyright (C) 2017-2018 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 
@@ -65,8 +63,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'pycoal'
-copyright = u'2017 Lewis John McGibbney, Taylor Alexander Brown, Heidi Clayton, and Xiaomei Wang'
-author = u'Lewis John McGibbney, Taylor Alexander Brown, Heidi Clayton, and Xiaomei Wang'
+copyright = u'Copyright (C) 2017-2018 COAL Developers'
+author = u'COAL Developers'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -285,7 +283,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'COAL.tex', u'COAL Documentation',
-     u'Lewis John McGibbney, Kim D. Whitehall, Taylor Alexander Brown, Heidi Clayton, and Xiaomei Wang', 'manual'),
+     u'COAL Developers', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -342,7 +340,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'COAL', u'COAL Documentation',
-     author, 'COAL', 'One line description of project.',
+     author, 'COAL Developers', 'One line description of project.',
      'Miscellaneous'),
 ]
 

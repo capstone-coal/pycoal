@@ -1,4 +1,4 @@
-# Copyright (C) 2017 COAL Developers
+# Copyright (C) 2017-2018 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 

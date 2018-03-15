@@ -1,4 +1,4 @@
-# Copyright (C) 2017 COAL Developers
+# Copyright (C) 2017-2018 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 
@@ -28,7 +28,7 @@ class MineralClassification:
         Construct a new ``MineralClassification`` object with a spectral library
         in ENVI format such as the `USGS Digital Spectral Library 06
         <https://speclab.cr.usgs.gov/spectral.lib06/>`_ or the `ASTER Spectral
-        Library Version 2.0 <https://speclib.jpl.nasa.gov/>`_ converted with
+        Library Version 2.0 <https://asterweb.jpl.nasa.gov/`_ converted with
         ``pycoal.mineral.AsterConversion.convert()``.
 
         If provided, the optional class name parameter will initialize the
@@ -317,8 +317,8 @@ class AsterConversion:
 
     def __init__(self):
         """
-        This class provides a method for converting the ASTER Spectral
-        Library Version 2.0 into ENVI format.
+        This class provides a method for converting the `ASTER Spectral
+        Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ into ENVI format.
 
         Args:
             None

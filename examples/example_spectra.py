@@ -1,6 +1,4 @@
-#!/usr/bin/python
-#
-# Copyright (C) 2017 COAL Developers
+# Copyright (C) 2017-2018 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 
@@ -24,7 +22,7 @@ The images ``spectra.png`` and ``spectra.svg`` are saved in the current director
 
 @author:     COAL Developers
 
-@copyright:  2017 COAL Developers. All rights reserved.
+@copyright:  Copyright (C) 2017-2018 COAL Developers
 
 @license:    GNU General Public License version 2
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2017 COAL Developers
+# Copyright (C) 2017-2018 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 
@@ -15,5 +15,5 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 [run]
-source = pycoal.environment,pycoal.history,pycoal.mineral,pycoal.mining
+source = pycoal.mineral,pycoal.mining,pycoal.environment,pycoal.cli.mineral,pycoal.cli.mining,pycoal.cli.environment,examples.example_mineral,examples.example_mining,examples.example_environment,examples.example_sam,examples.example_spectra,examples.example_splib06
 [report]

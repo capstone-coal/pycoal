@@ -1,4 +1,4 @@
-# Copyright (C) 2017 COAL Developers
+# Copyright (C) 2017-2018 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 
@@ -19,7 +19,7 @@ from setuptools import find_packages, setup
 
 # Package data
 # ------------
-_author = 'COAL Capstone Develeopers'
+_author = 'COAL Developers'
 _author_email = 'coal-capstone@googlegroups.com'
 _classifiers = [
     'Environment :: Console',

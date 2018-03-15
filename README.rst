@@ -2,7 +2,13 @@
 COAL
 ======
 
-| |license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads| |Docker Pulls| |microbadger|
+**Development**
+
+|license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads|
+
+**Docker**
+
+|Docker Pulls| |microbadger|
 
 COAL is a Python library for processing hyperspectral imagery from remote sensing devices such as the
 `Airborne Visible/InfraRed Imaging Spectrometer (AVIRIS) <https://aviris.jpl.nasa.gov/>`__ and 
@@ -37,6 +43,7 @@ Installation
 
 pip
 ^^^
+|PyPI|
 
 The Python COAL package **pycoal** can be installed from the cheeseshop
 
@@ -46,6 +53,7 @@ The Python COAL package **pycoal** can be installed from the cheeseshop
     
 conda
 ^^^^^
+|Anaconda-Server Version| |Anaconda-Server Downloads|
 
 or from conda
 
@@ -65,6 +73,7 @@ or from source
 
 Docker
 ^^^^^^
+|Docker Pulls| |microbadger|
 
 `Docker <https://www.docker.com/>`_ greatly simplifies installation of pycoal and the environment. 
 The image can be installed from `Dockerhub <https://hub.docker.com/>`_ as follows
@@ -75,13 +84,39 @@ The image can be installed from `Dockerhub <https://hub.docker.com/>`_ as follow
 
 Additionally, if you are developing the image and wish to build it locally, you can run the following
 
+**Installation**
+
+1. Install `Docker <https://www.docker.com/>`_.
+
+2. Build from files in this directory:
+
 ::
 
-	docker build .
+	$(boot2docker shellinit | grep export)
+	docker build -t capstonecoal/coal .
 
+**Usage**
+
+Start docker
+
+::
+
+	boot2docker up
+	$(boot2docker shellinit | grep export)
+
+Start up an image and attach to it
+
+::
+
+	docker run -t -i -d --name coalcontainer capstonecoal/coal /bin/bash
+	docker attach --sig-proxy=false coalcontainer
+
+pycoal is located in ~/coal and is almost ready to run. You just need to grab some data.
 
 Tests
 -----
+
+|Travis| |Coveralls|
 
 COAL uses the popular `nose <http://nose.readthedocs.org/en/latest/>`__
 testing suite for unit tests.
@@ -104,6 +139,8 @@ If you would like to run the examples yourself, head over to the **examples** mo
 
 Documentation
 -------------
+
+|documentation|
 
 COAL documentation can be found at `Readthedocs <http://pycoal.readthedocs.io>`__ however you can also build documentation manually.
 
