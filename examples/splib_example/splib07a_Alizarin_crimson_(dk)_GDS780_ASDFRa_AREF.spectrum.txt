@@ -1,0 +1,30 @@
+Name: Alizarin_crimson
+Type:  
+Class: 
+Subclass: 
+Particle Size:  Solid
+Sample No.:  0095UUUASP
+Owner: 
+Wavelength Range:  All
+Origin: Spectra obtained from the Noncoventional Exploitation Factors 
+Data System of the National Photographic Interpretation Center. 
+Description:  Gray and black construction asphalt.  The sample was 
+soiled and weathered, with some limestone and quartz aggregate 
+showing.
+
+
+
+Measurement:  Directional (10 Degree) Hemispherical Reflectance
+First Column:  X
+Second Column: Y    
+X Units:  Wavelength (micrometers)
+Y Units:  Reflectance (percent)
+First X Value: 
+Last X Value:
+Number of X Values:
+Additional Information:
+
+0.0033038475	0.3
+0.0034711290	0.31
+
+

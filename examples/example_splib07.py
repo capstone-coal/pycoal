@@ -44,17 +44,31 @@ from os import getcwd
 import inspect
 import pycoal
 sys.path.insert(0, '../pycoal')
+reload(sys)
+sys.setdefaultencoding('utf8')
 import mineral
 import math
 import numpy
 import spectral
 
 # load library
-spectral_library_file = '../pycoal/tests/usgs_splib07/ASCIIdata/splib07a_Bandpass_(FWHM)_ASDFR_StandardResolution.db'
+#spectral_library_file = '../pycoal/tests/usgs_splib07/ASCIIdata/splib07a_Bandpass_(FWHM)_ASDFR_StandardResolution.db'
+#header_name = "s07av95a_envi"
+
+# create a new mineral aster conversion instance
+#spectral_envi = mineral.SpectralConversion()
+# Generate .sli and .hdr
+#spectral_envi.convert(header_name,spectral_library_file)
+
+# load library
+#This will generate three files s07av95a_envi.hdr, s07av95a_envi.hdr.sli,splib.db and dataSplib07.db
+library_filename = 'splib_example'
+data_dir = "dataSplib07.db"
 header_name = "s07av95a_envi"
 
 # create a new mineral aster conversion instance
-spectral_envi = mineral.SpectralConversion()
+spectral_envi = mineral.AsterConversion()
 # Generate .sli and .hdr
-spectral_envi.convert(header_name,spectral_library_file)
+spectral_envi.convert(library_filename,data_dir,header_name)
+
 
