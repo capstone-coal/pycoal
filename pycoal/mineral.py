@@ -14,6 +14,9 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth 
 # Floor, Boston, MA 02110-1301, USA.
 
+import sys
+import os
+import inspect
 import logging
 import math
 import numpy
@@ -363,43 +366,95 @@ class AsterConversion:
 
         library.save(hdr_file)
 
-class SpectralConversion:
+class SpectralToAsterConversion:
     
     def __init__(self):
         """
-            This class provides a method for converting the ASTER Spectral
-            Library Version 2.0 into ENVI format.
+            This class provides a method for converting Spectral .txt files into
+            ASTER Library Version 2.0 .txt files
             
             Args:
-            None
+                none
             """
         pass
     
     @classmethod
-    def convert(cls, hdr_file="", spectral_library_file=""):
+    def convert(cls, library_filename=""):
         """
-            This class method generates an ENVI format spectral library file.
-            From Spectral Version 7 and takes upwards of 10 minutes and creating
-            an ENVI format file takes up to 5 minutes. Note: This feature is still
-            experimental.
+            This class method converts a Spectral version 7 .txt file into
+            an ASTER Library Version 2.0 .spectrum.txt file
+            
+            Spectral Library Version 7 can be downloaded here https://speclab.cr.usgs.gov/spectral-lib.html
+            
+            How to use on entire USGS Spectral Library Version 7:
+            1. Move all .txt files in Spectral Library Version 7 to one directory named 'usgs_splib07_modified'
+            2. Place this directory('usgs_splib07_modified') you just made in the pycoal/examples directory
+            3. run splib07_convert.py in the pycoal/examples directory
+            4. run example_splib07.py in the pycoal/examples directory
+            5. s07av95a_envi.hdr and s07av95a_envi.sli will be generated
             
             Args:
-            hdr_file (str):           name of the ENVI spectral library to generate
-            (without the ``.hdr`` or ``.sli`` extension)
+            library_filename (str): path to Spectral File you wish to convert
             """
-        if not hdr_file:
-            raise ValueError("Must provide path for generated ENVI header file.")
+        if not library_filename:
+            raise ValueError("Must provide path for Spectral File.")
         
-        if not spectral_library_file:
-            raise ValueError("Must provide path to Spectral Library Version 7 Data base file")
-        
-        spectrum_ids = [x[0] for x in spectral_library_file.query('SELECT SampleID FROM Samples').fetchall()]
-        band_min = 0.38315
-        band_max = 2.5082
-        band_num = 128
-        band_info = spectral.BandInfo()
-        band_info.centers = numpy.arange(band_min, band_max, (band_max - band_min) / band_num)
-        band_info.band_unit = 'micrometer'
-        library = aster_database.create_envi_spectral_library(spectrum_ids, band_info)
-        
-        library.save(hdr_file)
+        with open(library_filename,'r') as f:
+            for i, l in enumerate(f):
+                pass
+            
+        f = open(library_filename,'r')
+        nameTemp = f.readline()
+        name = nameTemp[23:]
+        k = 0
+        x = open('2.txt','w')
+        while(k < i):
+            num = float(f.readline()) * 100
+            num = num / 1000
+            num2 = num * 10
+            num = round(num,4)
+            num2 = round(num2,4)
+            line = str(num) + '  ' + str(num2)
+            x.write(line)
+            x.write('\n')
+            k = k+1
+        f = open(library_filename,'w')
+        f.write('Name:')
+        f.write(name)
+        f.write('Type:\n')
+        f.write('Class:\n')
+        f.write('Subclass:\n')
+        f.write('Particle Size:  Solid\n')
+        f.write('Sample No.:  0095UUUASP\n')
+        f.write('Owner:\n')
+        f.write('Wavelength Range:  ALL\n')
+        f.write('Origin: Spectra obtained from the Noncoventional Exploitation Factors\n')
+        f.write('Data System of the National Photographic Interpretation Center.\n')
+        f.write('Description:  Gray and black construction asphalt.  The sample was\n')
+        f.write('soiled and weathered, with some limestone and quartz aggregate\n')
+        f.write('showing.\n')
+        f.write('\n')
+        f.write('\n')
+        f.write('\n')
+        f.write('Measurement:  Directional (10 Degree) Hemispherical Reflectance\n')
+        f.write('First Column:  X\n')
+        f.write('Second Column: Y\n')
+        f.write('X Units:  Wavelength (micrometers)\n')
+        f.write('Y Units:  Reflectance (percent)\n')
+        f.write('First X Value:\n')
+        f.write('Last X Value:\n')
+        f.write('Number of X Values:\n')
+        f.write('Additional Information:\n')
+        f.write('\n')
+        j = 0
+        x.close()
+        x = open('2.txt','r')
+        while(j < i):
+            num = x.readline()
+            f.write(num)
+            j = j+1
+        f.close()
+        x.close()
+        os.rename(library_filename,library_filename + '.spectrum.txt')
+        os.remove('2.txt')
+        print("Successfully converted file " + library_filename)

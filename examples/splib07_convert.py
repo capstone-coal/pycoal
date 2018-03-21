@@ -18,9 +18,7 @@
 # encoding: utf-8
 
 '''
-example_sam -- Plot Spectral Angles
-
-.sli and .hdr files will be generated from spectral library.
+Spectral Version 7 .txt file converted to ASTER .txt file format
 
 @author:     COAL Developers
 
@@ -30,7 +28,6 @@ example_sam -- Plot Spectral Angles
 
 @contact:    coal-capstone@googlegroups.com
 '''
-
 
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
@@ -50,25 +47,17 @@ import mineral
 import math
 import numpy
 import spectral
+import glob
 
-# load library
-#spectral_library_file = '../pycoal/tests/usgs_splib07/ASCIIdata/splib07a_Bandpass_(FWHM)_ASDFR_StandardResolution.db'
-#header_name = "s07av95a_envi"
-
+#This will convert a Spectral Version .txt file to a ASTER .txt file
+library_filename = 'usgs_splib07_modified/'
 # create a new mineral aster conversion instance
-#spectral_envi = mineral.SpectralConversion()
-# Generate .sli and .hdr
-#spectral_envi.convert(header_name,spectral_library_file)
-
-# load library
-#This will generate three files s07av95a_envi.hdr, s07av95a_envi.hdr.sli,splib.db and dataSplib07.db
-library_filename = 'usgs_splib07_modified'
-data_dir = "dataSplib07.db"
-header_name = "s07av95a_envi"
-
-# create a new mineral aster conversion instance
-spectral_envi = mineral.AsterConversion()
-# Generate .sli and .hdr
-spectral_envi.convert(library_filename,data_dir,header_name)
+spectral_aster = mineral.SpectralToAsterConversion()
+# Convert all files
+files = os.listdir(library_filename)
+for x in range(0, len(files)):
+    name = 'usgs_splib07_modified/' + files[x]
+    #print(name)
+    spectral_aster.convert(name)
 
 
