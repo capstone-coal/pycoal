@@ -90,9 +90,9 @@ RUN apt-get update && \
 		xfonts-scalable xvfb
 
 # Download GDAL
-RUN wget http://download.osgeo.org/gdal/CURRENT/gdal-2.2.3.tar.gz && \
-	tar zxvf gdal-2.2.3.tar.gz && \
-	cd gdal-2.2.3 && \
+RUN wget http://download.osgeo.org/gdal/2.2.4/gdal-2.2.4.tar.gz && \
+	tar zxvf gdal-2.2.4.tar.gz && \
+	cd gdal-2.2.4 && \
 	./configure && \
 	make && \
 	make install && \
