@@ -14,6 +14,9 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth 
 # Floor, Boston, MA 02110-1301, USA.
 
+import sys
+import os
+import inspect
 import logging
 import math
 import numpy
@@ -28,7 +31,7 @@ class MineralClassification:
         Construct a new ``MineralClassification`` object with a spectral library
         in ENVI format such as the `USGS Digital Spectral Library 06
         <https://speclab.cr.usgs.gov/spectral.lib06/>`_ or the `ASTER Spectral
-        Library Version 2.0 <https://asterweb.jpl.nasa.gov/`_ converted with
+        Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ converted with
         ``pycoal.mineral.AsterConversion.convert()``.
 
         If provided, the optional class name parameter will initialize the
@@ -317,8 +320,8 @@ class AsterConversion:
 
     def __init__(self):
         """
-        This class provides a method for converting the `ASTER Spectral
-        Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ into ENVI format.
+        This class provides a method for converting the ASTER Spectral
+        Library Version 2.0 <https://asterweb.jpl.nasa.gov/> into ENVI format.
 
         Args:
             None
@@ -362,3 +365,99 @@ class AsterConversion:
         library = aster_database.create_envi_spectral_library(spectrum_ids, band_info)
 
         library.save(hdr_file)
+
+class SpectralToAsterConversion:
+    
+    def __init__(self):
+        """
+            This class provides a method for converting USGS Spectral Library Version 7
+            <https://speclab.cr.usgs.gov/spectral-lib.html> .txt files into ASTER Spectral
+            Library Version 2.0 <https://asterweb.jpl.nasa.gov/> .txt files
+            
+            Args:
+                none
+            """
+        pass
+    
+    @classmethod
+    def convert(cls, library_filename=""):
+        """
+            This class method converts a USGS Spectral Library Version 7
+            <https://speclab.cr.usgs.gov/spectral-lib.html> .txt file into
+            an ASTER Library Version 2.0 <https://asterweb.jpl.nasa.gov/> .spectrum.txt file
+            ASTER Library Version 2.0 Spectral Library files are in .spectrum.txt file format
+            
+            Spectral Library Version 7 can be downloaded here <https://speclab.cr.usgs.gov/spectral-lib.html>
+            
+            Args:
+            library_filename (str): path to Spectral File you wish to convert
+            """
+        if not library_filename:
+            raise ValueError("Must provide path for Spectral File.")
+        
+        line_count = 1
+        with open(library_filename,'r') as input_file:
+            for line_count, l in enumerate(input_file):
+                pass
+            
+        input_file = open(library_filename,'r')
+        #Read Name of Spectra on first line of the file
+        spectra_line = input_file.readline()
+        spectra_name = spectra_line[23:]
+        k = 0
+        #Loop through file and store all wavelength values for the given Spectra
+        spectra_values_file = open('SpectraValues.txt','w')
+        while(k < line_count):
+            spectra_wave_length = float(input_file.readline()) * 100
+            spectra_wave_length = spectra_wave_length / 1000
+            spectra_y_value = spectra_wave_length * 10
+            line = str(spectra_wave_length) + '  ' + str(spectra_y_value)
+            spectra_values_file.write(line)
+            spectra_values_file.write('\n')
+            k = k+1
+        #Write new file in the form of an ASTER .spectrum.txt file while using stored
+        #Spectra Name and stored Spectra Wavelength values`
+        input_file = open(library_filename,'w')
+        input_file.write('Name:')
+        input_file.write(spectra_name)
+        input_file.write('Type:\n')
+        input_file.write('Class:\n')
+        input_file.write('Subclass:\n')
+        input_file.write('Particle Size:  Solid\n')
+        input_file.write('Sample No.:  0095UUUASP\n')
+        input_file.write('Owner:\n')
+        input_file.write('Wavelength Range:  ALL\n')
+        input_file.write('Origin: Spectra obtained from the Noncoventional Exploitation Factors\n')
+        input_file.write('Data System of the National Photographic Interpretation Center.\n')
+        input_file.write('Description:  Gray and black construction asphalt.  The sample was\n')
+        input_file.write('soiled and weathered, with some limestone and quartz aggregate\n')
+        input_file.write('showing.\n')
+        input_file.write('\n')
+        input_file.write('\n')
+        input_file.write('\n')
+        input_file.write('Measurement:  Directional (10 Degree) Hemispherical Reflectance\n')
+        input_file.write('First Column:  X\n')
+        input_file.write('Second Column: Y\n')
+        input_file.write('X Units:  Wavelength (micrometers)\n')
+        input_file.write('Y Units:  Reflectance (percent)\n')
+        input_file.write('First X Value:\n')
+        input_file.write('Last X Value:\n')
+        input_file.write('Number of X Values:\n')
+        input_file.write('Additional Information:\n')
+        input_file.write('\n')
+        j = 0
+        spectra_values_file.close()
+        #Read in values saved in SpectraValues.txt and output them to the library_filename
+        spectra_values_file = open('SpectraValues.txt','r')
+        while(j < line_count):
+            spectra_wave_length = spectra_values_file.readline()
+            input_file.write(spectra_wave_length)
+            j = j+1
+        #Close all open files
+        input_file.close()
+        spectra_values_file.close()
+        #Rename library_filename to match ASTER .spectrum.txt file format
+        os.rename(library_filename,library_filename + '.spectrum.txt')
+        #Remove temporary file for storing wavelength data
+        os.remove('SpectraValues.txt')
+        print("Successfully converted file " + library_filename)
