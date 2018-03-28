@@ -31,26 +31,26 @@ ASTER Library Version 2.0 Spectral Library files are in .spectrum.txt file forma
 @contact:    coal-capstone@googlegroups.com
 '''
 
-import sys
-import os
-import pycoal
-sys.path.insert(0, '../pycoal')
-reload(sys)
-sys.setdefaultencoding('utf8')
-import mineral
-import math
-import numpy
-import spectral
+#!/usr/bin/python
 
-#This will take the .txt files for Spectra in USGS Spectral Version 7 and
-#convert their format to match that of ASTER .spectrum.txt files for spectra
-library_filename = 'usgs_splib07_modified/'
-# create a new mineral aster conversion instance
-spectral_aster = mineral.SpectralToAsterConversion()
-# Convert all files
-files = os.listdir(library_filename)
-for x in range(0, len(files)):
-    name = 'usgs_splib07_modified/' + files[x]
-    spectral_aster.convert(name)
+import os
+import sys
+from sys import path
+import fnmatch
+import shutil
+
+directory = 'usgs_splib07_modified'
+if not os.path.exists(directory):
+    os.makedirs(directory)
+
+exclude = set(['usgs_splib07_modified'])
+for root, dir, files in os.walk("."):
+    dir[:] = [d for d in dir if d not in exclude]
+    for items in fnmatch.filter(files, "*.txt"):
+        if "Bandpass" not in items:
+            if "errorbars" not in items:
+                if "Wave" not in items:
+                    if "SpectraValues" not in items:
+                        shutil.copy2(os.path.join(root,items), directory)
 
 

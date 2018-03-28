@@ -1,6 +1,4 @@
-#!/usr/bin/python
-#
-# Copyright (C) 2018 COAL Developers
+#Copyright (C) 2017-2018 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 
@@ -18,29 +16,20 @@
 # encoding: utf-8
 
 '''
-example_sam -- Plot Spectral Angles
-
-.sli and .hdr files will be generated from spectral library.
+example_splib07.py -- an example script that will generate envi .sli and .hdr files for
+a spectral library in ASTER Library Version 2.0 <https://asterweb.jpl.nasa.gov/> format
 
 @author:     COAL Developers
 
-@copyright:  2018 COAL Developers. All rights reserved.
+@copyright:  2017-2018 COAL Developers. All rights reserved.
 
 @license:    GNU General Public License version 2
 
 @contact:    coal-capstone@googlegroups.com
 '''
 
-
-from argparse import ArgumentParser
-from argparse import RawDescriptionHelpFormatter
-
-import logging
-
 import sys
 import os
-from sys import path
-from os import getcwd
 import inspect
 import pycoal
 sys.path.insert(0, '../pycoal')
@@ -51,17 +40,8 @@ import math
 import numpy
 import spectral
 
-# load library
-#spectral_library_file = '../pycoal/tests/usgs_splib07/ASCIIdata/splib07a_Bandpass_(FWHM)_ASDFR_StandardResolution.db'
-#header_name = "s07av95a_envi"
-
-# create a new mineral aster conversion instance
-#spectral_envi = mineral.SpectralConversion()
-# Generate .sli and .hdr
-#spectral_envi.convert(header_name,spectral_library_file)
-
-# load library
 #This will generate three files s07av95a_envi.hdr, s07av95a_envi.hdr.sli,splib.db and dataSplib07.db
+#For a library in ASTER Library Version 2.0 <https://asterweb.jpl.nasa.gov/> format
 library_filename = 'usgs_splib07_modified'
 data_dir = "dataSplib07.db"
 header_name = "s07av95a_envi"
