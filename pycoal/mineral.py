@@ -382,19 +382,12 @@ class SpectralToAsterConversion:
     @classmethod
     def convert(cls, library_filename=""):
         """
-            This class method converts a USGS Spectral version 7
+            This class method converts a USGS Spectral Library Version 7
             <https://speclab.cr.usgs.gov/spectral-lib.html> .txt file into
             an ASTER Library Version 2.0 <https://asterweb.jpl.nasa.gov/> .spectrum.txt file
             ASTER Library Version 2.0 Spectral Library files are in .spectrum.txt file format
             
             Spectral Library Version 7 can be downloaded here <https://speclab.cr.usgs.gov/spectral-lib.html>
-            
-            How to use on entire USGS Spectral Library Version 7:
-            1. Move all .txt files in Spectral Library Version 7 to one directory named 'usgs_splib07_modified'
-            2. Place this directory('usgs_splib07_modified') you just made in the pycoal/examples directory
-            3. run splib07_convert.py in the pycoal/examples directory
-            4. run example_splib07.py in the pycoal/examples directory
-            5. s07av95a_envi.hdr and s07av95a_envi.sli will be generated in the examples directory
             
             Args:
             library_filename (str): path to Spectral File you wish to convert
