@@ -320,8 +320,8 @@ class AsterConversion:
 
     def __init__(self):
         """
-        This class provides a method for converting the ASTER Spectral
-        Library Version 2.0 <https://asterweb.jpl.nasa.gov/> into ENVI format.
+        This class provides a method for converting the `ASTER Spectral
+        Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ into ENVI format.
 
         Args:
             None
@@ -370,8 +370,8 @@ class SpectralToAsterConversion:
     
     def __init__(self):
         """
-            This class provides a method for converting USGS Spectral Library Version 7
-            <https://speclab.cr.usgs.gov/spectral-lib.html> .txt files into ASTER Spectral
+            This class provides a method for converting `USGS Spectral Library Version 7
+            <https://speclab.cr.usgs.gov/spectral-lib.html>`_ .txt files into ASTER Spectral
             Library Version 2.0 <https://asterweb.jpl.nasa.gov/> .txt files
             
             Args:
@@ -382,12 +382,12 @@ class SpectralToAsterConversion:
     @classmethod
     def convert(cls, library_filename=""):
         """
-            This class method converts a USGS Spectral Library Version 7
-            <https://speclab.cr.usgs.gov/spectral-lib.html> .txt file into
-            an ASTER Library Version 2.0 <https://asterweb.jpl.nasa.gov/> .spectrum.txt file
+            This class method converts a `USGS Spectral Library Version 7
+            <https://speclab.cr.usgs.gov/spectral-lib.html>`_ .txt file into
+            an `ASTER Spectral Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ .spectrum.txt file
             ASTER Library Version 2.0 Spectral Library files are in .spectrum.txt file format
             
-            Spectral Library Version 7 can be downloaded here <https://speclab.cr.usgs.gov/spectral-lib.html>
+            Spectral Library Version 7 can be downloaded `here <https://speclab.cr.usgs.gov/spectral-lib.html>`_
             
             Args:
             library_filename (str): path to Spectral File you wish to convert
