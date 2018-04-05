@@ -1,9 +1,0 @@
-Name:   Pegmatite
-
-Geologic Name:  None
-
-Reference: Cameron, Eugene, N., and others:  Pegmatite Investigations 1942-45,
-New England, U.S.G.S. Prof. Paper 255, 1954
-
-Microscopic characters: Coarse pegmatitic intergrowth of quartz and microcline
-perthite.  A small amount of muscovite is present.
