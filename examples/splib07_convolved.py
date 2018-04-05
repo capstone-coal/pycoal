@@ -58,6 +58,7 @@ import mineral
 import math
 import numpy
 import spectral
+import mmap
 
 #This will take all the necessary .txt files for spectra in USGS
 #Spectral Library Version 7 and put them in a new directory called
@@ -79,11 +80,30 @@ for root, dir, files in os.walk("./usgs_splib07/ASCIIdata"):
 #convert their format to match that of ASTER .spectrum.txt files for spectra
 # create a new mineral aster conversion instance
 spectral_aster = mineral.SpectralToAsterConversion()
+#List to check for duplicates
+spectra_list = []
 # Convert all files
 files = os.listdir(directory +'/')
 for x in range(0, len(files)):
     name = directory+'/' + files[x]
-    spectral_aster.convert(name)
+    #Get name
+    input_file = open(name,'r')
+    spectra_line = input_file.readline()
+    spectra_cut = spectra_line[23:]
+    spectra_name = spectra_cut[:-14]
+    #Remove first and last char in case extra spaces are added
+    spectra_first_space = spectra_name[1:]
+    spectra_last_space = spectra_first_space[:-1]
+    
+    #Check if Spectra is unique
+    set_spectra = set(spectra_list)
+    if not any(spectra_name in s for s in set_spectra):
+        if not any(spectra_last_space in a for a in set_spectra):
+            spectral_aster.convert(name)
+            spectra_list.append(spectra_name)
+
+set_spectra = set(spectra_list)
+print(set_spectra)
 
 #This will generate three files s07av95a_envi.hdr, s07av95a_envi.hdr.sli,splib.db and dataSplib07.db
 #For a library in `ASTER Spectral Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ format
