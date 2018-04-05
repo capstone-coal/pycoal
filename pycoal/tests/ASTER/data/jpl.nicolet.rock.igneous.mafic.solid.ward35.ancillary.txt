@@ -1,0 +1,11 @@
+Name:   Basalt
+
+Geologic Name:  Watchung basalt
+
+Reference:  Lewis, J.V., Petrography of the Neward igneous rocks of New Jersey:
+New Jersey Geol. Survey Ann. Report, p. 148-167, 1907.
+
+Microscopic characters:  Hypocrystalline-porphyritic texture.  Lath-shaped
+phenocrysts of labradorite are often wholly or completely enclosed in large
+clear augite grains.  Small grains of magnetite and leucoxene are abundant.
+Chlorite and opaque glass fill interstices.
