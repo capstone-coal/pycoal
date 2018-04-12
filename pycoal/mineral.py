@@ -366,7 +366,7 @@ class AsterConversion:
         spectrum_ids = [x[0] for x in aster_database.query('SELECT SampleID FROM Samples').fetchall()]
         band_min = 0.38315
         band_max = 2.5082
-        band_num = 224
+        band_num = 128
         band_info = spectral.BandInfo()
         band_info.centers = numpy.arange(band_min, band_max, (band_max - band_min) / band_num)
         band_info.band_unit = 'micrometer'
