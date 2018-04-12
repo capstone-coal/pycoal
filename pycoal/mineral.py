@@ -23,6 +23,14 @@ import numpy
 import pycoal
 import spectral
 import time
+from sys import path
+sys.path.insert(0, '../pycoal')
+reload(sys)
+sys.setdefaultencoding('utf8')
+import fnmatch
+import shutil
+import mineral
+import mmap
 
 class MineralClassification:
 
@@ -358,7 +366,7 @@ class AsterConversion:
         spectrum_ids = [x[0] for x in aster_database.query('SELECT SampleID FROM Samples').fetchall()]
         band_min = 0.38315
         band_max = 2.5082
-        band_num = 128
+        band_num = 224
         band_info = spectral.BandInfo()
         band_info.centers = numpy.arange(band_min, band_max, (band_max - band_min) / band_num)
         band_info.band_unit = 'micrometer'
@@ -410,6 +418,7 @@ class SpectralToAsterConversion:
         while(k < line_count):
             spectra_wave_length = float(input_file.readline()) * 100
             spectra_wave_length = spectra_wave_length / 1000
+            spectra_wave_length = float("{0:.5f}".format(spectra_wave_length))
             spectra_y_value = spectra_wave_length * 10
             line = str(spectra_wave_length) + '  ' + str(spectra_y_value)
             spectra_values_file.write(line)
@@ -461,3 +470,87 @@ class SpectralToAsterConversion:
         #Remove temporary file for storing wavelength data
         os.remove('SpectraValues.txt')
         print("Successfully converted file " + library_filename)
+
+class FullSpectralLibrary7Convert:
+    def __init__(self):
+        """
+            This class method converts the entire `USGS Spectral Library Version 7
+            <https://speclab.cr.usgs.gov/spectral-lib.html>`_ library into
+            its convolved envi format
+            
+            Args:
+            none
+            """
+        pass
+
+    @classmethod
+    def convert(cls, library_filename=""):
+        """
+            This class method converts the entire `USGS Spectral Library Version 7
+            <https://speclab.cr.usgs.gov/spectral-lib.html>`_ library into
+            its convolved envi format
+            
+            Spectral Library Version 7 can be downloaded `here <https://speclab.cr.usgs.gov/spectral-lib.html>`_
+            
+            Args:
+            library_filename (str): path to USGS Spectral Library Version 7 directory
+            """
+        if not library_filename:
+            raise ValueError("Must provide path for USGS Spectral Library Version 7.")
+        
+        #This will take all the necessary .txt files for spectra in USGS
+        #Spectral Library Version 7 and put them in a new directory called
+        #"usgs_splib07_modified" in the examples directory
+        directory = 'usgs_splib07_modified'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+
+        for root, dir, files in os.walk(library_filename + "/ASCIIdata"):
+            dir[:] = [d for d in dir]
+            for items in fnmatch.filter(files, "*.txt"):
+                if "Bandpass" not in items:
+                    if "errorbars" not in items:
+                        if "Wave" not in items:
+                            if "SpectraValues" not in items:
+                                shutil.copy2(os.path.join(root,items), directory)
+
+        #This will take the .txt files for Spectra in USGS Spectral Version 7 and
+        #convert their format to match that of ASTER .spectrum.txt files for spectra
+        # create a new mineral aster conversion instance
+        spectral_aster = mineral.SpectralToAsterConversion()
+        #List to check for duplicates
+        spectra_list = []
+        # Convert all files
+        files = os.listdir(directory +'/')
+        for x in range(0, len(files)):
+            name = directory+'/' + files[x]
+            #Get name
+            input_file = open(name,'r')
+            spectra_line = input_file.readline()
+            spectra_cut = spectra_line[23:]
+            spectra_name = spectra_cut[:-14]
+            #Remove first and last char in case extra spaces are added
+            spectra_first_space = spectra_name[1:]
+            spectra_last_space = spectra_first_space[:-1]
+            
+            #Check if Spectra is unique
+            set_spectra = set(spectra_list)
+            if not any(spectra_name in s for s in set_spectra):
+                if not any(spectra_last_space in a for a in set_spectra):
+                    spectral_aster.convert(name)
+                    spectra_list.append(spectra_name)
+
+        set_spectra = set(spectra_list)
+        print(set_spectra)
+
+        #This will generate three files s07av95a_envi.hdr, s07av95a_envi.hdr.sli,splib.db and dataSplib07.db
+        #For a library in `ASTER Spectral Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ format
+        data_dir = "dataSplib07.db"
+        header_name = "s07av95a_envi"
+
+        # create a new mineral aster conversion instance
+        spectral_envi = mineral.AsterConversion()
+        # Generate .sli and .hdr
+        spectral_envi.convert(directory,data_dir,header_name)
+
+
