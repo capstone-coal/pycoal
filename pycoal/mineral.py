@@ -27,10 +27,8 @@ import importlib
 from sys import path
 sys.path.insert(0, '../pycoal')
 importlib.reload(sys)
-#sys.setdefaultencoding('utf8')
 import fnmatch
 import shutil
-import mineral
 import mmap
 
 class MineralClassification:
