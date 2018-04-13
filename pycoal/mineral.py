@@ -28,6 +28,7 @@ from sys import path
 sys.path.insert(0, '../pycoal')
 importlib.reload(sys)
 import fnmatch
+import mineral
 import shutil
 import mmap
 
