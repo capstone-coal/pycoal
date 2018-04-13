@@ -23,11 +23,11 @@ import numpy
 import pycoal
 import spectral
 import time
-from importlib import reload
+import importlib
 from sys import path
 sys.path.insert(0, '../pycoal')
-reload(sys)
-sys.setdefaultencoding('utf8')
+importlib.reload(sys)
+#sys.setdefaultencoding('utf8')
 import fnmatch
 import shutil
 import mineral
