@@ -23,6 +23,7 @@ import numpy
 import pycoal
 import spectral
 import time
+from importlib import reload
 from sys import path
 sys.path.insert(0, '../pycoal')
 reload(sys)
