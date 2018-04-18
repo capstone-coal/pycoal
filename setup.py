@@ -1,21 +1,25 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# Copyright (C) 2017-2018 COAL Developers
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+# This program is free software; you can redistribute it and/or 
+# modify it under the terms of the GNU General Public License 
+# as published by the Free Software Foundation; version 2.
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the implied warranty 
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public 
+# License along with this program; if not, write to the Free 
+# Software Foundation, Inc., 51 Franklin Street, Fifth 
+# Floor, Boston, MA 02110-1301, USA.
 
 import os.path
 from setuptools import find_packages, setup
 
 # Package data
 # ------------
-_author = 'COAL Capstone Develeopers'
+_author = 'COAL Developers'
 _author_email = 'coal-capstone@googlegroups.com'
 _classifiers = [
     'Environment :: Console',
@@ -23,8 +27,8 @@ _classifiers = [
     'Intended Audience :: Information Technology',
     'Intended Audience :: Science/Research',
     'Topic :: Scientific/Engineering',
-    'Development Status :: 3 - Alpha',
-    'License :: OSI Approved :: Apache Software License',
+    'Development Status :: 4 - Beta',
+    'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Topic :: Software Development :: Libraries :: Python Modules',
@@ -33,15 +37,15 @@ _description = 'COAL mining library for AVIRIS data.'
 _download_url = 'http://pypi.python.org/pypi/pycoal/'
 _requirements = ["numpy", "spectral"]
 _keywords = ['spectroscopy', 'aviris', 'aviris-ng', 'mining', 'minerals']
-_license = 'Apache License, Version 2.0'
+_license = 'GNU GENERAL PUBLIC LICENSE, Version 2'
 _long_description = 'A python suite for the identification and characterization of mining activity within AVIRIS data.'
 _name = 'pycoal'
 _namespaces = []
 _test_suite = 'pycoal.tests'
 _url = 'https://github.com/capstone-coal/pycoal'
-_version = '0.5-dev'
+_version = '0.5.2'
 _zip_safe = False
-
+_entry_points = {'console_scripts' : ['pycoal-mineral = pycoal.cli.mineral:main', 'pycoal-mining = pycoal.cli.mining:main', 'pycoal-environment = pycoal.cli.environment:main']}
 # Setup Metadata
 # --------------
 
@@ -52,7 +56,7 @@ def _read(*rnames):
 _header = '*' * len(_name) + '\n' + _name + '\n' + '*' * len(_name)
 _longDescription = '\n\n'.join([
     _header,
-    _read('README.md')
+    _read('README.rst')
 ])
 open('doc.txt', 'w').write(_longDescription)
 
@@ -75,4 +79,5 @@ setup(
     url=_url,
     version=_version,
     zip_safe=_zip_safe,
+    entry_points = _entry_points
 )

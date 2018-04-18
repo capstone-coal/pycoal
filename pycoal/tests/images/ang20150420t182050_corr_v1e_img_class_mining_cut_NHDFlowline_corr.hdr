@@ -1,6 +1,6 @@
 ENVI
 description = {
-  PyCOAL 0.5-dev environmental correlation image.}
+  COAL 0.5-dev environmental correlation image.}
 samples = 83
 lines = 47
 bands = 1

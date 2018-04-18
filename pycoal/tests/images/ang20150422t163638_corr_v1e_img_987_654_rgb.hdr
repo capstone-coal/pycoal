@@ -1,6 +1,6 @@
 ENVI
 description = {
-  PyCOAL 0.2 three-band RGB image.}
+  COAL 0.2 three-band RGB image.}
 samples = 1
 lines = 1
 bands = 3

@@ -1,14 +1,18 @@
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# Copyright (C) 2017-2018 COAL Developers
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+# This program is free software; you can redistribute it and/or 
+# modify it under the terms of the GNU General Public License 
+# as published by the Free Software Foundation; version 2.
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+# This program is distributed in the hope that it will be useful, 
+# but WITHOUT ANY WARRANTY; without even the implied warranty 
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public 
+# License along with this program; if not, write to the Free 
+# Software Foundation, Inc., 51 Franklin Street, Fifth 
+# Floor, Boston, MA 02110-1301, USA.
 
 from nose import with_setup
 from test import setup_module, teardown_module, _remove_files
@@ -19,26 +23,26 @@ import pycoal
 import pycoal.mining
 
 # test files for mining classification test
-mineralFilename = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
-miningFilename = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80.hdr'
-testFilename = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.hdr'
-testImage = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.img'
+mineral_file_name = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
+mining_file_name = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80.hdr'
+test_file_name = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.hdr'
+test_image = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.img'
 
 # delete temporary files
-def _test_classifyImage_teardown():
-    _remove_files([testFilename, testImage])
+def _test_classify_image_teardown():
+    _remove_files([test_file_name, test_image])
 
 # verify that the expected mining classifications equal the actual mining classifications
-@with_setup(None, _test_classifyImage_teardown)
-def test_classifyImage():
+@with_setup(None, _test_classify_image_teardown)
+def test_classify_image():
 
     # classify mining and and save to temporary file
     mc = pycoal.mining.MiningClassification()
-    mc.classifyImage(mineralFilename, testFilename)
+    mc.classify_image(mineral_file_name, test_file_name)
 
     # open the mining and temporary files
-    expected = spectral.open_image(miningFilename)
-    actual = spectral.open_image(testFilename)
+    expected = spectral.open_image(mining_file_name)
+    actual = spectral.open_image(test_file_name)
 
     # verify that every pixel has the same classification
     assert numpy.array_equal(expected.asarray(), actual.asarray())
