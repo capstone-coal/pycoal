@@ -40,7 +40,6 @@ All files generated will be located in the examples directory
 import os
 import sys
 import pycoal
-from sys import path
 sys.path.insert(0, '../pycoal')
 import mineral
 

@@ -23,12 +23,7 @@ import numpy
 import pycoal
 import spectral
 import time
-import importlib
-from sys import path
-sys.path.insert(0, '../pycoal')
-importlib.reload(sys)
 import fnmatch
-import mineral
 import shutil
 import mmap
 
@@ -517,7 +512,7 @@ class FullSpectralLibrary7Convert:
         #This will take the .txt files for Spectra in USGS Spectral Version 7 and
         #convert their format to match that of ASTER .spectrum.txt files for spectra
         # create a new mineral aster conversion instance
-        spectral_aster = mineral.SpectralToAsterConversion()
+        spectral_aster = SpectralToAsterConversion()
         #List to check for duplicates
         spectra_list = []
         # Convert all files
@@ -549,7 +544,7 @@ class FullSpectralLibrary7Convert:
         header_name = "s07av95a_envi"
 
         # create a new mineral aster conversion instance
-        spectral_envi = mineral.AsterConversion()
+        spectral_envi = AsterConversion()
         # Generate .sli and .hdr
         spectral_envi.convert(directory,data_dir,header_name)
 
