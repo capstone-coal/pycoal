@@ -62,14 +62,15 @@ class MineralClassification:
          "-spectral library '%s', -class names '%s', -threshold '%s', -in_memory '%s'" 
             %(library_file_name, class_names, threshold, in_memory))
 
-    def classify_image(self, image_file_name, classified_file_name):
+    def classify_image(self, image_file_name, classified_file_name, classifier_type=None):
         """
-        Classify minerals in an AVIRIS image using spectral angle mapper
+        Classify minerals in an AVIRIS image using specified classifier_type, if none defaults to spectral angle mapper
         classification and save the results to a file.
 
         Args:
             image_file_name (str):      filename of the image to be classified
             classified_file_name (str): filename of the classified image
+            classifier_type (str):      Classifier type used
 
         Returns:
             None
@@ -91,44 +92,64 @@ class MineralClassification:
         # TODO band resampler should do this
         resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
                                           self.library.bands.centers)
-
+        if classifier_type == None or classifier_type == 'SAM':
+        # this will run the default value, the Spectral angle mapper.             
         # allocate a zero-initialized MxN array for the classified image
-        classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+            classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
 
-        # for each pixel in the image
-        for x in range(M):
+            # for each pixel in the image
+            for x in range(M):
 
-            for y in range(N):
+                for y in range(N):
 
-                # read the pixel from the file
-                pixel = data[x,y]
+                    # read the pixel from the file
+                    pixel = data[x,y]
 
-                # if it is not a no data pixel
-                if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
+                    # if it is not a no data pixel
+                    if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
 
-                    # resample the pixel ignoring NaNs from target bands that don't overlap
-                    # TODO fix spectral library so that bands are in order
-                    resampled_pixel = numpy.nan_to_num(resample(pixel))
+                        # resample the pixel ignoring NaNs from target bands that don't overlap
+                        # TODO fix spectral library so that bands are in order
+                        resampled_pixel = numpy.nan_to_num(resample(pixel))
 
-                    # calculate spectral angles
-                    angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
-                                                                     numpy.newaxis,
-                                                                     ...],
-                                                      self.library.spectra)
+                        # calculate spectral angles
+                        angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
+                                                                         numpy.newaxis,
+                                                                         ...],
+                                                          self.library.spectra)
 
-                    # normalize confidence values from [pi,0] to [0,1]
-                    for z in range(angles.shape[2]):
-                        angles[0,0,z] = 1-angles[0,0,z]/math.pi
+                        # normalize confidence values from [pi,0] to [0,1]
+                        for z in range(angles.shape[2]):
+                            angles[0,0,z] = 1-angles[0,0,z]/math.pi
 
-                    # get index of class with largest confidence value
-                    index_of_max = numpy.argmax(angles)
+                        # get index of class with largest confidence value
+                        index_of_max = numpy.argmax(angles)
 
-                    # classify pixel if confidence above threshold
-                    if angles[0,0,index_of_max] > self.threshold:
+                        # classify pixel if confidence above threshold
+                        if angles[0,0,index_of_max] > self.threshold:
 
-                        # index from one (after zero for no data)
-                        classified[x,y] = index_of_max + 1
+                            # index from one (after zero for no data)
+                            classified[x,y] = index_of_max + 1
 
+        elif classifier_type == 'GML':
+            # Gaussian Maximum Likelihood
+            # the following is the method layed out in the spectral python documentation, needs to be converted to work with our formatting
+            # create classifier 
+            gmlc = GaussianClassifier(classes)
+            # classify our training image and display the resulting classification map.
+            clmap = gmlc.classify_image(image)
+            v = imshow(classes=clmap)
+            # mask out all the pixels not associated with a training class
+            gtresults = clmap * (gt != 0)
+            v = imshow(classes=gtresults)
+            
+        elif classifier_type == 'KMeans':
+            # K-means generates clusters, this will read in pixels and figure out nearest cluster center
+            # the following is the method layed out in the spectral python documentation, needs to be converted to work with our formatting
+            # run the k-means algorithm on the image and create 20 clusters, using a maximum of 50 iterations, call kmeans as follows
+            (m, c) = kmeans(imgage, 20, 30)
+        
+        # save the classified image to a file
         # save the classified image to a file
         spectral.io.envi.save_classification(
             classified_file_name,
