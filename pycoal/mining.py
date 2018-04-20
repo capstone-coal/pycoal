@@ -21,9 +21,9 @@ import spectral
 import time
 
 # classes identified as proxies for coal mining
-proxy_class_names = [u'Schwertmannite BZ93-1 s06av95a=b',
-                   u'Renyolds_TnlSldgWet SM93-15w s06av95a=a',
-                   u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a']
+proxy_class_names = [u'Schwertmannite BZ93-1         BECKb AREF',
+                   u'Renyolds_TnlSldgWet SM93-15w  BECKa AREF',
+                   u'Renyolds_Tnl_Sludge SM93-15   BECKa AREF']
 
 class MiningClassification:
 
