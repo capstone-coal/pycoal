@@ -410,6 +410,7 @@ class SpectralToAsterConversion:
         k = 0
         #Loop through file and store all wavelength values for the given Spectra
         spectra_values_file = open('SpectraValues.txt','w')
+        spectra_wave_length = 0
         while(k < line_count):
             spectra_wave_length = float(input_file.readline()) * 100
             spectra_wave_length = spectra_wave_length / 1000
@@ -464,7 +465,6 @@ class SpectralToAsterConversion:
         os.rename(library_filename,library_filename + '.spectrum.txt')
         #Remove temporary file for storing wavelength data
         os.remove('SpectraValues.txt')
-        print("Successfully converted file " + library_filename)
 
 class FullSpectralLibrary7Convert:
     def __init__(self):
@@ -541,7 +541,7 @@ class FullSpectralLibrary7Convert:
         #This will generate three files s07av95a_envi.hdr, s07av95a_envi.hdr.sli,splib.db and dataSplib07.db
         #For a library in `ASTER Spectral Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ format
         data_dir = "dataSplib07.db"
-        header_name = "s07av95a_envi"
+        header_name = "s07_AV95_envi"
 
         # create a new mineral aster conversion instance
         spectral_envi = AsterConversion()

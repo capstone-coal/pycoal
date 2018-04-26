@@ -268,3 +268,24 @@ def test_aster_conversion():
     aster = spectral.open_image(envi+'.hdr')
     assert isinstance(aster, spectral.io.envi.SpectralLibrary)
     assert aster.spectra.shape == (3, 128)
+
+# test files for FullSpectralLibrary7Convert conversion test
+_test_SpectralConversion_data = 'usgs_splib07'
+_test_SpectralConversion_dir = 'usgs_splib07_modified'
+_test_SpectralConversion_db = 'dataSplib07.db'
+_test_SpectralConversion_envi = 's07_AV95_envi'
+
+# tear down FullSpectralLibrary7Convert conversion test by deleting test files
+def _test_spectral_conversion_teardown():
+    _remove_files([_test_SpectralConversion_db,
+                   _test_SpectralConversion_dir])
+
+# verify that a small subset of the USGS Spectral Library 7 is converted to ENVI format
+@with_setup(None, _test_spectral_conversion_teardown)
+def test_spectral_conversion():
+    data, dir, db, envi = _test_SpectralConversion_data, _test_SpectralConversion_dir, _test_SpectralConversion_db, _test_SpectralConversion_envi
+    spectral_conversion = mineral.FullSpectralLibrary7Convert()
+    spectral_conversion.convert(library_filename=data)
+    spectral7 = spectral.open_image(envi+'.hdr')
+    assert isinstance(spectral7, spectral.io.envi.SpectralLibrary)
+    assert spectral7.spectra.shape == (3, 128)
