@@ -30,18 +30,14 @@ class MineralClassification:
         <https://speclab.cr.usgs.gov/spectral.lib06/>`_ or the `ASTER Spectral
         Library Version 2.0 <https://asterweb.jpl.nasa.gov/`_ converted with
         ``pycoal.mineral.AsterConversion.convert()``.
-
         If provided, the optional class name parameter will initialize the
         classifier with a subset of the spectral library, otherwise the full
         spectral library will be used.
-
         The optional threshold parameter defines a confidence value between zero
         and one below which classifications will be discarded, otherwise all
         classifications will be included.
-
         In order to improve performance on systems with sufficient memory,
         enable the optional parameter to load entire images.
-
         Args:
             library_file_name (str):        filename of the spectral library
             class_names (str[], optional): list of names of classes to include
@@ -62,16 +58,14 @@ class MineralClassification:
          "-spectral library '%s', -class names '%s', -threshold '%s', -in_memory '%s'" 
             %(library_file_name, class_names, threshold, in_memory))
 
-    def classify_image(self, image_file_name, classified_file_name, classifier_type=None):
+    def classify_image(self, image_file_name, classified_file_name, classifier_type=SAM):
         """
-        Classify minerals in an AVIRIS image using specified classifier_type, if none defaults to spectral angle mapper
+        Classify minerals in an AVIRIS image using specified classifier_type, either SAM, GML, KMeans, MDC. If none, defaults to spectral angle mapper
         classification and save the results to a file.
-
         Args:
             image_file_name (str):      filename of the image to be classified
             classified_file_name (str): filename of the classified image
             classifier_type (str):      Classifier type used
-
         Returns:
             None
         """
@@ -92,7 +86,7 @@ class MineralClassification:
         # TODO band resampler should do this
         resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
                                           self.library.bands.centers)
-        if classifier_type == None or classifier_type == 'SAM':
+        if classifier_type == 'SAM':
         # this will run the default value, the Spectral angle mapper.             
         # allocate a zero-initialized MxN array for the classified image
             classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
@@ -145,8 +139,9 @@ class MineralClassification:
             
         elif classifier_type == 'KMeans':
             # K-means generates clusters, this will read in pixels and figure out nearest cluster center
+            # Currently only setup to run using default values of 20 iterations and 10 clusters
             # the following is the method layed out in the spectral python documentation, needs to be converted to work with our formatting
-            # run the k-means algorithm on the image and create 20 clusters, using a maximum of 50 iterations, call kmeans as follows
+            for x in range(20)
             (m, c) = kmeans(imgage, 20, 30)
         
         # save the classified image to a file
@@ -173,10 +168,8 @@ class MineralClassification:
     def filter_classes(classified_file_name):
         """
         Modify a classified image to remove unused classes.
-
         Args:
             classified_file_name (str): file of the classified image
-
         Returns:
             None
         """
@@ -211,14 +204,12 @@ class MineralClassification:
     def to_rgb(image_file_name, rgb_image_file_name, red=680.0, green=532.5, blue=472.5):
         """
         Generate a three-band RGB image from an AVIRIS image and save it to a file.
-
         Args:
             image_file_name (str):     filename of the source image
             rgb_image_file_name (str):  filename of the three-band RGB image
             red (float, optional):   wavelength in nanometers of the red band
             green (float, optional): wavelength in nanometers of the green band
             blue (float, optional):  wavelength in nanometers of the blue band
-
         Returns:
             None
         """
@@ -304,11 +295,9 @@ class MineralClassification:
 
         """
         Create a copy of the spectral library containing only the named classes.
-
         Args:
             spectral_library (SpectralLibrary): ENVI spectral library
             class_names (str[]):                list of names of classes to include
-
         Returns:
             SpectralLibrary: subset of ENVI spectral library
         """
@@ -340,7 +329,6 @@ class AsterConversion:
         """
         This class provides a method for converting the `ASTER Spectral
         Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ into ENVI format.
-
         Args:
             None
         """
@@ -354,7 +342,6 @@ class AsterConversion:
         generating an SQLite database takes upwards of 10 minutes and creating
         an ENVI format file takes up to 5 minutes. Note: This feature is still
         experimental.
-
         Args:
             data_dir (str, optional): path to directory containing ASCII data files
             db_file (str):            name of the SQLite file that either already exists if
