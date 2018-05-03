@@ -132,7 +132,7 @@ def test_classify_image_threshold():
 def test_classify_image_subset():
 
     # create mineral classification instance with mining subset
-    mc = mineral.MineralClassification(libraryFilenames[0], class_names=mining.proxy_class_names)
+    mc = mineral.MineralClassification(libraryFilenames[0], class_names=mining.proxy_class_names_usgsv6)
 
     # classify image
     mc.classify_image(test_classifyImage_threshold_subset_imageFilename, \
@@ -144,7 +144,7 @@ def test_classify_image_subset():
         for y in range(actual.shape[1]):
             actual_class_id = actual[x,y,0]
             actual_class_name = actual.metadata.get('class names')[actual_class_id]
-            assert actual_class_name in mining.proxy_class_names \
+            assert actual_class_name in mining.proxy_class_names_usgsv6 \
                 or actual_class_name == 'No data'
 
 # test files for filter_classes test
@@ -288,4 +288,3 @@ def test_spectral_conversion():
     spectral_conversion.convert(library_filename=data)
     spectral7 = spectral.open_image(envi+'.hdr')
     assert isinstance(spectral7, spectral.io.envi.SpectralLibrary)
-    assert spectral7.spectra.shape == (3, 128)

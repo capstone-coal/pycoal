@@ -61,7 +61,7 @@ PROFILE = 0
 
 
 input_filename = 'avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
-library_filename='../pycoal/tests/s06av95a_envi.hdr'
+library_filename='../pycoal/tests/s07_AV95_envi.hdr'
 
 def run_mineral(input_filename, library_filename):
     '''
@@ -120,7 +120,7 @@ USAGE
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-i", "--image", dest="image", default=input_filename, help="Input file to be processed [default: ang20150420t182050_corr_v1e_img.hdr]")
-        parser.add_argument("-s", "--slib", dest="slib", default=library_filename, help="Spectral Library filename [default: s06av95a_envi.hdr]")
+        parser.add_argument("-s", "--slib", dest="slib", default=library_filename, help="Spectral Library filename [default: s07_AV95_envi.hdr]")
 
         # Process arguments
         args = parser.parse_args(['-i', input_filename, '-s', library_filename])

@@ -16,7 +16,6 @@
 
 import sys
 import os
-import inspect
 import logging
 import math
 import numpy
@@ -25,7 +24,6 @@ import spectral
 import time
 import fnmatch
 import shutil
-import mmap
 
 class MineralClassification:
 
@@ -369,7 +367,7 @@ class AsterConversion:
 
         library.save(hdr_file)
 
-class SpectralToAsterConversion:
+class SpectalToAsterFileFormat:
     
     def __init__(self):
         """
@@ -512,7 +510,7 @@ class FullSpectralLibrary7Convert:
         #This will take the .txt files for Spectra in USGS Spectral Version 7 and
         #convert their format to match that of ASTER .spectrum.txt files for spectra
         # create a new mineral aster conversion instance
-        spectral_aster = SpectralToAsterConversion()
+        spectral_aster = SpectalToAsterFileFormat()
         #List to check for duplicates
         spectra_list = []
         # Convert all files

@@ -20,14 +20,19 @@ import pycoal
 import spectral
 import time
 
-# classes identified as proxies for coal mining
-proxy_class_names = [u'Schwertmannite BZ93-1         BECKb AREF',
-                   u'Renyolds_TnlSldgWet SM93-15w  BECKa AREF',
-                   u'Renyolds_Tnl_Sludge SM93-15   BECKa AREF']
+# classes identified as proxies for coal mining classification using USGSv6
+proxy_class_names_usgsv6 = [u'Schwertmannite BZ93-1 s06av95a=b',
+                            u'Renyolds_TnlSldgWet SM93-15w s06av95a=a',
+                            u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a']
+
+# classes identified as proxies for coal mining classification using USGSv7
+proxy_class_names_usgsv7 = [u'Schwertmannite BZ93-1         BECKb AREF',
+                     u'Renyolds_TnlSldgWet SM93-15w  BECKa AREF',
+                     u'Renyolds_Tnl_Sludge SM93-15   BECKa AREF']
 
 class MiningClassification:
 
-    def __init__(self, class_names=proxy_class_names):
+    def __init__(self, class_names=proxy_class_names_usgsv6):
         """
         Construct a new MiningClassification object given an optional list of
         spectral class names which defaults to coal mining proxies.
@@ -40,7 +45,7 @@ class MiningClassification:
         logging.info("Instantiated Mining Classifier with following specification: " \
          "-proxy class names '%s'" %(class_names))
 
-    def classify_image(self, image_file_name, classified_file_name):
+    def classify_image(self, image_file_name, classified_file_name, spectral_version):
 
         """
         Classify mines or other features in a COAL mineral classified image by
@@ -53,7 +58,11 @@ class MiningClassification:
         Returns:
             None
         """
-
+        if (spectral_version == "7"):
+            class_names = proxy_class_names_usgsv7
+            self.class_names = class_names
+            logging.info("Instantiated Mining Classifier with following specification: " \
+                     "-proxy class names '%s'" %(class_names))
         start = time.time()
         logging.info("Starting Mining Classification for image '%s', saving classified image to '%s'" 
             %(image_file_name, classified_file_name))

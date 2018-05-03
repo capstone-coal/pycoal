@@ -1,3 +1,4 @@
+#!/usr/bin/python
 #Copyright (C) 2017-2018 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
@@ -21,21 +22,19 @@ files of `USGS Spectral Library Version 7 <https://speclab.cr.usgs.gov/spectral-
 
 Dependencies
 `USGS Spectral Library Version 7 <https://speclab.cr.usgs.gov/spectral-lib.html>`_
-must be downloaded to the examples directory
+must be downloaded and unzipped to the examples directory
 
 All files generated will be located in the examples directory
 
 
 @author:     COAL Developers
 
-@copyright:  2018 COAL Developers. All rights reserved.
+@copyright:  2017-2018 COAL Developers. All rights reserved.
 
 @license:    GNU General Public License version 2
 
 @contact:    coal-capstone@googlegroups.com
 '''
-
-#!/usr/bin/python
 
 import os
 import sys
@@ -45,5 +44,3 @@ import mineral
 
 usgs_convolved = mineral.FullSpectralLibrary7Convert()
 usgs_convolved.convert('usgs_splib07')
-
-

@@ -52,7 +52,7 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-def run_mining(mineral_filename="ang20150420t182050_corr_v1e_img_class.hdr", mining_filename="ang20150420t182050_corr_v1e_img_class_mining.hdr"):
+def run_mining(mineral_filename="ang20150420t182050_corr_v1e_img_class.hdr", mining_filename="ang20150420t182050_corr_v1e_img_class_mining.hdr",spectral_version="6"):
     '''
     ...
     '''
@@ -61,12 +61,15 @@ def run_mining(mineral_filename="ang20150420t182050_corr_v1e_img_class.hdr", min
 
     # path to save mining classified image
     mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
+    
+    #Spectral Library Verison Number, Change to 7 if you want to use USGS Spectral Library Version 7
+    spectral_version = "6"
 
     # create a new mining classification instance
     mining_classification = mining.MiningClassification()
 
     # generate a mining classified image
-    mining_classification.classify_image(mineral_filename, mining_filename)
+    mining_classification.classify_image(mineral_filename, mining_filename,spectral_version)
 
 def main(argv=None): # IGNORE:C0111
     '''Command line options.'''
@@ -106,15 +109,17 @@ USAGE
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-mi", "--mineral_input", dest="input", default='ang20150420t182050_corr_v1e_img_class.hdr', help="Input classified mineral file to be processed [default: ang20150420t182050_corr_v1e_img_class.hdr]")
         parser.add_argument("-mo", "--mining_output", dest="output", default='ang20150420t182050_corr_v1e_img_class_mining.hdr', help="Output mining classified image filename [default: ang20150420t182050_corr_v1e_img_class_mining.hdr]")
+        parser.add_argument("-v", "--spectral_version", dest="spectral_version", default='6', help="USGS Spectral Library Version Number")
 
         # Process arguments
-        args = parser.parse_args(['-mi', 'ang20150420t182050_corr_v1e_img_class.hdr', '-mo', 'ang20150420t182050_corr_v1e_img_class_mining.hdr'])
+        args = parser.parse_args(['-mi', 'ang20150420t182050_corr_v1e_img_class.hdr', '-mo', 'ang20150420t182050_corr_v1e_img_class_mining.hdr', '-v', '6'])
         #args = parser.parse_args()
 
         mineral_filename = args.input
         mining_filename = args.output
+        spectral_version = args.spectral_version
         
-        run_mining(mineral_filename, mining_filename)
+        run_mining(mineral_filename, mining_filename, spectral_version)
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###
         return 0
