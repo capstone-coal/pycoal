@@ -37,7 +37,7 @@ def setup_module(module):
     # download spectral library over FTP if necessary
     if not os.path.isfile(libraryFilenames[0]) and \
        not os.path.isfile(libraryFilenames[1]):
-        ftp_url = "ftpext.cr.usgs.gov"
+        ftp_url = "ftpext.cr.usgs.gov/"
         ftp_dir = "pub/cr/co/denver/speclab/pub/spectral.library/splib06.library/Convolved.libraries/"
         ftp = ftplib.FTP(ftp_url)
         ftp.login()
