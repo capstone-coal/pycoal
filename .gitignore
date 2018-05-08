@@ -103,8 +103,3 @@ doc.txt
 pycoal/tests/images/
 pycoal/tests/images/ang20140912t192359_corr_v1c_img_400-410_10-20_rgb_test.img
 pycoal/tests/images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80_filtered.img
-
-pycoal/tests/s06av95a_envi.hdr
-pycoal/tests/s06av95a_envi.sli
-s06av95a_envi.hdr
-s06av95a_envi.sli
