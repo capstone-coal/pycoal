@@ -27,6 +27,7 @@ mineral_file_name = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-8
 mining_file_name = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80.hdr'
 test_file_name = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.hdr'
 test_image = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.img'
+spectral_version = "6"
 
 # delete temporary files
 def _test_classify_image_teardown():
@@ -38,7 +39,7 @@ def test_classify_image():
 
     # classify mining and and save to temporary file
     mc = pycoal.mining.MiningClassification()
-    mc.classify_image(mineral_file_name, test_file_name)
+    mc.classify_image(mineral_file_name, test_file_name, spectral_version)
 
     # open the mining and temporary files
     expected = spectral.open_image(mining_file_name)

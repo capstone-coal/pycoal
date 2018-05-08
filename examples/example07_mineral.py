@@ -14,13 +14,15 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth 
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
-'''
-example_mining -- an example script which demonstrates COAL mining classification
 
-example_mining provides a CLI which demonstrates how the COAL Mining Classification 
-API filters mineral classified images to identify specific classes of interest, 
-by default proxies for coal mining in the USGS Digital Spectral Library 06. 
-More reading an this example can be seen at 
+'''
+example_mineral -- an example script which demonstrates COAL mineral classification
+
+example_mineral provides a CLI which demonstrates how the COAL Mineral Classification 
+API provides methods for generating visible-light and mineral classified images. 
+Mineral classification can take hours to days depending on the size of the spectral 
+library and the available computing resources, so running a script in the background 
+is recommended. More reading an this example can be seen at 
 https://capstone-coal.github.io/docs#usage
 
 @author:     COAL Developers
@@ -34,12 +36,17 @@ https://capstone-coal.github.io/docs#usage
 
 import sys
 import os
+from sys import path
+from os import getcwd
+import inspect
 
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
 import logging
 
+import sys
+import os
 import pycoal
 sys.path.insert(0, '../pycoal')
 import mineral
@@ -52,26 +59,31 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-def run_mining(mineral_filename="ang20150420t182050_corr_v1e_img_class.hdr", mining_filename="ang20150420t182050_corr_v1e_img_class_mining.hdr",spectral_version="6"):
+
+input_filename = 'avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
+library_filename='../pycoal/tests/s07_AV95_envi.hdr'
+
+def run_mineral(input_filename, library_filename):
     '''
     ...
     '''
-    # path to mineral classified image
-    mineral_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
+    logging.info("Starting mineral classification with input file '%s' and spectral library '%s'." %(input_filename, library_filename))
+    # path to save RGB image
+    rgb_filename = "ang20150420t182050_corr_v1e_img_rgb.hdr"
 
-    # path to save mining classified image
-    mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
-    
-    #Spectral Library Verison Number, Change to 7 if you want to use USGS Spectral Library Version 7
-    spectral_version = "6"
+    # path to save mineral classified image
+    classified_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
 
-    # create a new mining classification instance
-    mining_classification = mining.MiningClassification()
+    # create a new mineral classification instance
+    mineral_classification = mineral.MineralClassification(library_filename)
 
-    # generate a mining classified image
-    mining_classification.classify_image(mineral_filename, mining_filename,spectral_version)
+    # generate a georeferenced visible-light image
+    mineral_classification.to_rgb(input_filename, rgb_filename)
 
-def main(argv=None): # IGNORE:C0111
+    # generate a mineral classified image
+    mineral_classification.classify_image(input_filename, classified_filename)
+
+def main(argv=None):
     '''Command line options.'''
     logging.basicConfig(filename='pycoal.log',level=logging.INFO, format='%(asctime)s %(message)s')
     if argv is None:
@@ -107,19 +119,18 @@ USAGE
     try:
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-mi", "--mineral_input", dest="input", default='ang20150420t182050_corr_v1e_img_class.hdr', help="Input classified mineral file to be processed [default: ang20150420t182050_corr_v1e_img_class.hdr]")
-        parser.add_argument("-mo", "--mining_output", dest="output", default='ang20150420t182050_corr_v1e_img_class_mining.hdr', help="Output mining classified image filename [default: ang20150420t182050_corr_v1e_img_class_mining.hdr]")
-        parser.add_argument("-v", "--spectral_version", dest="spectral_version", default='6', help="USGS Spectral Library Version Number")
+        parser.add_argument("-i", "--image", dest="image", default=input_filename, help="Input file to be processed [default: ang20150420t182050_corr_v1e_img.hdr]")
+        parser.add_argument("-s", "--slib", dest="slib", default=library_filename, help="Spectral Library filename [default: s07_AV95_envi.hdr]")
 
         # Process arguments
-        args = parser.parse_args(['-mi', 'ang20150420t182050_corr_v1e_img_class.hdr', '-mo', 'ang20150420t182050_corr_v1e_img_class_mining.hdr', '-v', '6'])
+        args = parser.parse_args(['-i', input_filename, '-s', library_filename])
         #args = parser.parse_args()
 
-        mineral_filename = args.input
-        mining_filename = args.output
-        spectral_version = args.spectral_version
+        image = args.image
+        slib = args.slib
         
-        run_mining(mineral_filename, mining_filename, spectral_version)
+        run_mineral(image, slib)
+
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###
         return 0
@@ -142,7 +153,7 @@ if __name__ == "__main__":
     if PROFILE:
         import cProfile
         import pstats
-        profile_filename = 'example_mining_profile.txt'
+        profile_filename = 'example_mineral_profile.txt'
         cProfile.run('main()', profile_filename)
         statsfile = open("profile_stats.txt", "wb")
         p = pstats.Stats(profile_filename, stream=statsfile)

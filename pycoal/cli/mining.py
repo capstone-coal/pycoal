@@ -42,18 +42,20 @@ def main(argv=None):  # IGNORE:C0111
     parser = ArgumentParser(description=program_description,formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("-mi", "--mineral_input", dest="input", help="Input classified mineral file to be processed")
     parser.add_argument("-mo", "--mining_output", dest="output", help="Output mining classified image filename")
+    parser.add_argument("-v", "--spectral_version", dest="spectral_version", help="USGS Spectral Library Version Number (6 or 7)")
 
     # Process arguments
     args = parser.parse_args()
     
     mineral_filename = args.input
     mining_filename = args.output
+    spectral_version = args.spectral_version
 
     # create a new mining classification instance
     mining_classification = MiningClassification()
 
     # generate a mining classified image
-    mining_classification.classify_image(mineral_filename, mining_filename)
+    mining_classification.classify_image(mineral_filename, mining_filename, spectral_version)
 
 
 if __name__ == '__main__':

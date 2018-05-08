@@ -19,6 +19,7 @@ from nose.tools import assert_raises
 from test import setup_module, teardown_module, _remove_files, libraryFilenames
 
 import shutil
+import os
 import numpy
 import spectral
 import pycoal
@@ -132,7 +133,7 @@ def test_classify_image_threshold():
 def test_classify_image_subset():
 
     # create mineral classification instance with mining subset
-    mc = mineral.MineralClassification(libraryFilenames[0], class_names=mining.proxy_class_names)
+    mc = mineral.MineralClassification(libraryFilenames[0], class_names=mining.proxy_class_names_usgsv6)
 
     # classify image
     mc.classify_image(test_classifyImage_threshold_subset_imageFilename, \
@@ -144,7 +145,7 @@ def test_classify_image_subset():
         for y in range(actual.shape[1]):
             actual_class_id = actual[x,y,0]
             actual_class_name = actual.metadata.get('class names')[actual_class_id]
-            assert actual_class_name in mining.proxy_class_names \
+            assert actual_class_name in mining.proxy_class_names_usgsv6 \
                 or actual_class_name == 'No data'
 
 # test files for filter_classes test
@@ -268,3 +269,31 @@ def test_aster_conversion():
     aster = spectral.open_image(envi+'.hdr')
     assert isinstance(aster, spectral.io.envi.SpectralLibrary)
     assert aster.spectra.shape == (3, 128)
+
+# test files for FullSpectralLibrary7Convert conversion test
+_test_SpectralConversion_data = 'usgs_splib07'
+_test_SpectralConversion_dir = 'usgs_splib07_modified'
+_test_SpectralConversion_db = 'dataSplib07.db'
+_test_SpectralConversion_envi = 's07_AV95_envi_sample'
+_test_SpectralConversion_envi_hdr = 's07_AV95_envi_sample.hdr'
+_test_SpectralConversion_envi_sli = 's07_AV95_envi_sample.sli'
+
+# tear down FullSpectralLibrary7Convert conversion test by deleting test files
+def _test_spectral_conversion_teardown():
+    _remove_files([_test_SpectralConversion_db,
+                   _test_SpectralConversion_dir,
+                   _test_SpectralConversion_envi,
+                   _test_SpectralConversion_envi_hdr,
+                   _test_SpectralConversion_envi_sli])
+
+# verify that a small subset of the USGS Spectral Library 7 is converted to ENVI format
+@with_setup(None, _test_spectral_conversion_teardown)
+def test_spectral_conversion():
+    data, dir, db, envi = _test_SpectralConversion_data, _test_SpectralConversion_dir, _test_SpectralConversion_db, _test_SpectralConversion_envi
+    spectral_conversion = mineral.FullSpectralLibrary7Convert()
+    spectral_conversion.convert(library_filename=data)
+    spectral7 = spectral.open_image(envi+'.hdr')
+    assert isinstance(spectral7, spectral.io.envi.SpectralLibrary)
+    if (os.path.isfile('SpectraValues.txt')):
+        os.remove('SpectraValues.txt')
+    shutil.rmtree('usgs_splib07_modified')
