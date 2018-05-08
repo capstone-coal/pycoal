@@ -536,11 +536,14 @@ class FullSpectralLibrary7Convert:
         set_spectra = set(spectra_list)
         print(set_spectra)
 
-        #This will generate three files s07av95a_envi.hdr, s07av95a_envi.hdr.sli,splib.db and dataSplib07.db
+        #This will generate three files s07AV95a_envi.hdr, s07AV95a_envi.hdr.sli,splib.db and dataSplib07.db
         #For a library in `ASTER Spectral Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ format
         data_dir = "dataSplib07.db"
-        header_name = "s07_AV95_envi"
-
+        #Avoid overwrite during nosetests of full .hdr and .sli files with sample .hdr and .sli
+        if (os.path.isfile('s07_AV95_envi.hdr')):
+            header_name = "s07_AV95_envi_sample"
+        else :
+            header_name = "s07_AV95_envi"
         # create a new mineral aster conversion instance
         spectral_envi = AsterConversion()
         # Generate .sli and .hdr
