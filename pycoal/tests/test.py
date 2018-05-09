@@ -17,10 +17,10 @@
 import os
 
 # utility function to remove multiple test files
-def _remove_files(listOfFileNames):
-    for fileName in listOfFileNames:
+def _remove_files(list_of_file_names):
+    for file_name in list_of_file_names:
         try:
-            os.remove(fileName)
+            os.remove(file_name)
         except OSError:
             pass
 
