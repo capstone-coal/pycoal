@@ -111,7 +111,7 @@ Start up an image and attach to it
 	docker run -t -i -d --name coalcontainer capstonecoal/coal /bin/bash
 	docker attach --sig-proxy=false coalcontainer
 
-pycoal is located in ~/coal and is almost ready to run. You just need to grab some data.
+pycoal is located in /coal and is almost ready to run. You just need to grab some data.
 
 Tests
 -----
