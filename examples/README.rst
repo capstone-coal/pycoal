@@ -102,7 +102,7 @@ After running this Python script, you will see two new images written locally, n
 
 Mining Classification
 ---------------------
-The `Mining Identification API <http://pycoal.readthedocs.io/en/latest/mining.html>`__ filters mineral classified images to identify specific classes of interest, by default proxies for coal mining in the USGS Digital Spectral Library 06.
+The `Mining Identification API <http://pycoal.readthedocs.io/en/latest/mining.html>`__ filters mineral classified images to identify specific classes of interest, by default proxies for coal mining in the USGS Digital Spectral Library 06 or 07.
 
 Command Line Interface
 ^^^^^^^^^^^^^^^^^^^^^^
