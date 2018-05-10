@@ -11,7 +11,7 @@ Prerequisites
 
 Build and Test pycoal
 ^^^^^^^^^^^^^^^^^^^^^
-Please `build the pycoal source <https://github.com/capstone-coal/pycoal/#source>`__ and then `test <https://github.com/capstone-coal/pycoal/#tests>`__ it. This fetches and stages the **USGS Digital Spectral Library** we will be using in this example.
+Please `build the pycoal source <https://github.com/capstone-coal/pycoal/#source>`__ and then `test <https://github.com/capstone-coal/pycoal/#tests>`__ it. 
 
 AVIRIS-NG Data
 ^^^^^^^^^^^^^^
@@ -23,9 +23,9 @@ pycoal does not come packaged with absolutely everything e.g. spectral library(i
 
 A full description of what this data actually is, is detailed in the `AVIRIS-NG Distribution Document <ftp://avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_v1e_README.txt>`__.
 
-USGS Digital Spectral Library splib06a
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-If you have built and tested pycoal, if you navigate to *pycoal/tests/* you will see two files named **s06av95a_envi.hdr** and *s06av95a_envi.sli*. These files, as explained in the example code, are the `USGS Digital Spectral Library splib06a <https://speclab.cr.usgs.gov/spectral.lib06/ds231/index.html>`__ header and digital spectral index files respectively. We use these to characterize and classify AVIRIS pixel spectral signatures. Please DO NOT move these files are they are read in a relative fashion.
+USGS Digital Spectral Library splib06a and splib07a
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you navigate to *pycoal/tests/* you will see two files named **s06av95a_envi.hdr** and *s06av95a_envi.sli*. These files, as explained in the example code, are the `USGS Digital Spectral Library splib06a <https://speclab.cr.usgs.gov/spectral.lib06/ds231/index.html>`__ header and digital spectral index files respectively. In *pycoal/tests/* you will also see two files named **s07_AV95_envi.hdr** and *s07_AV95_envi.sli* for `USGS Spectral Library Version 7 <https://speclab.cr.usgs.gov/spectral-lib.html>`__. Please DO NOT move these files as they are read in a relative fashion.
 
 USGS National Hydrography Dataset (NHD) Best Resolution for New Mexico State or Territory
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -40,7 +40,7 @@ Anaconda3
 
 In order to get the examples to run 
 You must download Anaconda3 and in Anaconda3\\anaconda\\Lib\\site-packages\\spectral\\io\\envi.py
-You must change like 387 of envi.py
+You may need to change line 387 of envi.py, if you have an older version than 5.1 of Anaconda3 installed
 From
 
 ::
@@ -102,14 +102,14 @@ After running this Python script, you will see two new images written locally, n
 
 Mining Classification
 ---------------------
-The `Mining Identification API <http://pycoal.readthedocs.io/en/latest/mining.html>`__ filters mineral classified images to identify specific classes of interest, by default proxies for coal mining in the USGS Digital Spectral Library 06.
+The `Mining Identification API <http://pycoal.readthedocs.io/en/latest/mining.html>`__ filters mineral classified images to identify specific classes of interest, by default proxies for coal mining in the USGS Digital Spectral Library 06 or 07.
 
 Command Line Interface
 ^^^^^^^^^^^^^^^^^^^^^^
 
 ::
 
-	usage: example_mining.py [-h] [-mi INPUT] [-mo OUTPUT]
+	usage: example_mining.py [-h] [-mi INPUT] [-mo OUTPUT] [-v SPECTRAL_VERSION]
 
 	example_mining -- an example script which demonstrates COAL mining classification
 
@@ -141,6 +141,9 @@ Command Line Interface
   		-mo OUTPUT, --mining_output OUTPUT
                         Output mining classified image filename [default:
                         ang20150420t182050_corr_v1e_img_class_mining.hdr]
+		-v SPECTRAL_VERSION, --spectral_version SPECTRAL_VERSION
+			USGS Spectral Library Version Number (6 or 7) 
+			[default: 6]
 
 
 Environment Classification
