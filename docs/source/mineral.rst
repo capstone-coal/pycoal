@@ -2,20 +2,20 @@
    #
    # Copyright (C) 2017-2018 COAL Developers
    #
-   # This program is free software; you can redistribute it and/or 
-   # modify it under the terms of the GNU General Public License 
+   # This program is free software; you can redistribute it and/or
+   # modify it under the terms of the GNU General Public License
    # as published by the Free Software Foundation; version 2.
    #
-   # This program is distributed in the hope that it will be useful, 
-   # but WITHOUT ANY WARRANTY; without even the implied warranty 
-   # of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+   # This program is distributed in the hope that it will be useful,
+   # but WITHOUT ANY WARRANTY; without even the implied warranty
+   # of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
    # See the GNU General Public License for more details.
    #
-   # You should have received a copy of the GNU General Public 
-   # License along with this program; if not, write to the Free 
-   # Software Foundation, Inc., 51 Franklin Street, Fifth 
+   # You should have received a copy of the GNU General Public
+   # License along with this program; if not, write to the Free
+   # Software Foundation, Inc., 51 Franklin Street, Fifth
    # Floor, Boston, MA 02110-1301, USA.
-   
+
 Mineral Classification API
 *********************************
 
@@ -24,5 +24,13 @@ Mineral Classification API
     :members:
 
 .. autoclass:: pycoal.mineral.AsterConversion
+    :special-members:
+    :members:
+
+.. autoclass:: pycoal.mineral.SpectalToAsterFileFormat
+    :special-members:
+    :members:
+
+.. autoclass:: pycoal.mineral.FullSpectralLibrary7Convert
     :special-members:
     :members:
