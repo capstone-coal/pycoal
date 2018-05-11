@@ -56,15 +56,15 @@ for root, dir, files in os.walk(library_filename):
         if "vegetation" in items:
             os.remove(library_filename + '/' + items);
         else:
-            f = open(library_filename + '/' + items, "r", encoding="utf8", errors='ignore')
-            contents = f.readlines()
-            f.close()
+            input_file = open(library_filename + '/' + items, "r", encoding="utf8", errors='ignore')
+            contents = input_file.readlines()
+            input_file.close()
             #Add 5 '\n' after description
             contents.insert(11, '\n\n\n\n\n')
-            f = open(library_filename + '/' + items, "w", encoding="utf8", errors='ignore')
+            input_file = open(library_filename + '/' + items, "w", encoding="utf8", errors='ignore')
             contents = "".join(contents)
-            f.write(contents)
-            f.close()
+            input_file.write(contents)
+            input_file.close()
 
 ecoStress = mineral.AsterConversion()
 ecoStress.convert(library_filename,'dataEcoStress.db','ECO_01_SPLIB.envi')
