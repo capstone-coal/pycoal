@@ -22,7 +22,3 @@ Mineral Classification API
 .. autoclass:: pycoal.mineral.MineralClassification
     :special-members:
     :members:
-
-.. autoclass:: pycoal.mineral.AsterConversion
-    :special-members:
-    :members:
