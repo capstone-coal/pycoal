@@ -52,15 +52,25 @@ library_filename = sys.argv[1]
 for root, dir, files in os.walk(library_filename):
     dir[:] = [d for d in dir]
     for items in fnmatch.filter(files, "*spectrum.txt"):
-        #Remove vegation files because their format causes errors in the Spectral class
+        input_file = open(library_filename + '/' + items, "r", encoding="utf8", errors='ignore')
+        contents = input_file.readlines()
+        input_file.close()
+        #Add 5 '\n' after description
+        contents.insert(11, '\n\n\n\n\n')
+        input_file = open(library_filename + '/' + items, "w", encoding="utf8", errors='ignore')
+        contents = "".join(contents)
+        input_file.write(contents)
+        input_file.close()
+        #Edit vegation files because their format causes errors in the Spectral class
         if "vegetation" in items:
-            os.remove(library_filename + '/' + items);
-        else:
             input_file = open(library_filename + '/' + items, "r", encoding="utf8", errors='ignore')
             contents = input_file.readlines()
             input_file.close()
-            #Add 5 '\n' after description
-            contents.insert(11, '\n\n\n\n\n')
+            #Add subclass and particle size
+            contents.insert(5,'Subclass:\nParticle Size:   Unknown\n')
+            #Remove Genus and Species
+            contents.pop(4);
+            contents.pop(3);
             input_file = open(library_filename + '/' + items, "w", encoding="utf8", errors='ignore')
             contents = "".join(contents)
             input_file.write(contents)
