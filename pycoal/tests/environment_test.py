@@ -19,7 +19,7 @@ from unittest import skipIf
 from test import setup_module, teardown_module, _remove_files
 
 from os import environ
-from os.path import abspath, dirname, basename, splitext
+from os.path import abspath, basename, splitext
 import numpy
 import spectral
 import pycoal

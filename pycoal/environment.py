@@ -14,10 +14,12 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth 
 # Floor, Boston, MA 02110-1301, USA.
 
+import glob
 from subprocess import call
 import spectral
 import numpy
 from os.path import abspath, dirname, basename, splitext
+import platform
 import pycoal
 import logging
 import time
@@ -150,17 +152,28 @@ class EnvironmentalCorrelation:
     def proximity(self, feature_filename, proximity_filename):
         """
         Generate a proximity map from the features.
+        N.B. it is essential to have `GDAL's gdal_proximity.py <http://www.gdal.org/gdal_proximity.html>`_
+        available somewhere on the path. If running Mac OSX, this function will
+        scan /Library/Frameworks/GDAL.framework/**/gdal_proximity.py (which is where
+        the binary package installer installs it to) to locate the file.
 
         Args:
             feature_filename (str):   filename of the feature image
             proximity_filename (str): filename of the proximity image
         """
         logging.info("Generating a proximity map from features of '%s', writing them to '%s'" %(feature_filename, proximity_filename))
-        # generate an ENVI proximity map with georeferenced units
-        returncode = call(['gdal_proximity.py',
-                           feature_filename,
-                           proximity_filename,
-                           '-of', 'envi'])
+        if platform.system() == 'Darwin':
+            for file in glob.glob("/Library/Frameworks/GDAL.framework/**/gdal_proximity.py"):
+                if file is not None:
+                    logging.info("Located gdal_proximity.py at %s" % (file))
+                    gdal_proximity = file
+                else:
+                    logging.info("Unable to locate gdal_proximity.py via GDAL binary install.")
+                # generate an ENVI proximity map with georeferenced units
+                returncode = call([gdal_proximity, feature_filename, proximity_filename, '-of', 'envi'])
+        else:
+        	# generate an ENVI proximity map with georeferenced units
+            returncode = call(['gdal_proximity.py', feature_filename, proximity_filename, '-of', 'envi'])
 
         # detect errors
         if returncode != 0:
