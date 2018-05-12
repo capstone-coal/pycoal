@@ -20,8 +20,8 @@ example_ecostress.py -- a script which will generate envi .sli and .hdr convolve
 files of `ECOStress Spectral Library <https://speclib.jpl.nasa.gov/>`_
 
 Dependencies
-`ECOStress Spectral Library <https://speclib.jpl.nasa.gov/>`_
-must be downloaded to the examples directory
+`ECOStress Spectral Library <https://speclib.jpl.nasa.gov/download>`_
+ALL Spectra option must be downloaded to the examples directory.
 
 All files generated will be located in the examples directory
 

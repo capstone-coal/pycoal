@@ -26,3 +26,11 @@ Mineral Classification API
 .. autoclass:: pycoal.mineral.AsterConversion
     :special-members:
     :members:
+
+.. autoclass:: pycoal.mineral.SpectalToAsterFileFormat
+   :special-members:
+   :members:
+
+.. autoclass:: pycoal.mineral.FullSpectralLibrary7Convert
+   :special-members:
+   :members:
