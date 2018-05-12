@@ -23,6 +23,7 @@ import os
 import numpy
 import spectral
 import pycoal
+from pycoal import conversion
 from pycoal import mineral
 from pycoal import mining
 
@@ -261,7 +262,7 @@ def _test_aster_conversion_teardown():
 @with_setup(None, _test_aster_conversion_teardown)
 def test_aster_conversion():
     data, db, envi = _test_AsterConversion_data, _test_AsterConversion_db, _test_AsterConversion_envi
-    aster_conversion = mineral.AsterConversion()
+    aster_conversion = conversion.AsterToENVIConversion()
     assert_raises(ValueError, aster_conversion.convert, data_dir=data)
     assert_raises(ValueError, aster_conversion.convert, data_dir=data, hdr_file=envi)
     assert_raises(ValueError, aster_conversion.convert, data_dir=data, db_file=db)
@@ -290,7 +291,7 @@ def _test_spectral_conversion_teardown():
 @with_setup(None, _test_spectral_conversion_teardown)
 def test_spectral_conversion():
     data, dir, db, envi = _test_SpectralConversion_data, _test_SpectralConversion_dir, _test_SpectralConversion_db, _test_SpectralConversion_envi
-    spectral_conversion = mineral.FullSpectralLibrary7Convert()
+    spectral_conversion = conversion.FullUSGSSpectral7ToENVIConversion()
     spectral_conversion.convert(library_filename=data)
     spectral7 = spectral.open_image(envi+'.hdr')
     assert isinstance(spectral7, spectral.io.envi.SpectralLibrary)

@@ -34,3 +34,4 @@ Mineral Classification API
 .. autoclass:: pycoal.mineral.FullSpectralLibrary7Convert
    :special-members:
    :members:
+

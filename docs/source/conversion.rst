@@ -15,24 +15,18 @@
    # License along with this program; if not, write to the Free 
    # Software Foundation, Inc., 51 Franklin Street, Fifth 
    # Floor, Boston, MA 02110-1301, USA.
+   
+Conversion Utilities API
+************************
 
-Welcome to the COAL documentation!
-==================================
+.. autoclass:: pycoal.conversion.AsterToENVIConversion
+    :special-members:
+    :members:
 
-Contents:
+.. autoclass:: pycoal.conversion.USGSSpectral7ToAsterConversion
+    :special-members:
+    :members:
 
-.. toctree::
-   :maxdepth: 4
-
-   introduction
-   quickstart
-   conversion
-   mineral
-   mining
-   environment
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-
+.. autoclass:: pycoal.conversion.FullUSGSSpectral7ToENVIConversion
+    :special-members:
+    :members:
