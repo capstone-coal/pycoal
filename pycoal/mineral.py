@@ -25,9 +25,103 @@ import time
 import fnmatch
 import shutil
 
+
+"""
+Classifier callbacks functions must have at least the following args: library, 
+image_file_name, classified_file_name; which will always be passed by the calling 
+method (MineralClassification.classify_image). The remaining arguments, specific
+of each classifier function, will also be passed by the calling function, but are 
+optionals and may vary from one classifier to another.
+"""
+def SAM(library, image_file_name, classified_file_name, threshold=0.0, in_memory=False):
+    """
+    The optional threshold parameter defines a confidence value between zero
+    and one below which SAM classifications will be discarded, otherwise all
+    classifications will be included.
+
+    In order to improve performance on systems with sufficient memory,
+    enable the optional parameter to load entire images.
+
+    Args:
+        library (obj):        the spectral library object        
+        threshold (float, optional):  classification threshold
+        in_memory (boolean, optional): enable loading entire image
+        image_file_name (str):      filename of the image to be classified
+        classified_file_name (str): filename of the classified image
+
+    Returns:
+        None
+    """
+    # open the image
+    image = spectral.open_image(image_file_name)
+    if in_memory:
+        data = image.load()
+    else:
+        data = image.asarray()
+    M = image.shape[0]
+    N = image.shape[1]
+
+    # define a resampler
+    # TODO detect and scale units
+    # TODO band resampler should do this
+    resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
+                                      library.bands.centers)
+
+    # allocate a zero-initialized MxN array for the classified image
+    classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+
+    # for each pixel in the image
+    for x in range(M):
+
+        for y in range(N):
+
+            # read the pixel from the file
+            pixel = data[x,y]
+
+            # if it is not a no data pixel
+            if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
+
+                # resample the pixel ignoring NaNs from target bands that don't overlap
+                # TODO fix spectral library so that bands are in order
+                resampled_pixel = numpy.nan_to_num(resample(pixel))
+
+                # calculate spectral angles
+                angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
+                                                                 numpy.newaxis,
+                                                                 ...],
+                                                  library.spectra)
+
+                # normalize confidence values from [pi,0] to [0,1]
+                for z in range(angles.shape[2]):
+                    angles[0,0,z] = 1-angles[0,0,z]/math.pi
+
+                # get index of class with largest confidence value
+                index_of_max = numpy.argmax(angles)
+
+                # classify pixel if confidence above threshold
+                if angles[0,0,index_of_max] > threshold:
+
+                    # index from one (after zero for no data)
+                    classified[x,y] = index_of_max + 1
+
+    # save the classified image to a file
+    spectral.io.envi.save_classification(
+        classified_file_name,
+        classified,
+        class_names=['No data']+library.names,
+        metadata={
+            'data ignore value': 0,
+            'description': 'COAL '+pycoal.version+' mineral classified image.',
+            'map info': image.metadata.get('map info')
+        })
+
+    # remove unused classes from the image
+    pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
+
+
 class MineralClassification:
 
-    def __init__(self, library_file_name, class_names=None, threshold=0.0, in_memory=False):
+    def __init__(self, library_file_name, algorithm=SAM, class_names=None, **kargs):
         """
         Construct a new ``MineralClassification`` object with a spectral library
         in ENVI format such as the `USGS Digital Spectral Library 06
@@ -39,37 +133,31 @@ class MineralClassification:
         classifier with a subset of the spectral library, otherwise the full
         spectral library will be used.
 
-        The optional threshold parameter defines a confidence value between zero
-        and one below which classifications will be discarded, otherwise all
-        classifications will be included.
-
-        In order to improve performance on systems with sufficient memory,
-        enable the optional parameter to load entire images.
-
         Args:
             library_file_name (str):        filename of the spectral library
-            class_names (str[], optional): list of names of classes to include
-            threshold (float, optional):  classification threshold
-            in_memory (boolean, optional): enable loading entire image
+            algorithm (function, optional): the classifier callback 
+            class_names (str[], optional):  list of names of classes to include
         """
+
         # load and optionally subset the spectral library
         self.library = spectral.open_image(library_file_name)
         if class_names is not None:
             self.library = self.subset_spectral_library(self.library, class_names)
 
-        # store the threshold
-        self.threshold = threshold
+        # set the user's chosen classifier 
+        self.algorithm=algorithm
 
-        # store the memory setting
-        self.in_memory = in_memory
+        # hold the remaining arguments that will be passed to self.algorithm
+        self.args=kargs
+
         logging.info("Instantiated Mineral Classifier with following specification: " \
-         "-spectral library '%s', -class names '%s', -threshold '%s', -in_memory '%s'" 
-            %(library_file_name, class_names, threshold, in_memory))
+         "-spectral library '%s', -classifier function '%s', -class names '%s'" 
+            %(library_file_name, self.algorithm.__name__, class_names))
 
     def classify_image(self, image_file_name, classified_file_name):
         """
-        Classify minerals in an AVIRIS image using spectral angle mapper
-        classification and save the results to a file.
+        Classify minerals in an AVIRIS image using chosen specified
+        classification algorithm and save the results to a file.
 
         Args:
             image_file_name (str):      filename of the image to be classified
@@ -81,71 +169,10 @@ class MineralClassification:
         start = time.time()
         logging.info("Starting Mineral Classification for image '%s', saving classified image to '%s'" 
             %(image_file_name, classified_file_name))
-        # open the image
-        image = spectral.open_image(image_file_name)
-        if self.in_memory:
-            data = image.load()
-        else:
-            data = image.asarray()
-        M = image.shape[0]
-        N = image.shape[1]
+        
+        # run the classifier callback expanding self.args to fulfill the specific args of the function
+        self.algorithm(self.library, image_file_name, classified_file_name, **self.args)
 
-        # define a resampler
-        # TODO detect and scale units
-        # TODO band resampler should do this
-        resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
-                                          self.library.bands.centers)
-
-        # allocate a zero-initialized MxN array for the classified image
-        classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
-
-        # for each pixel in the image
-        for x in range(M):
-
-            for y in range(N):
-
-                # read the pixel from the file
-                pixel = data[x,y]
-
-                # if it is not a no data pixel
-                if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
-
-                    # resample the pixel ignoring NaNs from target bands that don't overlap
-                    # TODO fix spectral library so that bands are in order
-                    resampled_pixel = numpy.nan_to_num(resample(pixel))
-
-                    # calculate spectral angles
-                    angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
-                                                                     numpy.newaxis,
-                                                                     ...],
-                                                      self.library.spectra)
-
-                    # normalize confidence values from [pi,0] to [0,1]
-                    for z in range(angles.shape[2]):
-                        angles[0,0,z] = 1-angles[0,0,z]/math.pi
-
-                    # get index of class with largest confidence value
-                    index_of_max = numpy.argmax(angles)
-
-                    # classify pixel if confidence above threshold
-                    if angles[0,0,index_of_max] > self.threshold:
-
-                        # index from one (after zero for no data)
-                        classified[x,y] = index_of_max + 1
-
-        # save the classified image to a file
-        spectral.io.envi.save_classification(
-            classified_file_name,
-            classified,
-            class_names=['No data']+self.library.names,
-            metadata={
-                'data ignore value': 0,
-                'description': 'COAL '+pycoal.version+' mineral classified image.',
-                'map info': image.metadata.get('map info')
-            })
-
-        # remove unused classes from the image
-        pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
         end = time.time()
         seconds_elapsed = end - start
         m, s = divmod(seconds_elapsed, 60)
@@ -548,5 +575,3 @@ class FullSpectralLibrary7Convert:
         spectral_envi = AsterConversion()
         # Generate .sli and .hdr
         spectral_envi.convert(directory,data_dir,header_name)
-
-
