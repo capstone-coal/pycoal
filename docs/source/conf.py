@@ -33,7 +33,7 @@
 import os
 import sys
 sys.path.insert(0, os.path.abspath('../../pycoal'))
-import guzzle_sphinx_theme
+#import guzzle_sphinx_theme
 
 # -- General configuration ------------------------------------------------
 
@@ -134,10 +134,10 @@ todo_include_todos = False
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'guzzle_sphinx_theme'
+#html_theme = 'guzzle_sphinx_theme'
 
 # Register the theme as an extension to generate a sitemap.xml
-extensions.append("guzzle_sphinx_theme")
+#extensions.append("guzzle_sphinx_theme")
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -150,7 +150,7 @@ html_theme_options = {
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
-html_theme_path = guzzle_sphinx_theme.html_theme_path()
+#html_theme_path = guzzle_sphinx_theme.html_theme_path()
 
 # The name for this set of Sphinx documents.
 # "<project> v<release> documentation" by default.
