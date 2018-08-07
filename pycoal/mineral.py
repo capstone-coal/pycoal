@@ -20,7 +20,6 @@ import logging
 import math
 import numpy
 import pycoal
-import mineral
 import spectral
 import time
 import fnmatch
@@ -129,7 +128,7 @@ def SAM(library, image_file_name, classified_file_name, scores_file_name=None, t
         })
 
     # remove unused classes from the image
-    mineral.MineralClassification.filter_classes(classified_file_name)
+    pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
 
     if scores_file_name is not None:
         # save the scored image to a file
