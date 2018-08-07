@@ -70,12 +70,15 @@ def run_mineral(input_filename, library_filename):
     logging.info("Starting mineral classification with input file '%s' and spectral library '%s'." %(input_filename, library_filename))
     # path to save RGB image
     rgb_filename = "ang20150420t182050_corr_v1e_img_rgb.hdr"
-
+    
     # path to save mineral classified image
     classified_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
 
+    # path to save classification scores image
+    scores_filename = "ang20150420t182050_corr_v1e_img_scores.hdr"
+    
     # create a new mineral classification instance
-    mineral_classification = mineral.MineralClassification(library_filename)
+    mineral_classification = mineral.MineralClassification(library_filename, scores_file_name=scores_filename)
 
     # generate a georeferenced visible-light image
     mineral_classification.to_rgb(input_filename, rgb_filename)
