@@ -33,7 +33,7 @@ method (MineralClassification.classify_image). The remaining arguments, specific
 of each classifier function, will also be passed by the calling function, but are 
 optionals and may vary from one classifier to another.
 """
-def SAM(library, image_file_name, classified_file_name, threshold=0.0, in_memory=False):
+def SAM(library, image_file_name, classified_file_name, scores_file_name=None, threshold=0.0, in_memory=False):
     """
     The optional threshold parameter defines a confidence value between zero
     and one below which SAM classifications will be discarded, otherwise all
@@ -48,6 +48,7 @@ def SAM(library, image_file_name, classified_file_name, threshold=0.0, in_memory
         in_memory (boolean, optional): enable loading entire image
         image_file_name (str):      filename of the image to be classified
         classified_file_name (str): filename of the classified image
+        scores_file_name (str): filename of the image to hold each pixel's classification score
 
     Returns:
         None
@@ -69,6 +70,10 @@ def SAM(library, image_file_name, classified_file_name, threshold=0.0, in_memory
 
     # allocate a zero-initialized MxN array for the classified image
     classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+
+    if scores_file_name is not None:
+        # allocate a zero-initialized MxN array for the scores image
+        scored = numpy.zeros(shape=(M,N), dtype=numpy.float64)
 
     # for each pixel in the image
     for x in range(M):
@@ -98,11 +103,18 @@ def SAM(library, image_file_name, classified_file_name, threshold=0.0, in_memory
                 # get index of class with largest confidence value
                 index_of_max = numpy.argmax(angles)
 
+                # get confidence value of the classied pixel
+                score = angles[0,0,index_of_max]
+
                 # classify pixel if confidence above threshold
-                if angles[0,0,index_of_max] > threshold:
+                if score > threshold:
 
                     # index from one (after zero for no data)
                     classified[x,y] = index_of_max + 1
+
+                    if scores_file_name is not None:
+                        # store score value
+                        scored[x,y] = score
 
     # save the classified image to a file
     spectral.io.envi.save_classification(
@@ -118,10 +130,22 @@ def SAM(library, image_file_name, classified_file_name, threshold=0.0, in_memory
     # remove unused classes from the image
     pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
 
+    if scores_file_name is not None:
+        # save the scored image to a file
+        spectral.io.envi.save_image(
+            scores_file_name,
+            scored,
+            dtype=numpy.float64,
+            metadata={
+                'data ignore value': -50,
+                'description': 'COAL '+pycoal.version+' mineral scored image.',
+                'map info': image.metadata.get('map info')
+            })
+
 
 class MineralClassification:
 
-    def __init__(self, library_file_name, algorithm=SAM, class_names=None, **kargs):
+    def __init__(self, library_file_name, algorithm=SAM, class_names=None, **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral library
         in ENVI format such as the `USGS Digital Spectral Library 06
@@ -148,7 +172,7 @@ class MineralClassification:
         self.algorithm=algorithm
 
         # hold the remaining arguments that will be passed to self.algorithm
-        self.args=kargs
+        self.args=kwargs
 
         logging.info("Instantiated Mineral Classifier with following specification: " \
          "-spectral library '%s', -classifier function '%s', -class names '%s'" 
