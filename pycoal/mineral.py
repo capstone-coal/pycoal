@@ -33,9 +33,13 @@ method (MineralClassification.classify_image). The remaining arguments, specific
 of each classifier function, will also be passed by the calling function, but are 
 optionals and may vary from one classifier to another.
 """
-def SAM(library, image_file_name, classified_file_name, scores_file_name=None, threshold=0.0, in_memory=False):
+def SAM(image_file_name, classified_file_name, library_file_name, scores_file_name=None, class_names=None, threshold=0.0, in_memory=False):
     """
-    The optional threshold parameter defines a confidence value between zero
+    Parameter 'scores_file_name' optionally receives the path to where to save
+    an image that holds all the SAM scores yielded for each pixel of the 
+    classified image. No score image is create if not provided.
+
+    The optional 'threshold' parameter defines a confidence value between zero
     and one below which SAM classifications will be discarded, otherwise all
     classifications will be included.
 
@@ -43,16 +47,23 @@ def SAM(library, image_file_name, classified_file_name, scores_file_name=None, t
     enable the optional parameter to load entire images.
 
     Args:
-        library (obj):        the spectral library object        
-        threshold (float, optional):  classification threshold
-        in_memory (boolean, optional): enable loading entire image
-        image_file_name (str):      filename of the image to be classified
-        classified_file_name (str): filename of the classified image
-        scores_file_name (str): filename of the image to hold each pixel's classification score
+        library_file_name (str):            filename of the spectral library
+        image_file_name (str):              filename of the image to be classified
+        classified_file_name (str):         filename of the classified image
+        scores_file_name (str, optional):   filename of the image to hold each pixel's classification score
+        class_names (str[], optional):      list of classes' names to include
+        threshold (float, optional):        classification threshold
+        in_memory (boolean, optional):      enable loading entire image
 
     Returns:
         None
     """
+
+    # load and optionally subset the spectral library
+    library = spectral.open_image(library_file_name)
+    if class_names is not None:
+            library = pycoal.mineral.MineralClassification.subset_spectral_library(library, class_names)
+
     # open the image
     image = spectral.open_image(image_file_name)
     if in_memory:
@@ -142,10 +153,100 @@ def SAM(library, image_file_name, classified_file_name, scores_file_name=None, t
                 'map info': image.metadata.get('map info')
             })
 
+def avngDNN(image_file_name, classified_file_name, model_file_name, class_names=None, scores_file_name=None, in_memory=False):
+    """
+    This callback function takes a Keras model, trained to classify pixels from AVIRIS-NG
+    imagery, and assigns a class for every single pixel of the input image.
+
+    Parameter 'scores_file_name' optionally receives the path to where to save
+    an image that holds all the SAM scores yielded for each pixel of the 
+    classified image. No score image is create if not provided.
+
+    In order to improve performance on systems with sufficient memory,
+    enable the optional parameter to load entire images.
+
+    Args:
+        image_file_name (str):          filename of the image to be classified
+        classified_file_name (str):     filename of the classified image
+        model_file_name (str):          filename of the Keras model used to classify
+        class_names (str[], optional):  list of names of classes handled by the model
+        scores_file_name (str):         filename of the image to hold each pixel's classification score
+        in_memory (boolean, optional):  enable loading entire image
+
+    Returns:
+        None
+    """    
+
+    from keras.models import load_model
+    
+    # open the image
+    image = spectral.open_image(image_file_name)
+    if in_memory:
+        data = image.load()
+    else:
+        data = image.asarray()
+    M = image.shape[0]
+    N = image.shape[1]
+
+    # allocate a zero-initialized MxN array for the classified image
+    classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+
+    if scores_file_name is not None:
+        # allocate a zero-initialized MxN array for the scores image
+        scored = numpy.zeros(shape=(M,N), dtype=numpy.float64)
+
+    model = load_model(model_file_name)
+
+    # for each pixel in the image
+    for x in range(M):
+
+        for y in range(N):
+
+            # read the pixel from the file
+            pixel = numpy.array(data[x,y])
+
+            # adjust shape to comprise the AVIRIS-NG bands and comply with Keras model input format
+            pixel = numpy.reshape(pixel,(1,432,1))
+
+            # get the scores for each class considered
+            predict = model.predict(pixel)
+
+            # get the index of the class into the outputted list
+            index_of_max = numpy.argmax(predict).astype(numpy.uint16)
+
+            # store the class index (0 meaning nodata)
+            classified[x,y] = index_of_max+1
+
+            # store the outcome score
+            if scores_file_name is not None:
+                scored[x,y] = predict[0][index_of_max]
+
+    # save the classified image to a file
+    spectral.io.envi.save_classification(
+        classified_file_name,
+        classified,
+        class_names=['No data']+class_names,
+        metadata={
+            'data ignore value': 0,
+            'description': 'COAL '+pycoal.version+' mineral classified image.',
+            'map info': image.metadata.get('map info')
+        })
+
+    if scores_file_name is not None:
+        # save the scored image to a file
+        spectral.io.envi.save_image(
+            scores_file_name,
+            scored,
+            dtype=numpy.float64,
+            metadata={
+                'data ignore value': -50,
+                'description': 'COAL '+pycoal.version+' mineral scored image.',
+                'map info': image.metadata.get('map info')
+            })
 
 class MineralClassification:
 
-    def __init__(self, library_file_name, algorithm=SAM, class_names=None, **kwargs):
+    def __init__(self, algorithm=SAM, **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral library
         in ENVI format such as the `USGS Digital Spectral Library 06
@@ -158,15 +259,9 @@ class MineralClassification:
         spectral library will be used.
 
         Args:
-            library_file_name (str):        filename of the spectral library
-            algorithm (function, optional): the classifier callback 
-            class_names (str[], optional):  list of names of classes to include
-        """
-
-        # load and optionally subset the spectral library
-        self.library = spectral.open_image(library_file_name)
-        if class_names is not None:
-            self.library = self.subset_spectral_library(self.library, class_names)
+            algorithm (function, optional): the classifier callback
+            **kwargs: arguments that will be passed to the chosen classifier
+        """  
 
         # set the user's chosen classifier 
         self.algorithm=algorithm
@@ -175,8 +270,8 @@ class MineralClassification:
         self.args=kwargs
 
         logging.info("Instantiated Mineral Classifier with following specification: " \
-         "-spectral library '%s', -classifier function '%s', -class names '%s'" 
-            %(library_file_name, self.algorithm.__name__, class_names))
+         "-classifier function '%s'" 
+            %(self.algorithm.__name__, ))
 
     def classify_image(self, image_file_name, classified_file_name):
         """
@@ -195,13 +290,14 @@ class MineralClassification:
             %(image_file_name, classified_file_name))
         
         # run the classifier callback expanding self.args to fulfill the specific args of the function
-        self.algorithm(self.library, image_file_name, classified_file_name, **self.args)
+        self.algorithm(image_file_name, classified_file_name, **self.args)
 
         end = time.time()
         seconds_elapsed = end - start
         m, s = divmod(seconds_elapsed, 60)
         h, m = divmod(m, 60)
         logging.info("Completed Mineral Classification. Time elapsed: '%d:%02d:%02d'" % (h, m, s))
+
 
     @staticmethod
     def filter_classes(classified_file_name):

@@ -16,9 +16,10 @@
 # encoding: utf-8
 
 '''
-example_mineral -- an example script which demonstrates COAL mineral classification
+example_mineral_lstm -- an example script which demonstrates COAL mineral classification
+                        using a binary classifier based on Recurrent Neural Network
 
-example_mineral provides a CLI which demonstrates how the COAL Mineral Classification 
+example_mineral_lstm provides a CLI which demonstrates how the COAL Mineral Classification 
 API provides methods for generating visible-light and mineral classified images. 
 Mineral classification can take hours to days depending on the size of the spectral 
 library and the available computing resources, so running a script in the background 
@@ -61,7 +62,7 @@ PROFILE = 0
 
 
 input_filename = 'avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
-library_filename='../pycoal/tests/s06av95a_envi.hdr'
+model_filename='../pycoal/tests/nn_models/lstm_Schwertmannite.h5'
 
 def run_mineral(input_filename, library_filename):
     '''
@@ -77,8 +78,8 @@ def run_mineral(input_filename, library_filename):
     # path to save classification scores image
     scores_filename = "ang20150420t182050_corr_v1e_img_scores.hdr"
     
-    # create a new mineral classification instance (defaults to SAM algorithm)
-    mineral_classification = mineral.MineralClassification(library_file_name=library_filename, scores_file_name=scores_filename)
+    # create a new mineral classification instance
+    mineral_classification = mineral.MineralClassification(algorithm=mineral.avngDNN, model_file_name=model_filename, class_names=class_names, scores_file_name=scores_filename)
 
     # generate a georeferenced visible-light image
     mineral_classification.to_rgb(input_filename, rgb_filename)

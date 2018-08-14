@@ -48,10 +48,7 @@ def _test_classify_image_teardown():
 def test_classify_image():
 
     # create mineral classifier instance
-    mc = mineral.MineralClassification(libraryFilenames[0])
-
-    # make sure library is opened correctly
-    assert isinstance(mc.library, spectral.io.envi.SpectralLibrary)
+    mc = mineral.MineralClassification(library_file_name=libraryFilenames[0])
 
     # for each of the test images
     for image_file_name in test_classifyImage_testFilenames:
@@ -79,7 +76,7 @@ def test_classify_image():
 def test_classify_image_in_memory():
 
     # create mineral classifier instance with image loading enabled
-    mc = mineral.MineralClassification(libraryFilenames[0], in_memory=True)
+    mc = mineral.MineralClassification(library_file_name=libraryFilenames[0], in_memory=True)
 
     # for each of the test images
     for image_file_name in test_classifyImage_testFilenames:
@@ -111,7 +108,7 @@ def _test_classify_image_threshold_subset_teardown():
 def test_classify_image_threshold():
 
     # create mineral classification instance with threshold
-    mc = mineral.MineralClassification(libraryFilenames[0], threshold=0.75)
+    mc = mineral.MineralClassification(library_file_name=libraryFilenames[0], threshold=0.75)
 
     # classify image
     mc.classify_image(test_classifyImage_threshold_subset_imageFilename, \
@@ -134,7 +131,7 @@ def test_classify_image_threshold():
 def test_classify_image_subset():
 
     # create mineral classification instance with mining subset
-    mc = mineral.MineralClassification(libraryFilenames[0], class_names=mining.proxy_class_names_usgsv6)
+    mc = mineral.MineralClassification(library_file_name=libraryFilenames[0], class_names=mining.proxy_class_names_usgsv6)
 
     # classify image
     mc.classify_image(test_classifyImage_threshold_subset_imageFilename, \
