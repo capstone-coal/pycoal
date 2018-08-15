@@ -63,6 +63,7 @@ PROFILE = 0
 
 input_filename = 'avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
 model_filename='../pycoal/tests/nn_models/lstm_Schwertmannite.h5'
+library_filename=''
 
 def run_mineral(input_filename, library_filename):
     '''
@@ -77,6 +78,9 @@ def run_mineral(input_filename, library_filename):
 
     # path to save classification scores image
     scores_filename = "ang20150420t182050_corr_v1e_img_scores.hdr"
+
+    # list containing the names of all considered classification classes
+    class_names = ["Schwertmannite","non-Schwertmannite"]
     
     # create a new mineral classification instance
     mineral_classification = mineral.MineralClassification(algorithm=mineral.avngDNN, model_file_name=model_filename, class_names=class_names, scores_file_name=scores_filename)
