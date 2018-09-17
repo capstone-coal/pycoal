@@ -32,13 +32,6 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 	org.label-schema.vendor="Capstone Coal" \
 	org.label-schema.schema-version="1.0"
 
-RUN echo "deb     http://qgis.org/debian jessie main" >> /etc/apt/sources.list
-RUN echo "deb-src http://qgis.org/debian jessie main" >> /etc/apt/sources.list
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key 073D307A618E5811
-# dput breaks Docker build
-RUN printf "Package: dput\nPin: origin \"\"\nPin-Priority: -1" >> /etc/apt/preferences
-#RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
-
 # Install the dependencies
 RUN apt-get update && \
 	apt-get upgrade -y --force-yes && \
@@ -89,10 +82,17 @@ RUN apt-get update && \
 		xfonts-base \
 		xfonts-scalable xvfb
 
+RUN echo "deb     http://qgis.org/debian jessie main" >> /etc/apt/sources.list
+RUN echo "deb-src http://qgis.org/debian jessie main" >> /etc/apt/sources.list
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key 073D307A618E5811
+# dput breaks Docker build
+RUN printf "Package: dput\nPin: origin \"\"\nPin-Priority: -1" >> /etc/apt/preferences
+#RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+
 # Download GDAL
-RUN wget http://download.osgeo.org/gdal/2.2.4/gdal-2.2.4.tar.gz && \
-	tar zxvf gdal-2.2.4.tar.gz && \
-	cd gdal-2.2.4 && \
+RUN wget http://download.osgeo.org/gdal/2.3.1/gdal-2.3.1.tar.gz && \
+	tar zxvf gdal-2.3.1.tar.gz && \
+	cd gdal-2.3.1 && \
 	./configure && \
 	make && \
 	make install && \
