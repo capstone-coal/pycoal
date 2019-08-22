@@ -49,7 +49,7 @@ The Python COAL package **pycoal** can be installed from the cheeseshop
 
 ::
 
-	pip install pycoal
+	pip3 install pycoal
     
 conda
 ^^^^^
@@ -69,7 +69,7 @@ or from source
 ::
 
 	git clone https://github.com/capstone-coal/pycoal.git && cd pycoal
-	python setup.py install
+	python3 setup.py install
 
 Docker
 ^^^^^^
