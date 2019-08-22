@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#Copyright (C) 2017-2018 COAL Developers
+#Copyright (C) 2017-2019 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 
@@ -29,7 +29,7 @@ All files generated will be located in the examples directory
 
 @author:     COAL Developers
 
-@copyright:  2017-2018 COAL Developers. All rights reserved.
+@copyright:  2017-2019 COAL Developers. All rights reserved.
 
 @license:    GNU General Public License version 2
 
