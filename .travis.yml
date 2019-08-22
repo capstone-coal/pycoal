@@ -19,8 +19,6 @@ os:
   - linux
   #- osx does not support python
 python:
-  - '3.4'
-  - '3.5'
   - '3.6'
   - '3.7'
 notifications:
