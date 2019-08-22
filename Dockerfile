@@ -15,7 +15,7 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 # Use an official Python runtime as a base image (host debian:jessie)
-FROM python:3.6-slim
+FROM python:3.7-slim
 
 MAINTAINER COAL Developers <coal-capstone@googlegroups.com>
 
@@ -34,11 +34,11 @@ LABEL org.label-schema.build-date=$BUILD_DATE \
 
 # Install the dependencies
 RUN apt-get update && \
-	apt-get upgrade -y --force-yes && \
-	apt-get install -y --force-yes apache2 \
+	apt-get upgrade -y --allow-downgrades --allow-remove-essential --allow-change-held-packages && \
+	apt-get install -y --allow-downgrades --allow-remove-essential --allow-change-held-packages apache2 \
+		apt-utils \
 		bash-completion \
 		bison \
-		checkinstall \
 		cmake \
 		devscripts \
 		doxygen \
@@ -51,7 +51,7 @@ RUN apt-get update && \
 		libgdal-dev \
 		libgeos-dev \
 		libgsl0-dev \
-		libopenscenegraph-dev \
+		libopenscenegraph-3.4-dev \
 		libosgearth-dev \
 		libpq-dev \
 		libproj-dev \
@@ -88,23 +88,26 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key 073D307A618E5811
 # dput breaks Docker build
 RUN printf "Package: dput\nPin: origin \"\"\nPin-Priority: -1" >> /etc/apt/preferences
 #RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+RUN apt-get install gdal-bin #2.4.2+dfsg-1
 
 # Download GDAL
-RUN wget http://download.osgeo.org/gdal/2.3.1/gdal-2.3.1.tar.gz && \
-	tar zxvf gdal-2.3.1.tar.gz && \
-	cd gdal-2.3.1 && \
-	./configure && \
-	make && \
-	make install && \
-	ldconfig && \
-	# Test
-	gdalwarp --version
+#ENV GDAL_VERSION 3.0.1
+#RUN wget http://download.osgeo.org/gdal/$GDAL_VERSION/gdal-$GDAL_VERSION.tar.gz && \
+	#tar zxvf gdal-$GDAL_VERSION.tar.gz && \
+	#cd gdal-$GDAL_VERSION && \
+	#./configure && \
+	#make && \
+	#make install && \
+	#ldconfig && \
+
+# Test
+RUN gdalwarp --version
 
 # Set the working directory to /coal
-WORKDIR /coal
+WORKDIR /pycoal
 
 # Copy the current directory contents into the container at /coal
-ADD . /coal
+ADD . /pycoal
 
 # Install pycoal from source, ensures we always use the latest development branch
-RUN python setup.py install
+RUN python3 setup.py install
