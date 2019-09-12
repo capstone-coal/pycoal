@@ -137,6 +137,8 @@ See the `quickstart documentation <https://capstone-coal.github.io/docs#usage>`_
 
 If you would like to run the examples yourself, head over to the **examples** module.
 
+**WARNING** Running the examples requires `additional downloads <https://github.com/capstone-coal/pycoal/tree/master/examples#aviris-ng-data>`_. Ensure you have sufficient storage (~20 GB).
+
 Documentation
 -------------
 
