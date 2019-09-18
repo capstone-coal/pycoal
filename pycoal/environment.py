@@ -163,6 +163,9 @@ class EnvironmentalCorrelation:
             proximity_filename (str): filename of the proximity image
         """
         logging.info("Generating a proximity map from features of '%s', writing them to '%s'" %(feature_filename, proximity_filename))
+
+        # search for gdal_proximity on macOS
+        gdal_proximity = None
         if platform.system() == 'Darwin':
             for file in glob.glob("/Library/Frameworks/GDAL.framework/\*\*/gdal_proximity.py"):
                 if file is not None:
@@ -170,11 +173,9 @@ class EnvironmentalCorrelation:
                     gdal_proximity = file
                 else:
                     logging.info("Unable to locate gdal_proximity.py via GDAL binary install.")
-                # generate an ENVI proximity map with georeferenced units
-                returncode = call([gdal_proximity, feature_filename, proximity_filename, '-of', 'envi'])
-        else:
-            # generate an ENVI proximity map with georeferenced units
-            returncode = call(['gdal_proximity.py', feature_filename, proximity_filename, '-of', 'envi'])
+
+        # generate an ENVI proximity map with georeferenced units
+        returncode = call([('gdal_proximity.py' if gdal_proximity is None else gdal_proximity), feature_filename, proximity_filename, '-of', 'envi'])
 
         # detect errors
         if returncode != 0:

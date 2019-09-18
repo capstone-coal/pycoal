@@ -114,7 +114,7 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
                 # get index of class with largest confidence value
                 index_of_max = numpy.argmax(angles)
 
-                # get confidence value of the classied pixel
+                # get confidence value of the classified pixel
                 score = angles[0,0,index_of_max]
 
                 # classify pixel if confidence above threshold
