@@ -163,6 +163,7 @@ class EnvironmentalCorrelation:
             proximity_filename (str): filename of the proximity image
         """
         logging.info("Generating a proximity map from features of '%s', writing them to '%s'" %(feature_filename, proximity_filename))
+        returncode = 0
         if platform.system() == 'Darwin':
             for file in glob.glob("/Library/Frameworks/GDAL.framework/\*\*/gdal_proximity.py"):
                 if file is not None:

@@ -24,6 +24,49 @@ import spectral
 import time
 import fnmatch
 import shutil
+from pycoal import mineral
+import dask
+from dask import array as da
+import dask.delayed as delay
+
+
+@delay
+def CalculatePixel(x, y, data, classified, library, threshold, resample, scores_file_name):
+            # read the pixel from the file
+    # print(x)
+    pixel = data[x,y]
+
+    # if it is not a no data pixel
+    if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
+
+        # resample the pixel ignoring NaNs from target bands that don't overlap
+        # TODO fix spectral library so that bands are in order
+        resampled_pixel = numpy.nan_to_num(resample(pixel))
+        # calculate spectral angles
+        angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
+                                                            numpy.newaxis,
+                                                            ...],
+                                            library.spectra)
+        # normalize confidence values from [pi,0] to [0,1]
+        for z in range(angles.shape[2]):
+            angles[0,0,z] = 1-angles[0,0,z]/math.pi
+        # get index of class with largest confidence value
+        index_of_max = numpy.argmax(angles)
+
+        # get confidence value of the classied pixel
+        score = angles[0,0,index_of_max]
+
+        # classify pixel if confidence above threshold
+        if score > threshold:
+
+            # index from one (after zero for no data)
+            classified[x,y] = index_of_max + 1
+
+            if scores_file_name is not None:
+                # store score value
+                return score
+
+
 
 
 """
@@ -58,12 +101,11 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
     Returns:
         None
     """
-
+    start = time.time()
     # load and optionally subset the spectral library
     library = spectral.open_image(library_file_name)
     if class_names is not None:
             library = pycoal.mineral.MineralClassification.subset_spectral_library(library, class_names)
-
     # open the image
     image = spectral.open_image(image_file_name)
     if in_memory:
@@ -73,6 +115,8 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
     M = image.shape[0]
     N = image.shape[1]
 
+    print("M - {}. N - {}".format(M, N))
+
     # define a resampler
     # TODO detect and scale units
     # TODO band resampler should do this
@@ -81,53 +125,61 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
 
     # allocate a zero-initialized MxN array for the classified image
     classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+    # classifiedDask = da.from_array(classified, chunks=(100,100))
 
     if scores_file_name is not None:
         # allocate a zero-initialized MxN array for the scores image
         scored = numpy.zeros(shape=(M,N), dtype=numpy.float64)
-
+        # scoredDask = da.from_array(scored, chunks='auto')
+        # scoredDask.compute_chunk_sizes()
+    pixels = da.from_array(data, chunks='auto')
+    # scored[x, y] = dask.delayed(classified, library, threshold, resample, scores_file_name)
     # for each pixel in the image
+    # w = dask.delayed(CalculatePixelThing())
+    scoredDask = []
     for x in range(M):
-
+        # print(x)
+        # testInnerLoop(x, N, data, classifiedDask, library, threshold, resample, scored, scores_file_name)
         for y in range(N):
+            scoredDask.append(dask.delayed(CalculatePixel(x, y, pixels, classified, library, threshold, resample,scores_file_name)))
+    scored = dask.compute(*scoredDask)
+    #      # read the pixel from the file
+    #         pixel = data[x,y]
 
-            # read the pixel from the file
-            pixel = data[x,y]
+    #         # if it is not a no data pixel
+    #         if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
 
-            # if it is not a no data pixel
-            if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
+    #             # resample the pixel ignoring NaNs from target bands that don't overlap
+    #             # TODO fix spectral library so that bands are in order
+    #             resampled_pixel = numpy.nan_to_num(resample(pixel))
+    #             # calculate spectral angles
+    #             angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
+    #                                                              numpy.newaxis,
+    #                                                              ...],
+    #                                               library.spectra)
+    #             # normalize confidence values from [pi,0] to [0,1]
+    #             for z in range(angles.shape[2]):
+    #                 angles[0,0,z] = 1-angles[0,0,z]/math.pi
+    #             # get index of class with largest confidence value
+    #             index_of_max = numpy.argmax(angles)
 
-                # resample the pixel ignoring NaNs from target bands that don't overlap
-                # TODO fix spectral library so that bands are in order
-                resampled_pixel = numpy.nan_to_num(resample(pixel))
+    #             # get confidence value of the classied pixel
+    #             score = angles[0,0,index_of_max]
 
-                # calculate spectral angles
-                angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
-                                                                 numpy.newaxis,
-                                                                 ...],
-                                                  library.spectra)
+    #             # classify pixel if confidence above threshold
+    #             if score > threshold:
 
-                # normalize confidence values from [pi,0] to [0,1]
-                for z in range(angles.shape[2]):
-                    angles[0,0,z] = 1-angles[0,0,z]/math.pi
+    #                 # index from one (after zero for no data)
+    #                 classifiedDask[x,y] = index_of_max + 1
 
-                # get index of class with largest confidence value
-                index_of_max = numpy.argmax(angles)
-
-                # get confidence value of the classied pixel
-                score = angles[0,0,index_of_max]
-
-                # classify pixel if confidence above threshold
-                if score > threshold:
-
-                    # index from one (after zero for no data)
-                    classified[x,y] = index_of_max + 1
-
-                    if scores_file_name is not None:
-                        # store score value
-                        scored[x,y] = score
-
+    #                 if scores_file_name is not None:
+    #                     # store score value
+    #                     scoredDask[x,y] = score
+    # classifiedDask.compute()
     # save the classified image to a file
+    end = time.time()
+    seconds = end - start
+    print("time to run - {}".format(seconds))
     spectral.io.envi.save_classification(
         classified_file_name,
         classified,
@@ -152,6 +204,10 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
                 'description': 'COAL '+pycoal.version+' mineral scored image.',
                 'map info': image.metadata.get('map info')
             })
+    
+
+
+
 
 def avngDNN(image_file_name, classified_file_name, model_file_name, class_names=None, scores_file_name=None, in_memory=False):
     """
@@ -243,6 +299,7 @@ def avngDNN(image_file_name, classified_file_name, model_file_name, class_names=
                 'description': 'COAL '+pycoal.version+' mineral scored image.',
                 'map info': image.metadata.get('map info')
             })
+
 
 class MineralClassification:
 

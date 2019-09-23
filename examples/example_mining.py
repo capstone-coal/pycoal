@@ -42,9 +42,9 @@ import logging
 
 import pycoal
 sys.path.insert(0, '../pycoal')
-import mineral
-import mining
-import environment
+from pycoal import mineral
+from pycoal import mining
+from pycoal import environment
 
 __all__ = []
 
@@ -52,15 +52,15 @@ DEBUG = 1
 TESTRUN = 0
 PROFILE = 0
 
-def run_mining(mineral_filename="ang20150420t182050_corr_v1e_img_class.hdr", mining_filename="ang20150420t182050_corr_v1e_img_class_mining.hdr",spectral_version="6"):
+def run_mining(mineral_filename="f100825t01p00r08rdn_b_sc01_ort_img_class.hdr", mining_filename="ang20150420t182050_corr_v1e_img_class_mining.hdr",spectral_version="6"):
     '''
     ...
     '''
     # path to mineral classified image
-    mineral_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
+    mineral_filename = "f100825t01p00r08rdn_b_sc01_ort_img_class.hdr"
 
     # path to save mining classified image
-    mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
+    mining_filename = "f100825t01p00r08rdn_b_sc01_ort_img_class_mining.hdr"
     
     #Spectral Library Verison Number, Change to 7 if you want to use USGS Spectral Library Version 7
     spectral_version = "6"

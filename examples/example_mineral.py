@@ -60,7 +60,8 @@ TESTRUN = 0
 PROFILE = 0
 
 
-input_filename = 'avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
+# input_filename = 'avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
+input_filename = 'f180201t01p00r05rdn_e/f180201t01p00r05rdn_e_sc01_ort_img.hdr'
 library_filename='../pycoal/tests/s06av95a_envi.hdr'
 
 def run_mineral(input_filename, library_filename):
@@ -69,20 +70,22 @@ def run_mineral(input_filename, library_filename):
     '''
     logging.info("Starting mineral classification with input file '%s' and spectral library '%s'." %(input_filename, library_filename))
     # path to save RGB image
-    rgb_filename = "ang20150420t182050_corr_v1e_img_rgb.hdr"
-    
+    # rgb_filename = "ang20150420t182050_corr_v1e_img_rgb.hdr"
+    rgb_filename = "f180201t01p00r05rdn_e_sc01_ort_img_rgb.hdr" 
     # path to save mineral classified image
-    classified_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
+    # classified_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
+    classified_filename = "f180201t01p00r05rdn_e_sc01_ort_img_class.hdr"
 
     # path to save classification scores image
-    scores_filename = "ang20150420t182050_corr_v1e_img_scores.hdr"
+    # scores_filename = "ang20150420t182050_corr_v1e_img_scores.hdr"
+    scores_filename = "f180201t01p00r05rdn_e_sc01_ort_img_scores.hdr"
     
     # create a new mineral classification instance (defaults to SAM algorithm)
     mineral_classification = mineral.MineralClassification(library_file_name=library_filename, scores_file_name=scores_filename)
 
     # generate a georeferenced visible-light image
-    mineral_classification.to_rgb(input_filename, rgb_filename)
-
+    #mineral_classification.to_rgb(input_filename, rgb_filename)
+    
     # generate a mineral classified image
     mineral_classification.classify_image(input_filename, classified_filename)
 

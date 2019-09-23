@@ -58,13 +58,13 @@ PROFILE = 0
 
 def run_environment(mining_filename, vector_filename, correlation_filename):
     # path to mining classified image
-    mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
+    mining_filename = "f100825t01p00r08rdn_b_sc01_ort_img_class_mining.hdr"
 
     # path to hydrography data
     vector_filename = "Shape/NHDFlowline.shp"
 
     # path to save environmental correlation image
-    correlation_filename = "ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr"
+    correlation_filename = "f100825t01p00r08rdn_b_sc01_ort_img_class_mining_NHDFlowline_correlation.hdr"
 
     # create a new environmental correlation instance
     environmental_correlation = environment.EnvironmentalCorrelation()
