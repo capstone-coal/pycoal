@@ -43,28 +43,20 @@ from argparse import RawDescriptionHelpFormatter
 
 import logging
 
+import constants
 import pycoal
-sys.path.insert(0, '../pycoal')
-import mineral
-import mining
-import environment
+from pycoal import environment
 
 __all__ = []
 
-DEBUG = 1
-TESTRUN = 0
-PROFILE = 0
-
 
 def run_environment(mining_filename, vector_filename, correlation_filename):
-    # path to mining classified image
-    mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
+    """Run environment correlation.
 
-    # path to hydrography data
-    vector_filename = "Shape/NHDFlowline.shp"
-
-    # path to save environmental correlation image
-    correlation_filename = "ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr"
+    :param mining_filename: Input mining classified file to be processed
+    :param vector_filename: Path to hydrography data
+    :param correlation_filename: Output environmental correlation image
+    """
 
     # create a new environmental correlation instance
     environmental_correlation = environment.EnvironmentalCorrelation()
@@ -74,10 +66,11 @@ def run_environment(mining_filename, vector_filename, correlation_filename):
     environmental_correlation.intersect_proximity(
         mining_filename, vector_filename, 10.0, correlation_filename)
 
+
 def main(argv=None):
     '''Command line options.'''
-    logging.basicConfig(filename='pycoal.log', level=logging.INFO, 
-        format='%(asctime)s %(message)s')
+    logging.basicConfig(filename='pycoal.log', level=logging.INFO,
+                        format='%(asctime)s %(message)s')
     if argv is None:
         argv = sys.argv
     else:
@@ -116,8 +109,8 @@ USAGE
         parser.add_argument(
             "-m", "--mining",
             dest="mining_filename",
-            default='ang20150420t182050_corr_v1e_img_class_mining.hdr',
-            help="Input mining classified file to be processed [default: ang20150420t182050_corr_v1e_img_class_mining.hdr]")
+            default=constants.INPUT_NAME + "_class_mining.hdr",
+            help="Input mining classified file to be processed [default: " + constants.INPUT_NAME + "_class_mining.hdr]")
         parser.add_argument(
             "-hy", "--hydrography",
             dest="vector_filename",
@@ -126,14 +119,14 @@ USAGE
         parser.add_argument(
             "-e", "--environment",
             dest="correlation_filename",
-            default='ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr',
-            help="Output environmental correlation image [default: ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr]")
+            default=constants.INPUT_NAME + "_class_mining_NHDFlowline_correlation.hdr",
+            help="Output environmental correlation image [default: " + constants.INPUT_NAME + "_class_mining_NHDFlowline_correlation.hdr]")
 
         # Process arguments
         args = parser.parse_args(
-            ['-m', 'ang20150420t182050_corr_v1e_img_class_mining.hdr',
-            '-hy', 'Shape/NHDFlowline.shp',
-            '-e', 'ang20150420t182050_corr_v1e_img_class_mining_NHDFlowline_correlation.hdr'])
+            ['-m', constants.INPUT_NAME + "_class_mining.hdr",
+             '-hy', 'Shape/NHDFlowline.shp',
+             '-e', constants.INPUT_NAME + "_class_mining_NHDFlowline_correlation.hdr"])
 
         mining_filename = args.mining_filename
         vector_filename = args.vector_filename
@@ -144,24 +137,27 @@ USAGE
     except KeyboardInterrupt:
         return 0
     except Exception as e:
-        if DEBUG or TESTRUN:
+        if constants.DEBUG or constants.TESTRUN:
             raise e
         indent = len(program_name) * " "
         sys.stderr.write(program_name + ": " + repr(e) + "\n")
         sys.stderr.write(indent + "  for help use --help")
         return 2
 
+
 if __name__ == "__main__":
-    if DEBUG:
+    if constants.DEBUG:
         sys.argv.append("-h")
         sys.argv.append("-v")
         sys.argv.append("-r")
-    if TESTRUN:
+    if constants.TESTRUN:
         import doctest
+
         doctest.testmod()
-    if PROFILE:
+    if constants.PROFILE:
         import cProfile
         import pstats
+
         profile_filename = 'example_environment_profile.txt'
         cProfile.run('main()', profile_filename)
         statsfile = open("profile_stats.txt", "wb")
