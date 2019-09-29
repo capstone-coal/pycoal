@@ -47,8 +47,6 @@ import constants
 import pycoal
 from pycoal import environment
 
-__all__ = []
-
 
 def run_environment(mining_filename, vector_filename, correlation_filename):
     """Run environment correlation.

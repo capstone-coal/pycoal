@@ -44,7 +44,6 @@ import constants
 import pycoal
 from pycoal import mining
 
-__all__ = []
 
 '''
     # path to mineral classified image

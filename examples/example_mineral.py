@@ -15,14 +15,14 @@
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
 
-'''
+"""
 example_mineral -- an example script which demonstrates COAL mineral classification
 
-example_mineral provides a CLI which demonstrates how the COAL Mineral Classification 
-API provides methods for generating visible-light and mineral classified images. 
-Mineral classification can take hours to days depending on the size of the spectral 
-library and the available computing resources, so running a script in the background 
-is recommended. More reading an this example can be seen at 
+example_mineral provides a CLI which demonstrates how the COAL Mineral Classification
+API provides methods for generating visible-light and mineral classified images.
+Mineral classification can take hours to days depending on the size of the spectral
+library and the available computing resources, so running a script in the background
+is recommended. More reading an this example can be seen at
 https://capstone-coal.github.io/docs#usage
 
 @author:     COAL Developers
@@ -32,8 +32,7 @@ https://capstone-coal.github.io/docs#usage
 @license:    GNU General Public License version 2
 
 @contact:    coal-capstone@googlegroups.com
-'''
-
+"""
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
@@ -42,10 +41,7 @@ import logging
 import sys
 import os
 import constants
-import pycoal
-from pycoal import mineral
-
-__all__ = []
+from pycoal import mineral, version
 
 
 def run_mineral(input_filename=constants.INPUT_FILENAME, library_filename=constants.LIBRARY_FILENAME):
@@ -109,7 +105,7 @@ def main(argv=None):
   Floor, Boston, MA 02110-1301, USA.
 
 USAGE
-''' % (program_shortdesc, pycoal.version)
+''' % (program_shortdesc, version)
 
     try:
         # Setup argument parser
@@ -117,11 +113,10 @@ USAGE
         parser.add_argument("-i", "--image", dest="image", default=constants.INPUT_FILENAME,
                             help="Input file to be processed [default: " + constants.INPUT_FILENAME + "]")
         parser.add_argument("-s", "--slib", dest="slib", default=constants.LIBRARY_FILENAME,
-                            help="Spectral Library filename [default: " + constants.LIBRARY_FILENAME +"]")
+                            help="Spectral Library filename [default: " + constants.LIBRARY_FILENAME + "]")
 
         # Process arguments
         args = parser.parse_args(['-i', constants.INPUT_FILENAME, '-s', constants.LIBRARY_FILENAME])
-        # args = parser.parse_args()
 
         image = args.image
         slib = args.slib

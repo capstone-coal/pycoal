@@ -23,5 +23,7 @@ LARGE_INPUT_FILE = "avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420
 INPUT_NAME = SMALL_INPUT_NAME if TESTRUN else LARGE_INPUT_NAME
 INPUT_FILENAME = SMALL_INPUT_FILE if TESTRUN else LARGE_INPUT_FILE
 
-# Spectral library file name
-LIBRARY_FILENAME = "../pycoal/tests/s06av95a_envi.hdr"
+# Spectral library file name - change LIBRARY_FILENAME to 6 or 7 depending on which version you want to use
+LIBRARY_FILENAME_6 = "s06av95a_envi.hdr"
+LIBRARY_FILENAME_7 = "s07_AV95_envi.hdr"
+LIBRARY_FILENAME = "../pycoal/tests/" + LIBRARY_FILENAME_7
