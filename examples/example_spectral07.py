@@ -36,11 +36,7 @@ All files generated will be located in the examples directory
 @contact:    coal-capstone@googlegroups.com
 '''
 
-import os
-import sys
-import pycoal
-sys.path.insert(0, '../pycoal')
-import mineral
+from pycoal import mineral
 
 usgs_convolved = mineral.FullSpectralLibrary7Convert()
 usgs_convolved.convert('usgs_splib07')

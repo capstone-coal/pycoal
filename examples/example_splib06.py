@@ -31,12 +31,13 @@ The image ``s06av95a_envi.png`` is saved in the current directory. It shows that
 @contact:    coal-capstone@googlegroups.com
 '''
 
+import constants
 import numpy
 import spectral
 from spectral.graphics.colorscale import create_default_color_scale
 
 # Import SPLIB06 as a SPy image and display its dimensions.
-library_filename = '../pycoal/tests/s06av95a_envi.hdr'
+library_filename = constants.LIBRARY_FILENAME_6
 library = spectral.open_image(library_filename)
 library.spectra.shape
 # (1365, 224)

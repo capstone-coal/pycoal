@@ -40,40 +40,42 @@ from argparse import RawDescriptionHelpFormatter
 
 import logging
 
+import constants
 import pycoal
-sys.path.insert(0, '../pycoal')
-import mineral
-import mining
-import environment
+from pycoal import mining
 
-__all__ = []
 
-DEBUG = 1
-TESTRUN = 0
-PROFILE = 0
-
-def run_mining(mineral_filename="ang20150420t182050_corr_v1e_img_class.hdr", mining_filename="ang20150420t182050_corr_v1e_img_class_mining.hdr",spectral_version="6"):
-    '''
-    ...
-    '''
+'''
     # path to mineral classified image
-    mineral_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
+    mineral_filename = constants"ang20150420t182050_corr_v1e_img_class.hdr"
 
     # path to save mining classified image
     mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
     
     #Spectral Library Verison Number, Change to 7 if you want to use USGS Spectral Library Version 7
-    spectral_version = "6"
+'''
+
+
+def run_mining(mineral_filename=constants.INPUT_NAME + "_class.hdr",
+               mining_filename=constants.INPUT_NAME + "_mining.hdr",
+               spectral_version="6"):
+    """Run mining classification.
+
+    :param mineral_filename: The name of the mineral file
+    :param mining_filename: The name of the mining file
+    :param spectral_version: 6 by default. Use 7 if you want to use USGS Spectral Library Version 7
+    """
 
     # create a new mining classification instance
     mining_classification = mining.MiningClassification()
 
     # generate a mining classified image
-    mining_classification.classify_image(mineral_filename, mining_filename,spectral_version)
+    mining_classification.classify_image(mineral_filename, mining_filename, spectral_version)
 
-def main(argv=None): # IGNORE:C0111
+
+def main(argv=None):  # IGNORE:C0111
     '''Command line options.'''
-    logging.basicConfig(filename='pycoal.log',level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.basicConfig(filename='pycoal.log', level=logging.INFO, format='%(asctime)s %(message)s')
     if argv is None:
         argv = sys.argv
     else:
@@ -107,41 +109,51 @@ USAGE
     try:
         # Setup argument parser
         parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-mi", "--mineral_input", dest="input", default='ang20150420t182050_corr_v1e_img_class.hdr', help="Input classified mineral file to be processed [default: ang20150420t182050_corr_v1e_img_class.hdr]")
-        parser.add_argument("-mo", "--mining_output", dest="output", default='ang20150420t182050_corr_v1e_img_class_mining.hdr', help="Output mining classified image filename [default: ang20150420t182050_corr_v1e_img_class_mining.hdr]")
-        parser.add_argument("-v", "--spectral_version", dest="spectral_version", default='6', help="USGS Spectral Library Version Number")
+        parser.add_argument("-mi", "--mineral_input", dest="input", default=constants.INPUT_NAME + "_class.hdr",
+                            help="Input classified mineral file to be processed [default: " + constants.INPUT_NAME + "_class.hdr]")
+        parser.add_argument("-mo", "--mining_output", dest="output",
+                            default=constants.INPUT_NAME + "_class_mining.hdr",
+                            help="Output mining classified image filename [default: " + constants.INPUT_NAME + "_class_mining.hdr]")
+        parser.add_argument("-v", "--spectral_version", dest="spectral_version", default='6',
+                            help="USGS Spectral Library Version Number")
 
         # Process arguments
-        args = parser.parse_args(['-mi', 'ang20150420t182050_corr_v1e_img_class.hdr', '-mo', 'ang20150420t182050_corr_v1e_img_class_mining.hdr', '-v', '6'])
-        #args = parser.parse_args()
+        args = parser.parse_args(
+            ['-mi', constants.INPUT_NAME + "_class.hdr", '-mo', constants.INPUT_NAME + "_class_mining.hdr",
+             '-v', '6'])
+        # args = parser.parse_args()
 
         mineral_filename = args.input
         mining_filename = args.output
         spectral_version = args.spectral_version
-        
+
         run_mining(mineral_filename, mining_filename, spectral_version)
+        return 0
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###
         return 0
     except Exception as e:
-        if DEBUG or TESTRUN:
+        if constants.DEBUG or constants.TESTRUN:
             raise e
         indent = len(program_name) * " "
         sys.stderr.write(program_name + ": " + repr(e) + "\n")
         sys.stderr.write(indent + "  for help use --help")
         return 2
 
+
 if __name__ == "__main__":
-    if DEBUG:
+    if constants.DEBUG:
         sys.argv.append("-h")
         sys.argv.append("-v")
         sys.argv.append("-r")
-    if TESTRUN:
+    if constants.TESTRUN:
         import doctest
+
         doctest.testmod()
-    if PROFILE:
+    if constants.PROFILE:
         import cProfile
         import pstats
+
         profile_filename = 'example_mining_profile.txt'
         cProfile.run('main()', profile_filename)
         statsfile = open("profile_stats.txt", "wb")
