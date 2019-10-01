@@ -66,6 +66,35 @@ def CalculatePixel(x, y, data, classified, library, threshold, resample, scores_
                 # store score value
                 return score
 
+@delay
+def CalculateAngles(pixel, resample, library):
+    resampled_pixel = numpy.nan_to_num(resample(pixel))
+    # calculate spectral angles
+    angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis, numpy.newaxis, ...], library.spectra)
+    # normalize confidence values from [pi,0] to [0,1]
+    for z in range(angles.shape[2]):
+        angles[0,0,z] = 1-angles[0,0,z]/math.pi
+    return angles
+
+@delay
+def CalculateScore(angles, threshold, classified, scores_file_name, x, y):
+    index_of_max = numpy.argmax(angles)
+    # get confidence value of the classied pixel
+    score = angles[0,0,index_of_max]
+
+    # classify pixel if confidence above threshold
+    if score > threshold:
+
+        # index from one (after zero for no data)
+        classified[x,y] = index_of_max + 1
+
+        if scores_file_name is not None:
+            # store score value
+            return score
+    
+
+
+
 
 
 
@@ -132,17 +161,24 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         scored = numpy.zeros(shape=(M,N), dtype=numpy.float64)
         # scoredDask = da.from_array(scored, chunks='auto')
         # scoredDask.compute_chunk_sizes()
-    pixels = da.from_array(data, chunks='auto')
+    # pixels = da.from_array(data, chunks='auto')
     # scored[x, y] = dask.delayed(classified, library, threshold, resample, scores_file_name)
     # for each pixel in the image
     # w = dask.delayed(CalculatePixelThing())
     scoredDask = []
+
     for x in range(M):
-        # print(x)
-        # testInnerLoop(x, N, data, classifiedDask, library, threshold, resample, scored, scores_file_name)
         for y in range(N):
-            scoredDask.append(dask.delayed(CalculatePixel(x, y, pixels, classified, library, threshold, resample,scores_file_name)))
+            angles = CalculateAngles(data[x, y], resample, library)
+            scoredDask.append(CalculateScore(angles, threshold, classified, scores_file_name, x, y))
     scored = dask.compute(*scoredDask)
+
+    # for x in range(M):
+    #     # print(x)
+    #     # testInnerLoop(x, N, data, classifiedDask, library, threshold, resample, scored, scores_file_name)
+    #     for y in range(N):
+    #         scoredDask.append(dask.delayed(CalculatePixel(x, y, pixels, classified, library, threshold, resample, scores_file_name)))
+    # scored = dask.compute(*scoredDask)
     #      # read the pixel from the file
     #         pixel = data[x,y]
 
