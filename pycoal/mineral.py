@@ -19,6 +19,8 @@ import os
 import logging
 import math
 import numpy
+from spectral.io.spyfile import SubImage
+
 import pycoal
 import spectral
 import time
@@ -35,7 +37,7 @@ optionals and may vary from one classifier to another.
 
 
 def SAM(image_file_name, classified_file_name, library_file_name, scores_file_name=None, class_names=None,
-        threshold=0.0, in_memory=False):
+        threshold=0.0, in_memory=False, subset_rows=None, subset_cols=None):
     """
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the 
@@ -56,6 +58,8 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         class_names (str[], optional):      list of classes' names to include
         threshold (float, optional):        classification threshold
         in_memory (boolean, optional):      enable loading entire image
+        subset_rows (2-tuple, optional):        range of rows to read (empty to read the whole image)
+        subset_cols (2-tuple, optional):        range of columns to read (empty to read the whole image)
 
     Returns:
         None
@@ -68,12 +72,19 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
 
     # open the image
     image = spectral.open_image(image_file_name)
-    if in_memory:
-        data = image.load()
+    if subset_rows is not None and subset_cols is not None:
+        subset_image = SubImage(image, subset_rows, subset_cols)
+        M = subset_rows[1]
+        N = subset_cols[1]
     else:
-        data = image.asarray()
-    M = image.shape[0]
-    N = image.shape[1]
+        if in_memory:
+            data = image.load()
+        else:
+            data = image.asarray()
+        M = image.shape[0]
+        N = image.shape[1]
+
+    logging.info("Classifying a %iX%i image" % (M, N))
 
     # define a resampler
     # TODO detect and scale units
@@ -94,7 +105,10 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         for y in range(N):
 
             # read the pixel from the file
-            pixel = data[x, y]
+            if subset_rows is not None and subset_cols is not None:
+                pixel = subset_image.read_pixel(x, y)
+            else:
+                pixel = data[x, y]
 
             # if it is not a no data pixel
             if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:

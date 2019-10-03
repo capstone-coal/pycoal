@@ -65,7 +65,9 @@ def run_mineral(input_filename=constants.INPUT_FILENAME, library_filename=consta
 
     # create a new mineral classification instance (defaults to SAM algorithm)
     mineral_classification = mineral.MineralClassification(library_file_name=library_filename,
-                                                           scores_file_name=scores_filename)
+                                                           scores_file_name=scores_filename,
+                                                           subset_rows=constants.MINERAL_SUBSET_ROWS,
+                                                           subset_cols=constants.MINERAL_SUBSET_COLS)
 
     # generate a georeferenced visible-light image
     mineral_classification.to_rgb(input_filename, rgb_filename)

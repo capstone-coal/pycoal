@@ -1,3 +1,5 @@
+from spectral import BandInfo
+
 DEBUG = 1
 TESTRUN = 1
 PROFILE = 0
@@ -27,3 +29,10 @@ INPUT_FILENAME = SMALL_INPUT_FILE if TESTRUN else LARGE_INPUT_FILE
 LIBRARY_FILENAME_6 = "s06av95a_envi.hdr"
 LIBRARY_FILENAME_7 = "s07_AV95_envi.hdr"
 LIBRARY_FILENAME = "../pycoal/tests/" + LIBRARY_FILENAME_7
+
+# If you want to only classify a subset of the image, specify the range of rows and columns to classify.
+# Set to None to classify the entire image.
+# Only applies to example_mineral.py
+# For reference, the small image has the shape 931X339 (931 rows and 339 columns)
+MINERAL_SUBSET_ROWS = [0, 75]
+MINERAL_SUBSET_COLS = [0, 75]
