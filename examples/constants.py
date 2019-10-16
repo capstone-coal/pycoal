@@ -1,8 +1,25 @@
-from spectral import BandInfo
+# Copyright (C) 2017-2019 COAL Developers
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; version 2.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+# See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public
+# License along with this program; if not, write to the Free
+# Software Foundation, Inc., 51 Franklin Street, Fifth
+# Floor, Boston, MA 02110-1301, USA.
+# encoding: utf-8
 
 DEBUG = 1
 TESTRUN = 1
 PROFILE = 0
+
+# TODO: Also demonstrate this functionality in a Jupyter Notebook
 
 # File used if TESTRUN is set to 1.
 # Contains hyperspectral data that is 0.15GB when unpacked.
@@ -10,7 +27,7 @@ PROFILE = 0
 # to analyze (fewer coal mines, etc.) than the large input file.
 # Direct download link: ftp://avoil:Gulf0il$pill@popo.jpl.nasa.gov/y18_data/f180201t01p00r05.tar.gz
 # Note that wget may not work with this FTP link due to the login credentials.
-# Use your browser to download it by navigating to the link. Then move the move the file into the examples directory
+# Use your browser to download it by navigating to the link. Then move the file into the examples directory
 # and unzip it (tar -xzf f180201t01p00r05.tar.gz)
 SMALL_INPUT_NAME = "f180201t01p00r05rdn_e_sc01_ort_img"
 SMALL_INPUT_FILE = "f180201t01p00r05rdn_e/" + SMALL_INPUT_NAME + ".hdr"
