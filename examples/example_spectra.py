@@ -29,12 +29,13 @@ The images ``spectra.png`` and ``spectra.svg`` are saved in the current director
 @contact:    coal-capstone@googlegroups.com
 '''
 
+import constants
 import spectral
 import matplotlib
 import matplotlib.pyplot as plt
 
 # load library
-library_filename = '../pycoal/tests/s06av95a_envi.hdr'
+library_filename = constants.LIBRARY_FILENAME
 library = spectral.open_image(library_filename)
 schwert_index = library.names.index(u'Schwertmannite BZ93-1 s06av95a=b')
 sldgwet_index = library.names.index(u'Renyolds_TnlSldgWet SM93-15w s06av95a=a')

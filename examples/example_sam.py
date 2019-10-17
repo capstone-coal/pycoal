@@ -29,6 +29,7 @@ The images ``sam.png`` and ``sam.svg`` are saved in the current directory.
 @contact:    coal-capstone@googlegroups.com
 '''
 
+import constants
 import math
 import numpy
 import spectral
@@ -36,7 +37,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 
 # load library
-library_filename = '../pycoal/tests/s06av95a_envi.hdr'
+library_filename = constants.LIBRARY_FILENAME_6
 library = spectral.open_image(library_filename)
 
 # open the image
