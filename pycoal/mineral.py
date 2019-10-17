@@ -24,6 +24,75 @@ import spectral
 import time
 import fnmatch
 import shutil
+from pycoal import mineral
+import dask
+from dask import array as da
+import dask.delayed as delay
+import multiprocessing
+from joblib import Parallel, delayed
+
+def SpectralAngleReplacement(data, members):
+    assert members.shape[1] == data.shape[2], \
+        'Matrix dimensions are not aligned.'
+
+    (M, N, B) = data.shape
+    m = numpy.array(members, numpy.float64)
+    C = m.shape[0]
+
+    # Normalize endmembers
+    for i in range(C):
+        m[i] /= numpy.sqrt(m[i].dot(m[i]))
+
+
+    angles = numpy.zeros((M, N, C), numpy.float64)
+    num_cores = multiprocessing.cpu_count()
+
+    for i in range(M):
+        for j in range(N):
+            v = data[i, j].astype(float)
+            v = v / numpy.sqrt(v.dot(v))
+            angles[i, j] = numpy.array(Parallel(n_jobs=num_cores-1)(delayed(SpectralCLoop)(m, k, v)
+                                                for k in range(C)), dtype=numpy.float64)
+    return numpy.arccos(angles)
+
+def SpectralCLoop(m, k, v):
+    return numpy.clip(v.dot(m[k]), -1, 1)
+
+
+
+def CalculatePixel(pixel, x, y, classified, library, threshold, resample, scores_file_name):
+            # read the pixel from the file
+    # print(x)
+    # pixel = data[x,y]
+
+    # if it is not a no data pixel
+    if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
+
+        # resample the pixel ignoring NaNs from target bands that don't overlap
+        # TODO fix spectral library so that bands are in order
+        resampled_pixel = numpy.nan_to_num(resample(pixel))
+        # calculate spectral angles
+        # angles = SpectralAngleReplacement(resampled_pixel[numpy.newaxis, numpy.newaxis, ...], library.spectra)
+        angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis, numpy.newaxis, ...], library.spectra)
+        # normalize confidence values from [pi,0] to [0,1]
+        for z in range(angles.shape[2]):
+            angles[0,0,z] = 1-angles[0,0,z]/math.pi
+        # get index of class with largest confidence value
+        index_of_max = numpy.argmax(angles)
+
+        # get confidence value of the classied pixel
+        score = angles[0,0,index_of_max]
+
+        # classify pixel if confidence above threshold
+        if score > threshold:
+
+            # index from one (after zero for no data)
+            classified[x,y] = index_of_max + 1
+
+            if scores_file_name is not None:
+                # store score value
+                return score
+
 
 
 """
@@ -85,49 +154,80 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
     if scores_file_name is not None:
         # allocate a zero-initialized MxN array for the scores image
         scored = numpy.zeros(shape=(M,N), dtype=numpy.float64)
+        scoredJobLib = numpy.zeros(shape=(M,N), dtype=numpy.float64)
+       
+    num_cores = multiprocessing.cpu_count()
+    
 
-    # for each pixel in the image
-    for x in range(M):
 
-        for y in range(N):
+    # jobLibStart = time.time()
+    scoredSingle = numpy.array(Parallel(n_jobs=num_cores)(delayed(CalculatePixel)(data[x,y], 
+                        x, y, classified, library, threshold, resample, scores_file_name)
+                        for x in range(M) for y in range(N)), dtype=numpy.float64)
 
-            # read the pixel from the file
-            pixel = data[x,y]
+    #puts it all in one single array, need to make 2d array
+    k = 0
+    for i in range(M):
+        for j in range(N):
+            if scoredSingle[k] is scoredSingle[k]:
+                scoredJobLib[i][j] = scoredSingle[k]
+            k+=1
+    # jobLibEnd = time.time()
+    # print (scored.shape)
 
-            # if it is not a no data pixel
-            if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
+    # regularStart = time.time()
+    # for x in range(M):
+    # #     # print(x)
+    # #     # testInnerLoop(x, N, data, classifiedDask, library, threshold, resample, scored, scores_file_name)
+    #     for y in range(N):
+    # #         scoredDask.append(dask.delayed(CalculatePixel(x, y, pixels, classified, library, threshold, resample, scores_file_name)))
+    # # scored = dask.compute(*scoredDask)
+    # #      # read the pixel from the file
+    #         pixel = data[x,y]
 
-                # resample the pixel ignoring NaNs from target bands that don't overlap
-                # TODO fix spectral library so that bands are in order
-                resampled_pixel = numpy.nan_to_num(resample(pixel))
+    #         # if it is not a no data pixel
+    #         if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
 
-                # calculate spectral angles
-                angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
-                                                                 numpy.newaxis,
-                                                                 ...],
-                                                  library.spectra)
+    #             # resample the pixel ignoring NaNs from target bands that don't overlap
+    #             # TODO fix spectral library so that bands are in order
+    #             resampled_pixel = numpy.nan_to_num(resample(pixel))
+    #             # calculate spectral angles
+    #             angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
+    #                                                              numpy.newaxis,
+    #                                                              ...],
+    #                                               library.spectra)
+    #             # angles = SpectralAngleReplacement(resampled_pixel[numpy.newaxis, numpy.newaxis, ...], library.spectra)
+    #             # normalize confidence values from [pi,0] to [0,1]
+    #             for z in range(angles.shape[2]):
+    #                 angles[0,0,z] = 1-angles[0,0,z]/math.pi
+    #             # get index of class with largest confidence value
+    #             index_of_max = numpy.argmax(angles)
 
-                # normalize confidence values from [pi,0] to [0,1]
-                for z in range(angles.shape[2]):
-                    angles[0,0,z] = 1-angles[0,0,z]/math.pi
+    #             # get confidence value of the classied pixel
+    #             score = angles[0,0,index_of_max]
 
-                # get index of class with largest confidence value
-                index_of_max = numpy.argmax(angles)
+    #             # classify pixel if confidence above threshold
+    #             if score > threshold:
 
-                # get confidence value of the classied pixel
-                score = angles[0,0,index_of_max]
+    #                 # index from one (after zero for no data)
+    #                 classified[x,y] = index_of_max + 1
 
-                # classify pixel if confidence above threshold
-                if score > threshold:
-
-                    # index from one (after zero for no data)
-                    classified[x,y] = index_of_max + 1
-
-                    if scores_file_name is not None:
-                        # store score value
-                        scored[x,y] = score
-
+    #                 if scores_file_name is not None:
+    #                     # store score value
+    #                     scored[x,y] = score
+    # classifiedDask.compute()
     # save the classified image to a file
+    # regularEnd = time.time()
+    end = time.time()
+    seconds = end - start
+    # for x in range(M):
+    #     for y in range(N):
+    #         if scoredJobLib[x][y] is not scored[x][y]:
+    #             print ("{} - {}".format(scoredJobLib[x][y], scored[x][y]), end=" ")
+
+
+    print("time to run - {}".format(seconds))
+    # print("time to run joblib - {}\ntime to run regular - {}".format(jobLibEnd-jobLibStart, regularEnd-regularStart))
     spectral.io.envi.save_classification(
         classified_file_name,
         classified,
