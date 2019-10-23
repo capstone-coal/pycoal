@@ -103,11 +103,6 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         # allocate a zero-initialized MxN array for the scores image
         scored = numpy.zeros(shape=(M, N), dtype=numpy.float64)
 
-    # universal calculations for angles
-    m = numpy.array(library.spectra, numpy.float64)
-    m /= numpy.sqrt(numpy.einsum('ij,ij->i', m, m))[:, numpy.newaxis]
-    m = torch.from_numpy(m)
-
     # allocate a zero-initialized MxN array for the classified image
     classified_torch = torch.from_numpy(classified)
 
@@ -116,60 +111,53 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         scored_torch = torch.from_numpy(scored)
 
     resampled_data = numpy.zeros(data.shape)
-    start = time.time()
+    indices = numpy.where(numpy.logical_and(numpy.logical_not(numpy.isclose(data[:,:,0], -0.005)),data[:,:,0] != -50))
 
-    print("Starting Small Loop")
-    # for each pixel in the image
-    for x in range(M):
-        for y in range(N):
-            
-            # read the pixel from the file
-            pixel = data[x, y]
+    for i in range(len(indices[0])):
+        x = indices[0][i]
+        y = indices[1][i]
 
-            # if it is not a no data pixel
-            if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
+        resampled_data[x, y] = numpy.nan_to_num(resample(data[x, y]))
 
-                # resample the pixel ignoring NaNs from target bands that don't overlap
-                # TODO fix spectral library so that bands are in order
-                resampled_data[x, y] = numpy.nan_to_num(resample(pixel))
-    
     resampled_data = torch.from_numpy(resampled_data)
 
+    # universal calculations for angles
+    m = numpy.array(library.spectra, numpy.float64)
+    m /= numpy.sqrt(numpy.einsum('ij,ij->i', m, m))[:, numpy.newaxis]
+    m = torch.from_numpy(m)
 
-    print("Starting Big Loop")
-    for x in range(M):
+    for i in range(len(indices[0])):
+        x = indices[0][i]
+        y = indices[1][i]
 
-        for y in range(N):
-            if not torch.all(resampled_data[x, y] == 0):
-                resampled_pixel = resampled_data[x, y]
-                # calculate spectral angles: adapted from spectral.spectral_angles
-                angle_data = resampled_pixel.view(1,1,-1)
+        resampled_pixel = resampled_data[x, y]
 
-                norms = torch.sqrt(torch.einsum('ijk,ijk->ij', angle_data, angle_data))
-                dots = torch.einsum('ijk,mk->ijm', angle_data, m)
-                dots = torch.clamp(dots / torch.squeeze(norms), -1, 1)
-                angles = torch.acos(dots)
-    
-                # normalize confidence values from [pi,0] to [0,1]
-                angles = ((angles / math.pi) * -1) + 1
-                # get index of class with largest confidence value
-                score,index_of_max = torch.max(angles, 2)
-                # classify pixel if confidence above threshold
-                if score > threshold:
+        # calculate spectral angles: adapted from spectral.spectral_angles
+        angle_data = resampled_pixel.view(1,1,-1)
 
-                    # index from one (after zero for no data)
-                    classified_torch[x, y] = index_of_max + 1
+        norms = torch.sqrt(torch.einsum('ijk,ijk->ij', angle_data, angle_data))
+        dots = torch.einsum('ijk,mk->ijm', angle_data, m)
+        dots = torch.clamp(dots / torch.squeeze(norms), -1, 1)
+        angles = torch.acos(dots)
 
-                    if scores_file_name is not None:
-                        # store score value
-                        scored_torch[x, y] = score
-    end = time.time()
-    time1 = end - start
-    print("Time: ", time1)
+        # normalize confidence values from [pi,0] to [0,1]
+        angles = ((angles / math.pi) * -1) + 1
+        # get index of class with largest confidence value
+        score,index_of_max = torch.max(angles, 2)
+        # classify pixel if confidence above threshold
+        if score > threshold:
+
+            # index from one (after zero for no data)
+            classified_torch[x, y] = index_of_max + 1
+
+            if scores_file_name is not None:
+                # store score value
+                scored_torch[x, y] = score
+
     # save the classified image to a file
     spectral.io.envi.save_classification(
         classified_file_name,
-        classified,
+        classified_torch.numpy(),
         class_names=['No data'] + library.names,
         metadata={
             'data ignore value': 0,
@@ -184,7 +172,7 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         # save the scored image to a file
         spectral.io.envi.save_image(
             scores_file_name,
-            scored,
+            scored_torch.numpy(),
             dtype=numpy.float64,
             metadata={
                 'data ignore value': -50,
