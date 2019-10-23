@@ -110,16 +110,7 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         # allocate a zero-initialized MxN array for the scores image
         scored_torch = torch.from_numpy(scored)
 
-    resampled_data = numpy.zeros(data.shape)
     indices = numpy.where(numpy.logical_and(numpy.logical_not(numpy.isclose(data[:,:,0], -0.005)),data[:,:,0] != -50))
-
-    for i in range(len(indices[0])):
-        x = indices[0][i]
-        y = indices[1][i]
-
-        resampled_data[x, y] = numpy.nan_to_num(resample(data[x, y]))
-
-    resampled_data = torch.from_numpy(resampled_data)
 
     # universal calculations for angles
     m = numpy.array(library.spectra, numpy.float64)
@@ -130,7 +121,8 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         x = indices[0][i]
         y = indices[1][i]
 
-        resampled_pixel = resampled_data[x, y]
+        resampled_pixel = numpy.nan_to_num(resample(data[x, y]))
+        resampled_pixel = torch.from_numpy(resampled_pixel)
 
         # calculate spectral angles: adapted from spectral.spectral_angles
         angle_data = resampled_pixel.view(1,1,-1)
