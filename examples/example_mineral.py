@@ -16,12 +16,17 @@
 # encoding: utf-8
 
 """
-example_mineral -- an example script which demonstrates COAL mineral classification
+example_mineral -- an example script which demonstrates COAL mineral
+classification
 
-example_mineral provides a CLI which demonstrates how the COAL Mineral Classification
-API provides methods for generating visible-light and mineral classified images.
-Mineral classification can take hours to days depending on the size of the spectral
-library and the available computing resources, so running a script in the background
+example_mineral provides a CLI which demonstrates how the COAL Mineral
+Classification
+API provides methods for generating visible-light and mineral classified
+images.
+Mineral classification can take hours to days depending on the size of the
+spectral
+library and the available computing resources, so running a script in the
+background
 is recommended. More reading an this example can be seen at
 https://capstone-coal.github.io/docs#usage
 
@@ -44,15 +49,18 @@ import constants
 from pycoal import mineral, version
 
 
-def run_mineral(input_filename=constants.INPUT_FILENAME, library_filename=constants.LIBRARY_FILENAME):
+def run_mineral(input_filename=constants.INPUT_FILENAME,
+                library_filename=constants.LIBRARY_FILENAME):
     """ Run mineral classification.
 
     :param input_filename: Input file to be processed
     :param library_filename: Spectral Library filename
     """
 
-    logging.info("Starting mineral classification with input file '%s' and spectral library '%s'." % (
-        input_filename, library_filename))
+    logging.info(
+        "Starting mineral classification with input file '%s' and spectral "
+        "library '%s'." % (
+            input_filename, library_filename))
 
     # path to save RGB image
     rgb_filename = constants.INPUT_NAME + "_rgb.hdr"
@@ -64,10 +72,10 @@ def run_mineral(input_filename=constants.INPUT_FILENAME, library_filename=consta
     scores_filename = constants.INPUT_NAME + "_scores.hdr"
 
     # create a new mineral classification instance (defaults to SAM algorithm)
-    mineral_classification = mineral.MineralClassification(library_file_name=library_filename,
-                                                           scores_file_name=scores_filename,
-                                                           subset_rows=constants.MINERAL_SUBSET_ROWS,
-                                                           subset_cols=constants.MINERAL_SUBSET_COLS)
+    mineral_classification = mineral.MineralClassification(
+        library_file_name=library_filename, scores_file_name=scores_filename,
+        subset_rows=constants.MINERAL_SUBSET_ROWS,
+        subset_cols=constants.MINERAL_SUBSET_COLS)
 
     # generate a georeferenced visible-light image
     mineral_classification.to_rgb(input_filename, rgb_filename)
@@ -78,7 +86,8 @@ def run_mineral(input_filename=constants.INPUT_FILENAME, library_filename=consta
 
 def main(argv=None):
     '''Command line options.'''
-    logging.basicConfig(filename='pycoal.log', level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.basicConfig(filename='pycoal.log', level=logging.INFO,
+                        format='%(asctime)s %(message)s')
     if argv is None:
         argv = sys.argv
     else:
@@ -111,14 +120,20 @@ USAGE
 
     try:
         # Setup argument parser
-        parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-i", "--image", dest="image", default=constants.INPUT_FILENAME,
-                            help="Input file to be processed [default: " + constants.INPUT_FILENAME + "]")
-        parser.add_argument("-s", "--slib", dest="slib", default=constants.LIBRARY_FILENAME,
-                            help="Spectral Library filename [default: " + constants.LIBRARY_FILENAME + "]")
+        parser = ArgumentParser(description=program_license,
+                                formatter_class=RawDescriptionHelpFormatter)
+        parser.add_argument("-i", "--image", dest="image",
+                            default=constants.INPUT_FILENAME,
+                            help="Input file to be processed [default: " +
+                                 constants.INPUT_FILENAME + "]")
+        parser.add_argument("-s", "--slib", dest="slib",
+                            default=constants.LIBRARY_FILENAME,
+                            help="Spectral Library filename [default: " +
+                                 constants.LIBRARY_FILENAME + "]")
 
         # Process arguments
-        args = parser.parse_args(['-i', constants.INPUT_FILENAME, '-s', constants.LIBRARY_FILENAME])
+        args = parser.parse_args(
+            ['-i', constants.INPUT_FILENAME, '-s', constants.LIBRARY_FILENAME])
 
         image = args.image
         slib = args.slib

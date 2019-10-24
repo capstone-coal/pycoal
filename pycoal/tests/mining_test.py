@@ -15,7 +15,7 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 from nose import with_setup
-from test import setup_module, teardown_module, _remove_files
+import test
 
 import numpy
 import spectral
@@ -23,20 +23,26 @@ import pycoal
 import pycoal.mining
 
 # test files for mining classification test
-mineral_file_name = 'images/ang20150420t182808_corr_v1e_img_class_4200-4210_70-80.hdr'
-mining_file_name = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80.hdr'
-test_file_name = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.hdr'
-test_image = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200-4210_70-80_test.img'
+mineral_file_name = 'images/ang20150420t182808_corr_v1e_img_class_4200' \
+                    '-4210_70-80.hdr'
+mining_file_name = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200' \
+                   '-4210_70-80.hdr'
+test_file_name = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200' \
+                 '-4210_70-80_test.hdr'
+test_image = 'images/ang20150420t182808_corr_v1e_img_class_mining_4200' \
+             '-4210_70-80_test.img'
 spectral_version = "6"
+
 
 # delete temporary files
 def _test_classify_image_teardown():
-    _remove_files([test_file_name, test_image])
+    test.remove_files([test_file_name, test_image])
 
-# verify that the expected mining classifications equal the actual mining classifications
+
+# verify that the expected mining classifications equal the actual mining
+# classifications
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image():
-
     # classify mining and and save to temporary file
     mc = pycoal.mining.MiningClassification()
     mc.classify_image(mineral_file_name, test_file_name, spectral_version)
@@ -47,3 +53,13 @@ def test_classify_image():
 
     # verify that every pixel has the same classification
     assert numpy.array_equal(expected.asarray(), actual.asarray())
+
+
+# set up test module before running tests
+def setup_module():
+    test.setup_module()
+
+
+# tear down test module after running tests
+def teardown_module():
+    test.teardown_module()

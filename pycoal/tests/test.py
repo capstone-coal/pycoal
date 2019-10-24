@@ -16,25 +16,27 @@
 
 import os
 
+
 # utility function to remove multiple test files
-def _remove_files(list_of_file_names):
+def remove_files(list_of_file_names):
     for file_name in list_of_file_names:
         try:
             os.remove(file_name)
         except OSError:
             pass
 
+
 # file names of USGS Digital Spectral Library 06 in ENVI format
 libraryFilenames = ["s06av95a_envi.hdr", "s06av95a_envi.sli"]
 
+
 # set up test module before running tests
 def setup_module():
-
     # enter test directory
     os.chdir('pycoal/tests')
 
+
 # tear down test module after running tests
 def teardown_module():
-
     # leave test directory
     os.chdir('../..')
