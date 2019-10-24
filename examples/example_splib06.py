@@ -15,7 +15,7 @@
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
 
-'''
+"""
 example_splib06 -- Vizualizing the USGS Digital Spectral Library 06
 
 The Spectral Python (SPy) library
@@ -43,7 +43,7 @@ micrometers) on the bottom.
 @license:    GNU General Public License version 2
 
 @contact:    coal-capstone@googlegroups.com
-'''
+"""
 
 import constants
 import numpy

@@ -62,7 +62,8 @@ def run_environment(mining_filename, vector_filename, correlation_filename):
     # generate an environmental correlation image of mining
     # pixels within 10 meters of a stream
     environmental_correlation.intersect_proximity(mining_filename,
-        vector_filename, 10.0, correlation_filename)
+                                                  vector_filename, 10.0,
+                                                  correlation_filename)
 
 
 def main(argv=None):
@@ -102,20 +103,22 @@ USAGE
     try:
         # Setup argument parser
         parser = ArgumentParser(description=program_license,
-            formatter_class=RawDescriptionHelpFormatter)
+                                formatter_class=RawDescriptionHelpFormatter)
         parser.add_argument("-m", "--mining", dest="mining_filename",
-            default=constants.INPUT_NAME + "_class_mining.hdr",
-            help="Input mining classified file to be processed [default: " +
-                 constants.INPUT_NAME + "_class_mining.hdr]")
+                            default=constants.INPUT_NAME + "_class_mining.hdr",
+                            help="Input mining classified file to be "
+                                 "processed [default: " +
+                                 constants.INPUT_NAME + "_class_mining.hdr]")
         parser.add_argument("-hy", "--hydrography", dest="vector_filename",
-            default='Shape/NHDFlowline.shp',
-            help="Path to hydrography data [default: Shape/NHDFlowline.shp]")
+                            default='Shape/NHDFlowline.shp',
+                            help="Path to hydrography data [default: "
+                                 "Shape/NHDFlowline.shp]")
         parser.add_argument("-e", "--environment", dest="correlation_filename",
-            default=constants.INPUT_NAME +
-                    "_class_mining_NHDFlowline_correlation.hdr",
-            help="Output environmental correlation image [default: " +
-                 constants.INPUT_NAME +
-                 "_class_mining_NHDFlowline_correlation.hdr]")
+                            default=constants.INPUT_NAME +
+                                  "_class_mining_NHDFlowline_correlation.hdr",
+                            help="Output environmental correlation image ["
+                                 "default: " + constants.INPUT_NAME +
+                                 "_class_mining_NHDFlowline_correlation.hdr]")
 
         # Process arguments
         args = parser.parse_args(

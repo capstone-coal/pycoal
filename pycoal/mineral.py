@@ -82,17 +82,17 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     image = spectral.open_image(image_file_name)
     if subset_rows is not None and subset_cols is not None:
         subset_image = SubImage(image, subset_rows, subset_cols)
-        M = subset_rows[1]
-        N = subset_cols[1]
+        m = subset_rows[1]
+        n = subset_cols[1]
     else:
         if in_memory:
             data = image.load()
         else:
             data = image.asarray()
-        M = image.shape[0]
-        N = image.shape[1]
+        m = image.shape[0]
+        n = image.shape[1]
 
-    logging.info("Classifying a %iX%i image" % (M, N))
+    logging.info("Classifying a %iX%i image" % (m, n))
 
     # define a resampler
     # TODO detect and scale units
@@ -101,16 +101,16 @@ def SAM(image_file_name, classified_file_name, library_file_name,
                                       library.bands.centers)
 
     # allocate a zero-initialized MxN array for the classified image
-    classified = numpy.zeros(shape=(M, N), dtype=numpy.uint16)
+    classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
 
     if scores_file_name is not None:
         # allocate a zero-initialized MxN array for the scores image
-        scored = numpy.zeros(shape=(M, N), dtype=numpy.float64)
+        scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
 
     # for each pixel in the image
-    for x in range(M):
+    for x in range(m):
 
-        for y in range(N):
+        for y in range(n):
 
             # read the pixel from the file
             if subset_rows is not None and subset_cols is not None:
@@ -153,11 +153,16 @@ def SAM(image_file_name, classified_file_name, library_file_name,
 
     # save the classified image to a file
     spectral.io.envi.save_classification(classified_file_name, classified,
-        class_names=['No data'] + library.names,
-        metadata={'data ignore value': 0,
-            'description': 'COAL ' + pycoal.version + ' mineral classified '
-                                                      'image.',
-            'map info': image.metadata.get('map info')})
+                                         class_names=['No data'] +
+                                         library.names,
+                                         metadata={'data ignore value': 0,
+                                                   'description': 'COAL ' +
+                                                   pycoal.version + ' '
+                                                   'mineral classified '
+                                                   'image.',
+                                                   'map info':
+                                                       image.metadata.get(
+                                                        'map info')})
 
     # remove unused classes from the image
     pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
@@ -165,10 +170,13 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     if scores_file_name is not None:
         # save the scored image to a file
         spectral.io.envi.save_image(scores_file_name, scored,
-            dtype=numpy.float64, metadata={'data ignore value': -50,
-                'description': 'COAL ' + pycoal.version + ' mineral scored '
-                                                          'image.',
-                'map info': image.metadata.get('map info')})
+                                    dtype=numpy.float64,
+                                    metadata={'data ignore value': -50,
+                                              'description': 'COAL ' +
+                                              pycoal.version + ' mineral '
+                                              'scored image.',
+                                              'map info': image.metadata.get(
+                                                  'map info')})
 
 
 def avngDNN(image_file_name, classified_file_name, model_file_name,
@@ -208,22 +216,22 @@ def avngDNN(image_file_name, classified_file_name, model_file_name,
         data = image.load()
     else:
         data = image.asarray()
-    M = image.shape[0]
-    N = image.shape[1]
+    m = image.shape[0]
+    n = image.shape[1]
 
     # allocate a zero-initialized MxN array for the classified image
-    classified = numpy.zeros(shape=(M, N), dtype=numpy.uint16)
+    classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
 
     if scores_file_name is not None:
         # allocate a zero-initialized MxN array for the scores image
-        scored = numpy.zeros(shape=(M, N), dtype=numpy.float64)
+        scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
 
     model = load_model(model_file_name)
 
     # for each pixel in the image
-    for x in range(M):
+    for x in range(m):
 
-        for y in range(N):
+        for y in range(n):
 
             # read the pixel from the file
             pixel = numpy.array(data[x, y])
@@ -247,19 +255,28 @@ def avngDNN(image_file_name, classified_file_name, model_file_name,
 
     # save the classified image to a file
     spectral.io.envi.save_classification(classified_file_name, classified,
-        class_names=['No data'] + class_names,
-        metadata={'data ignore value': 0,
-            'description': 'COAL ' + pycoal.version + ' mineral classified '
-                                                      'image.',
-            'map info': image.metadata.get('map info')})
+                                         class_names=['No data'] + class_names,
+                                         metadata={'data ignore value': 0,
+                                                   'description': 'COAL ' +
+                                                   pycoal.version + ' mineral '
+                                                                  'classified '
+                                                                  'image.',
+                                                   'map info':
+                                                       image.metadata.get(
+                                                        'map info')})
 
     if scores_file_name is not None:
         # save the scored image to a file
         spectral.io.envi.save_image(scores_file_name, scored,
-            dtype=numpy.float64, metadata={'data ignore value': -50,
-                'description': 'COAL ' + pycoal.version + ' mineral scored '
-                                                          'image.',
-                'map info': image.metadata.get('map info')})
+                                    dtype=numpy.float64,
+                                    metadata={'data ignore value': -50,
+                                              'description': 'COAL ' +
+                                                             pycoal.version
+                                                             + ' mineral '
+                                                               'scored '
+                                                               'image.',
+                                              'map info': image.metadata.get(
+                                                  'map info')})
 
 
 class MineralClassification:
@@ -289,7 +306,7 @@ class MineralClassification:
         self.args = kwargs
 
         logging.info(
-            "Instantiated Mineral Classifier with following specification: " \
+            "Instantiated Mineral Classifier with following specification: "
             "-classifier function '%s'" % (self.algorithm.__name__,))
 
     def classify_image(self, image_file_name, classified_file_name):
@@ -305,10 +322,9 @@ class MineralClassification:
             None
         """
         start = time.time()
-        logging.info(
-            "Starting Mineral Classification for image '%s', saving "
-            "classified image to '%s'" % (
-            image_file_name, classified_file_name))
+        logging.info("Starting Mineral Classification for image '%s', saving "
+                     "classified image to '%s'" % (
+                         image_file_name, classified_file_name))
 
         # run the classifier callback expanding self.args to fulfill the
         # specific args of the function
@@ -321,7 +337,7 @@ class MineralClassification:
         logging.info(
             "Completed Mineral Classification. Time elapsed: '%d:%02d:%02d'"
             % (
-            h, m, s))
+                h, m, s))
 
     @staticmethod
     def filter_classes(classified_file_name):
@@ -356,9 +372,9 @@ class MineralClassification:
 
         # overwrite the file
         spectral.io.envi.save_classification(classified_file_name, copy,
-            force=True,
-            class_names=[classified.metadata.get('class names')[i] for i in
-                         classes], metadata=classified.metadata)
+                                             force=True, class_names=[
+                classified.metadata.get('class names')[i] for i in classes],
+                                             metadata=classified.metadata)
 
     @staticmethod
     def to_rgb(image_file_name, rgb_image_file_name, red=680.0, green=532.5,
@@ -411,8 +427,8 @@ class MineralClassification:
         for band in [red_band, green_band, blue_band]:
             for x in range(band.shape[0]):
                 for y in range(band.shape[1]):
-                    if numpy.isclose(band[x, y, 0], -0.005) or band[
-                        x, y, 0] == -50:
+                    if numpy.isclose(band[x, y, 0], -0.005) \
+                            or band[x, y, 0] == -50:
                         band[x, y] = 0
 
         # combine the red, green, and blue bands into a three-band RGB image
@@ -426,8 +442,8 @@ class MineralClassification:
         rgb_metadata['data ignore value'] = 0
         if wavelength_strings:
             rgb_metadata['wavelength'] = [wavelength_strings[red_index],
-                wavelength_strings[green_index],
-                wavelength_strings[blue_index]]
+                                          wavelength_strings[green_index],
+                                          wavelength_strings[blue_index]]
         if image.metadata.get('correction factors'):
             rgb_metadata['correction factors'] = [
                 image.metadata.get('correction factors')[red_index],
@@ -435,12 +451,12 @@ class MineralClassification:
                 image.metadata.get('correction factors')[blue_index]]
         if image.metadata.get('fwhm'):
             rgb_metadata['fwhm'] = [image.metadata.get('fwhm')[red_index],
-                image.metadata.get('fwhm')[green_index],
-                image.metadata.get('fwhm')[blue_index]]
+                                    image.metadata.get('fwhm')[green_index],
+                                    image.metadata.get('fwhm')[blue_index]]
         if image.metadata.get('bbl'):
             rgb_metadata['bbl'] = [image.metadata.get('bbl')[red_index],
-                image.metadata.get('bbl')[green_index],
-                image.metadata.get('bbl')[blue_index]]
+                                   image.metadata.get('bbl')[green_index],
+                                   image.metadata.get('bbl')[blue_index]]
         if image.metadata.get('smoothing factors'):
             rgb_metadata['smoothing factors'] = [
                 image.metadata.get('smoothing factors')[red_index],
@@ -457,7 +473,7 @@ class MineralClassification:
         h, m = divmod(m, 60)
         logging.info(
             "Completed RGB image generation. Time elapsed: '%d:%02d:%02d'" % (
-            h, m, s))
+                h, m, s))
 
     @staticmethod
     def subset_spectral_library(spectral_library, class_names):
@@ -493,7 +509,7 @@ class MineralClassification:
         # copy metadata
         metadata = {'wavelength units': spectral_library.metadata.get(
             'wavelength units'), 'spectra names': names,
-                    'wavelength': spectral_library.bands.centers}
+            'wavelength': spectral_library.bands.centers}
 
         # return new spectral library
         return spectral.io.envi.SpectralLibrary(spectra, metadata, {})
@@ -506,9 +522,6 @@ class AsterConversion:
         This class provides a method for converting the `ASTER Spectral
         Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ into ENVI
         format.
-
-        Args:
-            None
         """
 
     @classmethod
@@ -526,12 +539,10 @@ class AsterConversion:
             db_file (str):            name of the SQLite file that either
             already exists if
                                       ``data_dir`` isn't provided, or will
-                                      be generated if
-                                      ``data_dir`` is provided
+                                      be generated if ``data_dir`` is provided
             hdr_file (str):           name of the ENVI spectral library to
-            generate
-                                      (without the ``.hdr`` or ``.sli``
-                                      extension)
+                                      generate (without the ``.hdr`` or
+                                      ``.sli`` extension)
         """
         if not hdr_file:
             raise ValueError(
@@ -732,8 +743,8 @@ class FullSpectralLibrary7Convert:
         for _, file in enumerate(files):
             name = directory + '/' + file
             # Get name
-            input_file = open(name, 'r')
-            spectra_line = input_file.readline()
+            with open(name, 'r') as input_file:
+                spectra_line = input_file.readline()
             spectra_cut = spectra_line[23:]
             spectra_name = spectra_cut[:-14]
             # Remove first and last char in case extra spaces are added

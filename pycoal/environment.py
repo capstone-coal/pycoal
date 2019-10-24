@@ -46,7 +46,7 @@ class EnvironmentalCorrelation:
         Args:
             mining_filename (str):     filename of the mining classified image
             vector_filename (str):     filename of vector layer
-            proximity (float):     distance in meters
+            proximity (float):         distance in meters
             correlated_filename (str): filename of the correlated image
         """
         start = time.time()
@@ -93,8 +93,8 @@ class EnvironmentalCorrelation:
         # intersect features within proximity
         for x in range(mining_image.shape[0]):
             for y in range(mining_image.shape[1]):
-                if mining_image[x, y, 0] == 1 and proximity_image[
-                    x, y, 0] * pixel_size <= proximity:
+                if mining_image[x, y, 0] == 1 \
+                        and proximity_image[x, y, 0] * pixel_size <= proximity:
                     correlated_image[x, y, 0] = mining_image[x, y, 0]
 
         # save the environmental correlation image
@@ -138,8 +138,11 @@ class EnvironmentalCorrelation:
 
         # save it with source metadata
         spectral.io.envi.save_classification(destination_filename, destination,
-            class_names=['No data', 'Data'], metadata={'data ignore value': 0,
-                'map info': source.metadata.get('map info')})
+                                             class_names=['No data', 'Data'],
+                                             metadata={'data ignore value': 0,
+                                                       'map info':
+                                                           source.metadata.get(
+                                                               'map info')})
 
     @staticmethod
     def rasterize(vector_filename, feature_filename):
@@ -152,7 +155,7 @@ class EnvironmentalCorrelation:
         """
         logging.info(
             "Burning features from vector file: '%s' to raster file: '%s'" % (
-            vector_filename, feature_filename))
+                vector_filename, feature_filename))
         # assume the layer has the same name as the image
         layer_name = splitext(basename(vector_filename))[0]
 
@@ -184,8 +187,7 @@ class EnvironmentalCorrelation:
         """
         logging.info(
             "Generating a proximity map from features of '%s', writing them "
-            "to '%s'" % (
-            feature_filename, proximity_filename))
+            "to '%s'" % (feature_filename, proximity_filename))
 
         # search for gdal_proximity on macOS
         gdal_proximity = None
@@ -201,9 +203,9 @@ class EnvironmentalCorrelation:
                         "install.")
 
         # generate an ENVI proximity map with georeferenced units
-        returncode = call([(
-                               'gdal_proximity.py' if gdal_proximity is None else gdal_proximity),
-                           feature_filename, proximity_filename, '-of',
+        returncode = call([('gdal_proximity.py' if gdal_proximity is None
+                            else gdal_proximity), feature_filename,
+                           proximity_filename, '-of',
                            'envi'])
 
         # detect errors

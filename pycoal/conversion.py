@@ -28,9 +28,6 @@ class AsterToENVIConversion:
         This class provides a method for converting the `ASTER Spectral
         Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ into ENVI
         format.
-
-        Args:
-            None
         """
 
     @classmethod
@@ -48,12 +45,10 @@ class AsterToENVIConversion:
             db_file (str):            name of the SQLite file that either
             already exists if
                                       ``data_dir`` isn't provided, or will
-                                      be generated if
-                                      ``data_dir`` is provided
+                                      be generated if ``data_dir`` is provided
             hdr_file (str):           name of the ENVI spectral library to
-            generate
-                                      (without the ``.hdr`` or ``.sli``
-                                      extension)
+                                      generate (without the ``.hdr`` or
+                                      ``.sli`` extension)
         """
         if not hdr_file:
             raise ValueError(
@@ -90,9 +85,6 @@ class USGSSpectral7ToAsterConversion:
             <https://speclab.cr.usgs.gov/spectral-lib.html>`_ .txt files
             into ASTER Spectral
             Library Version 2.0 <https://asterweb.jpl.nasa.gov/> .txt files
-
-            Args:
-                none
             """
         pass
 
@@ -111,7 +103,7 @@ class USGSSpectral7ToAsterConversion:
 
             Args:
                 library_filename (str): path to Spectral File you wish to
-                convert
+                                        convert
             """
         if not library_filename:
             raise ValueError("Must provide path for Spectral File.")
@@ -196,11 +188,7 @@ class FullUSGSSpectral7ToENVIConversion:
         This class method converts the entire `USGS Spectral Library Version
         7 <https://speclab.cr.usgs.gov/spectral-lib.html>`_ library into its
         convolved envi format
-
-            Args:
-                none
-            """
-        pass
+        """
 
     @classmethod
     def convert(cls, library_filename=""):
@@ -274,7 +262,7 @@ class FullUSGSSpectral7ToENVIConversion:
         data_dir = "dataSplib07.db"
         # Avoid overwrite during nosetests of full .hdr and .sli files with
         # sample .hdr and .sli
-        if (os.path.isfile('s07_AV95_envi.hdr')):
+        if os.path.isfile('s07_AV95_envi.hdr'):
             header_name = "s07_AV95_envi_sample"
         else:
             header_name = "s07_AV95_envi"

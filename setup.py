@@ -22,12 +22,16 @@ from setuptools import find_packages, setup
 _author = 'COAL Developers'
 _author_email = 'coal-capstone@googlegroups.com'
 _classifiers = ['Environment :: Console', 'Intended Audience :: Developers',
-    'Intended Audience :: Information Technology',
-    'Intended Audience :: Science/Research', 'Topic :: Scientific/Engineering',
-    'Development Status :: 4 - Beta',
-    'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
-    'Operating System :: OS Independent', 'Programming Language :: Python',
-    'Topic :: Software Development :: Libraries :: Python Modules', ]
+                'Intended Audience :: Information Technology',
+                'Intended Audience :: Science/Research',
+                'Topic :: Scientific/Engineering',
+                'Development Status :: 4 - Beta',
+                'License :: OSI Approved :: GNU General Public License v2 ('
+                'GPLv2)',
+                'Operating System :: OS Independent',
+                'Programming Language :: Python',
+                'Topic :: Software Development :: Libraries :: Python '
+                'Modules', ]
 _description = 'COAL mining library for AVIRIS data.'
 _download_url = 'http://pypi.python.org/pypi/pycoal/'
 _requirements = ["numpy", "spectral", "guzzle_sphinx_theme"]
@@ -60,9 +64,9 @@ _longDescription = '\n\n'.join([_header, _read('README.rst')])
 open('doc.txt', 'w').write(_longDescription)
 
 setup(author=_author, author_email=_author_email, classifiers=_classifiers,
-    description=_description, download_url=_download_url,
-    include_package_data=True, install_requires=_requirements,
-    keywords=_keywords, license=_license, long_description=_long_description,
-    name=_name, namespace_packages=_namespaces, packages=find_packages(),
-    test_suite=_test_suite, url=_url, version=_version, zip_safe=_zip_safe,
-    entry_points=_entry_points)
+      description=_description, download_url=_download_url,
+      include_package_data=True, install_requires=_requirements,
+      keywords=_keywords, license=_license, long_description=_long_description,
+      name=_name, namespace_packages=_namespaces, packages=find_packages(),
+      test_suite=_test_suite, url=_url, version=_version, zip_safe=_zip_safe,
+      entry_points=_entry_points)

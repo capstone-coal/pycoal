@@ -48,13 +48,12 @@ from pycoal import environment
 mining_filename = 'images/ang20150420t182050_corr_v1e_img_class_mining_cut.hdr'
 vector_filename = 'images/NHDFlowline_cut.shp'
 proximity = 10.0
-correlated_filename = \
-    'images' \
-    '/ang20150420t182050_corr_v1e_img_class_mining_cut_NHDFlowline_corr.hdr'
-test_filename = \
-    'images' \
-    '/ang20150420t182050_corr_v1e_img_class_mining_cut_NHDFlowline_corr_test' \
-    '.hdr'
+correlated_filename = 'images' \
+                      '/ang20150420t182050_corr_v1e_img_class_mining_cut' \
+                      '_NHDFlowline_corr.hdr'
+test_filename = 'images' \
+                '/ang20150420t182050_corr_v1e_img_class_mining_cut' \
+                '_NHDFlowline_corr_test.hdr'
 
 
 # remove generated files
@@ -63,10 +62,10 @@ def _test_intersect_proximity_teardown():
     vector_name = splitext(basename(abspath(vector_filename)))[0]
     output_directory = 'images'
     feature_header_name = output_directory + '/' + mining_name + '_' + \
-                          vector_name + '.hdr'
+        vector_name + '.hdr'
     feature_image_name = feature_header_name[:-4] + '.img'
     proximity_header_name = output_directory + '/' + mining_name + '_' + \
-                            vector_name + '_proximity.hdr'
+        vector_name + '_proximity.hdr'
     proximity_image_name = proximity_header_name[:-4] + '.img'
     test_image_name = test_filename[:-4] + '.img'
     test.remove_files(
@@ -92,11 +91,12 @@ def test_intersect_proximity():
         'class names')
     assert expected.metadata.get('map info') == actual.metadata.get('map info')
 
+
 # set up test module before running tests
 def setup_module():
     test.setup_module()
 
+
 # tear down test module after running tests
 def teardown_module():
     test.teardown_module()
-

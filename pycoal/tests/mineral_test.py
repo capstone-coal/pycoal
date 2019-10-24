@@ -129,7 +129,7 @@ def test_classify_image_threshold():
         library_file_name=test.libraryFilenames[0], threshold=0.75)
 
     # classify image
-    mc.classify_image(test_classifyImage_threshold_subset_imageFilename, \
+    mc.classify_image(test_classifyImage_threshold_subset_imageFilename,
                       test_classifyImage_threshold_subset_testFilename)
     actual = spectral.open_image(
         test_classifyImage_threshold_subset_testFilename)
@@ -157,7 +157,7 @@ def test_classify_image_subset():
         class_names=mining.PROXY_CLASS_NAMES_USGSV6)
 
     # classify image
-    mc.classify_image(test_classifyImage_threshold_subset_imageFilename, \
+    mc.classify_image(test_classifyImage_threshold_subset_imageFilename,
                       test_classifyImage_threshold_subset_testFilename)
     actual = spectral.open_image(
         test_classifyImage_threshold_subset_testFilename)

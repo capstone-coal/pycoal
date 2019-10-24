@@ -18,8 +18,7 @@
 
 '''
 example_spectral07.py -- a script which will generate envi .sli and .hdr
-convolved library
-files of `USGS Spectral Library Version 7
+convolved library files of `USGS Spectral Library Version 7
 <https://speclab.cr.usgs.gov/spectral-lib.html>`_
 
 Dependencies
@@ -27,7 +26,7 @@ Dependencies
 <https://speclab.cr.usgs.gov/spectral-lib.html>`_
 must be downloaded and unzipped to the examples directory
 
-All files generated will be located in the examples directory
+All files generated will be located in the examples directory.
 
 
 @author:     COAL Developers

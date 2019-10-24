@@ -79,7 +79,7 @@ def run_mining(mineral_filename=constants.INPUT_NAME + "_class.hdr",
 
 
 def main(argv=None):  # IGNORE:C0111
-    '''Command line options.'''
+    # Command line options
     logging.basicConfig(filename='pycoal.log', level=logging.INFO,
                         format='%(asctime)s %(message)s')
     if argv is None:
@@ -143,7 +143,7 @@ USAGE
         run_mining(mineral_filename, mining_filename, spectral_version)
         return 0
     except KeyboardInterrupt:
-        ### handle keyboard interrupt ###
+        # handle keyboard interrupt
         return 0
     except Exception as e:
         if constants.DEBUG or constants.TESTRUN:
