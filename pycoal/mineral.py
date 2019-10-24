@@ -122,19 +122,16 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
        	# Resample the Data
         angle_data = torch.einsum('ij,j->i', resampling_matrix, pixel)
         angle_data[angle_data != angle_data] = 0
-        angle_data = angle_data.view(1,1,-1)
 
         # calculate spectral angles: adapted from spectral.spectral_angles
-        norms = torch.sqrt(torch.einsum('ijk,ijk->ij', angle_data, angle_data))
-        dots = torch.einsum('ijk,mk->ijm', angle_data, m)
-        dots = torch.clamp(dots / torch.squeeze(norms), -1, 1)
-        angles = torch.acos(dots)
+        dots = torch.einsum('i,ji->j', angle_data, m) / torch.norm(angle_data)
+        angles = torch.acos(torch.clamp(dots, -1, 1))
 
         # normalize confidence values from [pi,0] to [0,1]
         angles = ((angles / math.pi) * -1) + 1
 
         # get index of class with largest confidence value
-        score,index_of_max = torch.max(angles, 2)
+        score,index_of_max = torch.max(angles, 0)
 
         # classify pixel if confidence above threshold
         if score > threshold:
@@ -402,12 +399,8 @@ class MineralClassification:
         green_band = image[:, :, green_index]
         blue_band = image[:, :, blue_index]
 
-        # remove no data pixels
         for band in [red_band, green_band, blue_band]:
-            for x in range(band.shape[0]):
-                for y in range(band.shape[1]):
-                    if numpy.isclose(band[x, y, 0], -0.005) or band[x, y, 0] == -50:
-                        band[x, y] = 0
+            band[numpy.where(numpy.logical_or(numpy.isclose(band[:,:,0], -0.005),band[:,:,0] == -50))] = 0
 
         # combine the red, green, and blue bands into a three-band RGB image
         rgb = numpy.concatenate([red_band, green_band, blue_band], axis=2)
