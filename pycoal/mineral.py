@@ -22,6 +22,7 @@ import numpy
 from spectral.io.spyfile import SubImage
 
 import pycoal
+from pycoal.resampler import *
 import spectral
 import time
 import fnmatch
@@ -90,43 +91,40 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
 
     logging.info("Classifying a %iX%i image" % (M, N))
 
-    # define a resampler
+    # define a resampler Adapted from spectral.resampling.py
     # TODO detect and scale units
     # TODO band resampler should do this
-    resample = spectral.BandResampler([x / 1000 for x in image.bands.centers],
-                                      library.bands.centers)
+    resampling_matrix = create_resampling_matrix(
+        [x / 1000 for x in image.bands.centers], library.bands.centers)
+
+    resampling_matrix = torch.from_numpy(resampling_matrix)
 
     # allocate a zero-initialized MxN array for the classified image
-    classified = numpy.zeros(shape=(M, N), dtype=numpy.uint8)
+    classified = torch.from_numpy(numpy.zeros(shape=(M, N), dtype=numpy.uint8))
 
     if scores_file_name is not None:
         # allocate a zero-initialized MxN array for the scores image
-        scored = numpy.zeros(shape=(M, N), dtype=numpy.float64)
-
-    # allocate a zero-initialized MxN array for the classified image
-    classified_torch = torch.from_numpy(classified)
-
-    if scores_file_name is not None:
-        # allocate a zero-initialized MxN array for the scores image
-        scored_torch = torch.from_numpy(scored)
-
-    indices = numpy.where(numpy.logical_and(numpy.logical_not(numpy.isclose(data[:,:,0], -0.005)),data[:,:,0] != -50))
+        scored = torch.from_numpy(numpy.zeros(shape=(M, N), dtype=numpy.float64))
 
     # universal calculations for angles
-    m = numpy.array(library.spectra, numpy.float64)
+    m = numpy.array(library.spectra, dtype=numpy.float64)
     m /= numpy.sqrt(numpy.einsum('ij,ij->i', m, m))[:, numpy.newaxis]
     m = torch.from_numpy(m)
+
+    indices = numpy.where(numpy.logical_and(numpy.logical_not(numpy.isclose(data[:,:,0], -0.005)),data[:,:,0] != -50))
 
     for i in range(len(indices[0])):
         x = indices[0][i]
         y = indices[1][i]
 
-        resampled_pixel = numpy.nan_to_num(resample(data[x, y]))
-        resampled_pixel = torch.from_numpy(resampled_pixel)
+        pixel = torch.from_numpy(data[x,y].astype(numpy.float64))
+
+       	# Resample the Data
+        angle_data = torch.einsum('ij,j->i', resampling_matrix, pixel)
+        angle_data[angle_data != angle_data] = 0
+        angle_data = angle_data.view(1,1,-1)
 
         # calculate spectral angles: adapted from spectral.spectral_angles
-        angle_data = resampled_pixel.view(1,1,-1)
-
         norms = torch.sqrt(torch.einsum('ijk,ijk->ij', angle_data, angle_data))
         dots = torch.einsum('ijk,mk->ijm', angle_data, m)
         dots = torch.clamp(dots / torch.squeeze(norms), -1, 1)
@@ -134,22 +132,24 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
 
         # normalize confidence values from [pi,0] to [0,1]
         angles = ((angles / math.pi) * -1) + 1
+
         # get index of class with largest confidence value
         score,index_of_max = torch.max(angles, 2)
+
         # classify pixel if confidence above threshold
         if score > threshold:
 
             # index from one (after zero for no data)
-            classified_torch[x, y] = index_of_max + 1
+            classified[x, y] = index_of_max + 1
 
             if scores_file_name is not None:
                 # store score value
-                scored_torch[x, y] = score
+                scored[x, y] = score
 
     # save the classified image to a file
     spectral.io.envi.save_classification(
         classified_file_name,
-        classified_torch.numpy(),
+        classified.numpy(),
         class_names=['No data'] + library.names,
         metadata={
             'data ignore value': 0,
@@ -164,7 +164,7 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         # save the scored image to a file
         spectral.io.envi.save_image(
             scores_file_name,
-            scored_torch.numpy(),
+            scored.numpy(),
             dtype=numpy.float64,
             metadata={
                 'data ignore value': -50,
