@@ -28,13 +28,13 @@ def _remove_files(list_of_file_names):
 libraryFilenames = ["s06av95a_envi.hdr", "s06av95a_envi.sli"]
 
 # set up test module before running tests
-def setup_module(module):
+def setup_module():
 
     # enter test directory
     os.chdir('pycoal/tests')
 
 # tear down test module after running tests
-def teardown_module(module):
+def teardown_module():
 
     # leave test directory
     os.chdir('../..')

@@ -20,6 +20,7 @@ import spectral
 import fnmatch
 import shutil
 
+
 class AsterToENVIConversion:
 
     def __init__(self):
@@ -70,8 +71,9 @@ class AsterToENVIConversion:
 
         library.save(hdr_file)
 
+
 class USGSSpectral7ToAsterConversion:
-    
+
     def __init__(self):
         """
             This class provides a method for converting `USGS Spectral Library Version 7
@@ -82,7 +84,7 @@ class USGSSpectral7ToAsterConversion:
                 none
             """
         pass
-    
+
     @classmethod
     def convert(cls, library_filename=""):
         """
@@ -98,74 +100,72 @@ class USGSSpectral7ToAsterConversion:
             """
         if not library_filename:
             raise ValueError("Must provide path for Spectral File.")
-        
+
         line_count = 1
-        with open(library_filename,'r') as input_file:
-            for line_count, l in enumerate(input_file):
+        with open(library_filename, 'r') as input_file:
+            for line_count, _ in enumerate(input_file):
                 pass
-            
-        input_file = open(library_filename,'r')
-        #Read Name of Spectra on first line of the file
-        spectra_line = input_file.readline()
-        spectra_name = spectra_line[23:]
+
+        with open(library_filename, 'r') as input_file:
+            # Read Name of Spectra on first line of the file
+            spectra_line = input_file.readline()
+            spectra_name = spectra_line[23:]
+
         k = 0
-        #Loop through file and store all wavelength values for the given Spectra
-        spectra_values_file = open('SpectraValues.txt','w')
-        spectra_wave_length = 0
-        while(k < line_count):
-            spectra_wave_length = float(input_file.readline()) * 100
-            spectra_wave_length = spectra_wave_length / 1000
-            spectra_wave_length = float("{0:.5f}".format(spectra_wave_length))
-            spectra_y_value = spectra_wave_length * 10
-            line = str(spectra_wave_length) + '  ' + str(spectra_y_value)
-            spectra_values_file.write(line)
-            spectra_values_file.write('\n')
-            k = k+1
-        #Write new file in the form of an ASTER .spectrum.txt file while using stored
-        #Spectra Name and stored Spectra Wavelength values`
-        input_file = open(library_filename,'w')
-        input_file.write('Name:')
-        input_file.write(spectra_name)
-        input_file.write('Type:\n')
-        input_file.write('Class:\n')
-        input_file.write('Subclass:\n')
-        input_file.write('Particle Size:  Unknown\n')
-        input_file.write('Sample No.:  0000000000\n')
-        input_file.write('Owner:\n')
-        input_file.write('Wavelength Range:  ALL\n')
-        input_file.write('Origin: Spectra obtained from the Noncoventional Exploitation Factors\n')
-        input_file.write('Data System of the National Photographic Interpretation Center.\n')
-        input_file.write('Description:  Gray and black construction asphalt.  The sample was\n')
-        input_file.write('soiled and weathered, with some limestone and quartz aggregate\n')
-        input_file.write('showing.\n')
-        input_file.write('\n')
-        input_file.write('\n')
-        input_file.write('\n')
-        input_file.write('Measurement:  Unknown\n')
-        input_file.write('First Column:  X\n')
-        input_file.write('Second Column: Y\n')
-        input_file.write('X Units:  Wavelength (micrometers)\n')
-        input_file.write('Y Units:  Reflectance (percent)\n')
-        input_file.write('First X Value:\n')
-        input_file.write('Last X Value:\n')
-        input_file.write('Number of X Values:\n')
-        input_file.write('Additional Information:\n')
-        input_file.write('\n')
-        j = 0
-        spectra_values_file.close()
-        #Read in values saved in SpectraValues.txt and output them to the library_filename
-        spectra_values_file = open('SpectraValues.txt','r')
-        while(j < line_count):
-            spectra_wave_length = spectra_values_file.readline()
-            input_file.write(spectra_wave_length)
-            j = j+1
-        #Close all open files
-        input_file.close()
-        spectra_values_file.close()
-        #Rename library_filename to match ASTER .spectrum.txt file format
-        os.rename(library_filename,library_filename + '.spectrum.txt')
-        #Remove temporary file for storing wavelength data
+        # Loop through file and store all wavelength values for the given Spectra
+        with open('SpectraValues.txt', 'w') as spectra_values_file:
+            spectra_wave_length = 0
+            while (k < line_count):
+                spectra_wave_length = float(input_file.readline()) * 100
+                spectra_wave_length = spectra_wave_length / 1000
+                spectra_wave_length = float("{0:.5f}".format(spectra_wave_length))
+                spectra_y_value = spectra_wave_length * 10
+                line = str(spectra_wave_length) + '  ' + str(spectra_y_value)
+                spectra_values_file.write(line)
+                spectra_values_file.write('\n')
+                k = k + 1
+        # Write new file in the form of an ASTER .spectrum.txt file while using stored
+        # Spectra Name and stored Spectra Wavelength values`
+        with open(library_filename, 'w') as input_file:
+            input_file.write('Name:')
+            input_file.write(spectra_name)
+            input_file.write('Type:\n')
+            input_file.write('Class:\n')
+            input_file.write('Subclass:\n')
+            input_file.write('Particle Size:  Unknown\n')
+            input_file.write('Sample No.:  0000000000\n')
+            input_file.write('Owner:\n')
+            input_file.write('Wavelength Range:  ALL\n')
+            input_file.write('Origin: Spectra obtained from the Noncoventional Exploitation Factors\n')
+            input_file.write('Data System of the National Photographic Interpretation Center.\n')
+            input_file.write('Description:  Gray and black construction asphalt.  The sample was\n')
+            input_file.write('soiled and weathered, with some limestone and quartz aggregate\n')
+            input_file.write('showing.\n')
+            input_file.write('\n')
+            input_file.write('\n')
+            input_file.write('\n')
+            input_file.write('Measurement:  Unknown\n')
+            input_file.write('First Column:  X\n')
+            input_file.write('Second Column: Y\n')
+            input_file.write('X Units:  Wavelength (micrometers)\n')
+            input_file.write('Y Units:  Reflectance (percent)\n')
+            input_file.write('First X Value:\n')
+            input_file.write('Last X Value:\n')
+            input_file.write('Number of X Values:\n')
+            input_file.write('Additional Information:\n')
+            input_file.write('\n')
+            j = 0
+            # Read in values saved in SpectraValues.txt and output them to the library_filename
+            with open('SpectraValues.txt', 'r') as spectra_values_file:
+                while (j < line_count):
+                    spectra_wave_length = spectra_values_file.readline()
+                    input_file.write(spectra_wave_length)
+                    j = j + 1
+        # Rename library_filename to match ASTER .spectrum.txt file format
+        os.rename(library_filename, library_filename + '.spectrum.txt')
+        # Remove temporary file for storing wavelength data
         os.remove('SpectraValues.txt')
+
 
 class FullUSGSSpectral7ToENVIConversion:
     def __init__(self):
@@ -193,10 +193,10 @@ class FullUSGSSpectral7ToENVIConversion:
             """
         if not library_filename:
             raise ValueError("Must provide path for USGS Spectral Library Version 7.")
-        
-        #This will take all the necessary .txt files for spectra in USGS
-        #Spectral Library Version 7 and put them in a new directory called
-        #"usgs_splib07_modified" in the examples directory
+
+        # This will take all the necessary .txt files for spectra in USGS
+        # Spectral Library Version 7 and put them in a new directory called
+        # "usgs_splib07_modified" in the examples directory
         directory = 'usgs_splib07_modified'
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -208,28 +208,28 @@ class FullUSGSSpectral7ToENVIConversion:
                     if "errorbars" not in items:
                         if "Wave" not in items:
                             if "SpectraValues" not in items:
-                                shutil.copy2(os.path.join(root,items), directory)
+                                shutil.copy2(os.path.join(root, items), directory)
 
-        #This will take the .txt files for Spectra in USGS Spectral Version 7 and
-        #convert their format to match that of ASTER .spectrum.txt files for spectra
+        # This will take the .txt files for Spectra in USGS Spectral Version 7 and
+        # convert their format to match that of ASTER .spectrum.txt files for spectra
         # create a new mineral aster conversion instance
         spectral_aster = USGSSpectral7ToAsterConversion()
-        #List to check for duplicates
+        # List to check for duplicates
         spectra_list = []
         # Convert all files
-        files = os.listdir(directory +'/')
-        for x in range(0, len(files)):
-            name = directory+'/' + files[x]
-            #Get name
-            input_file = open(name,'r')
-            spectra_line = input_file.readline()
+        files = os.listdir(directory + '/')
+        for _, file in enumerate(files):
+            name = directory + '/' + file
+            # Get name
+            with open(name, 'r') as input_file:
+                spectra_line = input_file.readline()
             spectra_cut = spectra_line[23:]
             spectra_name = spectra_cut[:-14]
-            #Remove first and last char in case extra spaces are added
+            # Remove first and last char in case extra spaces are added
             spectra_first_space = spectra_name[1:]
             spectra_last_space = spectra_first_space[:-1]
-            
-            #Check if Spectra is unique
+
+            # Check if Spectra is unique
             set_spectra = set(spectra_list)
             if not any(spectra_name in s for s in set_spectra):
                 if not any(spectra_last_space in a for a in set_spectra):
@@ -239,16 +239,15 @@ class FullUSGSSpectral7ToENVIConversion:
         set_spectra = set(spectra_list)
         print(set_spectra)
 
-        #This will generate three files s07AV95a_envi.hdr, s07AV95a_envi.hdr.sli,splib.db and dataSplib07.db
-        #For a library in `ASTER Spectral Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ format
+        # This will generate three files s07AV95a_envi.hdr, s07AV95a_envi.hdr.sli,splib.db and dataSplib07.db
+        # For a library in `ASTER Spectral Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ format
         data_dir = "dataSplib07.db"
-        #Avoid overwrite during nosetests of full .hdr and .sli files with sample .hdr and .sli
+        # Avoid overwrite during nosetests of full .hdr and .sli files with sample .hdr and .sli
         if (os.path.isfile('s07_AV95_envi.hdr')):
             header_name = "s07_AV95_envi_sample"
-        else :
+        else:
             header_name = "s07_AV95_envi"
         # create a new mineral aster conversion instance
         spectral_envi = AsterToENVIConversion()
         # Generate .sli and .hdr
-        spectral_envi.convert(directory,data_dir,header_name)
-
+        spectral_envi.convert(directory, data_dir, header_name)

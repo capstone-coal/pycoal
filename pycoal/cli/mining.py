@@ -37,7 +37,7 @@ from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 from pycoal.mining import MiningClassification
 
-def main(argv=None):  # IGNORE:C0111
+def main():  # IGNORE:C0111
     # Setup argument parser
     parser = ArgumentParser(description=program_description,formatter_class=RawDescriptionHelpFormatter)
     parser.add_argument("-mi", "--mineral_input", dest="input", help="Input classified mineral file to be processed")

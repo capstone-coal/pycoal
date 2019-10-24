@@ -15,7 +15,7 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 from nose import with_setup
-from test import setup_module, teardown_module, _remove_files
+from test import _remove_files
 
 import numpy
 import spectral

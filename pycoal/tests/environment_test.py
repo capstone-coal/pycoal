@@ -16,7 +16,7 @@
 
 from nose import with_setup
 from unittest import skipIf
-from test import setup_module, teardown_module, _remove_files
+from test import _remove_files
 
 from os import environ
 from os.path import abspath, basename, splitext

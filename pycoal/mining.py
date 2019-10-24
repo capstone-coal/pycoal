@@ -32,7 +32,7 @@ proxy_class_names_usgsv7 = [u'Schwertmannite BZ93-1         BECKb AREF',
 
 class MiningClassification:
 
-    def __init__(self, class_names=proxy_class_names_usgsv6):
+    def __init__(self, class_names=None):
         """
         Construct a new MiningClassification object given an optional list of
         spectral class names which defaults to coal mining proxies.
@@ -41,6 +41,8 @@ class MiningClassification:
             class_names (str[]): list of class names to identify.
         """
 
+        if class_names is None:
+            class_names = proxy_class_names_usgsv6
         self.class_names = class_names
         logging.info("Instantiated Mining Classifier with following specification: " \
          "-proxy class names '%s'" %(class_names))

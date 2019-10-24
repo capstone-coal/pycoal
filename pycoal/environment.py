@@ -55,14 +55,14 @@ class EnvironmentalCorrelation:
 
         # rasterize the vector features to the same dimensions as the mining image
         feature_header_name = output_directory + '/' + mining_name + '_' + vector_name + '.hdr'
-        self.create_empty_copy(mining_filename, feature_header_name)
+        EnvironmentalCorrelation.create_empty_copy(mining_filename, feature_header_name)
         feature_image_name = feature_header_name[:-4] + '.img'
-        self.rasterize(vector_filename, feature_image_name)
+        EnvironmentalCorrelation.rasterize(vector_filename, feature_image_name)
 
         # generate a proximity map from the features
         proximity_header_name = output_directory + '/' + mining_name + '_' + vector_name + '_proximity.hdr'
         proximity_image_name = proximity_header_name[:-4] + '.img'
-        self.proximity(feature_image_name, proximity_image_name)
+        EnvironmentalCorrelation.proximity(feature_image_name, proximity_image_name)
 
         # load mining and proximity images and initialize environmental correlation array
         mining_image = spectral.open_image(mining_filename)
@@ -100,8 +100,8 @@ class EnvironmentalCorrelation:
         h, m = divmod(m, 60)
         logging.info("Completed Environmental Correlation. Time elapsed: '%d:%02d:%02d'" % (h, m, s))
 
-    #@staticmethod
-    def create_empty_copy(self, source_filename, destination_filename):
+    @staticmethod
+    def create_empty_copy(source_filename, destination_filename):
         """
         Create an empty copy of a COAL classified image with the same size.
 
@@ -126,7 +126,8 @@ class EnvironmentalCorrelation:
                 'map info': source.metadata.get('map info')
             })
 
-    def rasterize(self, vector_filename, feature_filename):
+    @staticmethod
+    def rasterize(vector_filename, feature_filename):
         """
         Burn features from a vector image onto a raster image.
 
@@ -149,7 +150,8 @@ class EnvironmentalCorrelation:
         if returncode != 0:
             raise RuntimeError('Could not rasterize vector.')
 
-    def proximity(self, feature_filename, proximity_filename):
+    @staticmethod
+    def proximity(feature_filename, proximity_filename):
         """
         Generate a proximity map from the features.
         N.B. it is essential to have 
@@ -157,6 +159,7 @@ class EnvironmentalCorrelation:
         available somewhere on the path. If running Mac OSX, this function will
         scan ``/Library/Frameworks/GDAL.framework/.../gdal_proximity.py`` (which is where
         the binary package installer installs it to) to locate the file.
+        Alternatively, ensure that gdal_proximity.py can be called in the current environment.
 
         Args:
             feature_filename (str): filename of the feature image
@@ -167,7 +170,7 @@ class EnvironmentalCorrelation:
         # search for gdal_proximity on macOS
         gdal_proximity = None
         if platform.system() == 'Darwin':
-            for file in glob.glob("/Library/Frameworks/GDAL.framework/\*\*/gdal_proximity.py"):
+            for file in glob.glob("/Library/Frameworks/GDAL.framework/**/gdal_proximity.py"):
                 if file is not None:
                     logging.info("Located gdal_proximity.py at %s" % (file))
                     gdal_proximity = file

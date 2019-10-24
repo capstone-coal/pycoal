@@ -16,7 +16,7 @@
 
 from nose import with_setup
 from nose.tools import assert_raises
-from test import setup_module, teardown_module, _remove_files, libraryFilenames
+from test import _remove_files, libraryFilenames
 
 import shutil
 import os
@@ -123,8 +123,7 @@ def test_classify_image_threshold():
             actual_class_name = actual.metadata.get('class names')[actual_class_id]
             expected_class_id = expected[x,y,0]
             expected_class_name = expected.metadata.get('class names')[expected_class_id]
-            assert actual_class_name == expected_class_name \
-                or actual_class_name == 'No data'
+            assert actual_class_name in (expected_class_name, 'No data')
 
 # verify that subset classification identifies only the selected classes
 @with_setup(None, _test_classify_image_threshold_subset_teardown)
@@ -287,10 +286,10 @@ def _test_spectral_conversion_teardown():
 # verify that a small subset of the USGS Spectral Library 7 is converted to ENVI format
 @with_setup(None, _test_spectral_conversion_teardown)
 def test_spectral_conversion():
-    data, dir, db, envi = _test_SpectralConversion_data, _test_SpectralConversion_dir, _test_SpectralConversion_db, _test_SpectralConversion_envi
+    data, envi = _test_SpectralConversion_data, _test_SpectralConversion_envi
     spectral_conversion = conversion.FullUSGSSpectral7ToENVIConversion()
     spectral_conversion.convert(library_filename=data)
-    spectral7 = spectral.open_image(envi+'.hdr')
+    spectral7 = spectral.open_image(envi + '.hdr')
     assert isinstance(spectral7, spectral.io.envi.SpectralLibrary)
     if (os.path.isfile('SpectraValues.txt')):
         os.remove('SpectraValues.txt')

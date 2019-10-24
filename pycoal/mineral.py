@@ -14,7 +14,6 @@
 # Software Foundation, Inc., 51 Franklin Street, Fifth 
 # Floor, Boston, MA 02110-1301, USA.
 
-import sys
 import os
 import logging
 import math
@@ -567,7 +566,7 @@ class SpectalToAsterFileFormat:
 
         line_count = 1
         with open(library_filename, 'r') as input_file:
-            for line_count, l in enumerate(input_file):
+            for line_count, _ in enumerate(input_file):
                 pass
 
         input_file = open(library_filename, 'r')
@@ -685,8 +684,8 @@ class FullSpectralLibrary7Convert:
         spectra_list = []
         # Convert all files
         files = os.listdir(directory + '/')
-        for x in range(0, len(files)):
-            name = directory + '/' + files[x]
+        for _, file in enumerate(files):
+            name = directory + '/' + file
             # Get name
             input_file = open(name, 'r')
             spectra_line = input_file.readline()
