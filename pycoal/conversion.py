@@ -110,20 +110,20 @@ class USGSSpectral7ToAsterConversion:
             # Read Name of Spectra on first line of the file
             spectra_line = input_file.readline()
             spectra_name = spectra_line[23:]
+            k = 0
+            # Loop through file and store all wavelength values for the given Spectra
+            with open('SpectraValues.txt', 'w') as spectra_values_file:
+                spectra_wave_length = 0
+                while (k < line_count):
+                    spectra_wave_length = float(input_file.readline()) * 100
+                    spectra_wave_length = spectra_wave_length / 1000
+                    spectra_wave_length = float("{0:.5f}".format(spectra_wave_length))
+                    spectra_y_value = spectra_wave_length * 10
+                    line = str(spectra_wave_length) + '  ' + str(spectra_y_value)
+                    spectra_values_file.write(line)
+                    spectra_values_file.write('\n')
+                    k = k + 1
 
-        k = 0
-        # Loop through file and store all wavelength values for the given Spectra
-        with open('SpectraValues.txt', 'w') as spectra_values_file:
-            spectra_wave_length = 0
-            while (k < line_count):
-                spectra_wave_length = float(input_file.readline()) * 100
-                spectra_wave_length = spectra_wave_length / 1000
-                spectra_wave_length = float("{0:.5f}".format(spectra_wave_length))
-                spectra_y_value = spectra_wave_length * 10
-                line = str(spectra_wave_length) + '  ' + str(spectra_y_value)
-                spectra_values_file.write(line)
-                spectra_values_file.write('\n')
-                k = k + 1
         # Write new file in the form of an ASTER .spectrum.txt file while using stored
         # Spectra Name and stored Spectra Wavelength values`
         with open(library_filename, 'w') as input_file:

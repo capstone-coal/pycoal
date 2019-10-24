@@ -16,7 +16,7 @@
 
 from nose import with_setup
 from nose.tools import assert_raises
-from test import _remove_files, libraryFilenames
+from test import setup_module, teardown_module, _remove_files, libraryFilenames
 
 import shutil
 import os
