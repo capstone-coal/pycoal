@@ -86,7 +86,6 @@ class USGSSpectral7ToAsterConversion:
             into ASTER Spectral
             Library Version 2.0 <https://asterweb.jpl.nasa.gov/> .txt files
             """
-        pass
 
     @classmethod
     def convert(cls, library_filename=""):

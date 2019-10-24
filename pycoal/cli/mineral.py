@@ -18,16 +18,12 @@
 program_description = '''
 pycoal-mineral -- a CLI for COAL mineral classification
 
-pycoal-mineral provides a CLI which demonstrates how the COAL Mineral 
-Classification 
-API provides methods for generating visible-light and mineral classified 
-images. 
-Mineral classification can take hours to days depending on the size of the 
-spectral 
-library and the available computing resources, so running a script in the 
-background 
-is recommended. More reading an this example can be seen at 
-https://capstone-coal.github.io/docs#usage
+pycoal-mineral provides a CLI which demonstrates how the COAL Mineral
+Classification API provides methods for generating visible-light and mineral
+classified images. Mineral classification can take hours to days depending on
+the size of the spectral library and the available computing resources, so
+running a script in the background is recommended. More reading an this
+example can be seen at https://capstone-coal.github.io/docs#usage
 
 @author:     COAL Developers
 

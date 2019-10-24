@@ -18,12 +18,11 @@
 program_description = '''
 pycoal-environment -- a CLI for COAL environment classification
 
-pycoal-environment provides a CLI which demonstrates how the COAL 
-Environment Classification
-API provides methods for generating environment classified images.
-Environment classification runtime depends largely on the size of the spectral
-library and the available computing resources. More reading an this example 
-can be seen at
+pycoal-environment provides a CLI which demonstrates how the COAL
+Environment Classification API provides methods for generating environment
+classified images. Environment classification runtime depends largely on the
+size of the spectral library and the available computing resources. More
+reading an this example can be seen at
 https://capstone-coal.github.io/docs#usage
 
 @author:     COAL Developers

@@ -27,14 +27,11 @@ import fnmatch
 import shutil
 
 """
-Classifier callbacks functions must have at least the following args: library, 
-image_file_name, classified_file_name; which will always be passed by the 
-calling 
-method (MineralClassification.classify_image). The remaining arguments, 
-specific
-of each classifier function, will also be passed by the calling function, 
-but are 
-optionals and may vary from one classifier to another.
+Classifier callbacks functions must have at least the following args: library,
+image_file_name, classified_file_name; which will always be passed by the
+calling  method (MineralClassification.classify_image). The remaining
+arguments, specific of each classifier function, will also be passed by the
+calling function but are optionals and may vary from one classifier to another.
 """
 
 
@@ -43,7 +40,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
         in_memory=False, subset_rows=None, subset_cols=None):
     """
     Parameter 'scores_file_name' optionally receives the path to where to save
-    an image that holds all the SAM scores yielded for each pixel of the 
+    an image that holds all the SAM scores yielded for each pixel of the
     classified image. No score image is create if not provided.
 
     The optional 'threshold' parameter defines a confidence value between zero
@@ -56,17 +53,17 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     Args:
         library_file_name (str):            filename of the spectral library
         image_file_name (str):              filename of the image to be
-        classified
+                                            classified
         classified_file_name (str):         filename of the classified image
         scores_file_name (str, optional):   filename of the image to hold
-        each pixel's classification score
+                                            each pixel's classification score
         class_names (str[], optional):      list of classes' names to include
         threshold (float, optional):        classification threshold
         in_memory (boolean, optional):      enable loading entire image
-        subset_rows (2-tuple, optional):        range of rows to read (empty
-        to read the whole image)
-        subset_cols (2-tuple, optional):        range of columns to read (
-        empty to read the whole image)
+        subset_rows (2-tuple, optional):    range of rows to read (empty
+                                            to read the whole image)
+        subset_cols (2-tuple, optional):    range of columns to read (
+                                            empty to read the whole image)
 
     Returns:
         None
@@ -372,8 +369,11 @@ class MineralClassification:
 
         # overwrite the file
         spectral.io.envi.save_classification(classified_file_name, copy,
-                                             force=True, class_names=[
-                classified.metadata.get('class names')[i] for i in classes],
+                                             force=True,
+                                             class_names=[
+                                                 classified.metadata.get(
+                                                     'class names')[i]
+                                                 for i in classes],
                                              metadata=classified.metadata)
 
     @staticmethod

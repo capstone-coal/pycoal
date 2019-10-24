@@ -47,7 +47,7 @@ class MiningClassification:
         self.class_names = class_names
         logging.info(
             "Instantiated Mining Classifier with following specification: "
-            "-proxy class names '%s'" % class_names)
+            "-proxy class names '%s'", class_names)
 
     def classify_image(self, image_file_name, classified_file_name,
                        spectral_version):
@@ -69,13 +69,12 @@ class MiningClassification:
             self.class_names = class_names
             logging.info(
                 "Instantiated Mining Classifier with following "
-                "specification: " \
-                "-proxy class names '%s'" % class_names)
+                "specification: "
+                "-proxy class names '%s'", class_names)
         start = time.time()
         logging.info(
             "Starting Mining Classification for image '%s', saving "
-            "classified image to '%s'" % (
-                image_file_name, classified_file_name))
+            "classified image to '%s'", image_file_name, classified_file_name)
         # open the image
         image = spectral.open_image(image_file_name)
         data = image.asarray()
@@ -116,5 +115,5 @@ class MiningClassification:
         m, s = divmod(seconds_elapsed, 60)
         h, m = divmod(m, 60)
         logging.info(
-            "Completed Mining Classification. Time elapsed: '%d:%02d:%02d'" % (
-                h, m, s))
+            "Completed Mining Classification. Time elapsed: '%d:%02d:%02d'",
+            h, m, s)

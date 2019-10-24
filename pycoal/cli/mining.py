@@ -18,13 +18,11 @@
 PROGRAM_DESCRIPTION = '''
 pycoal-mining -- a CLI for COAL mining classification
 
-pycoal-mining provides a CLI which demonstrates how the COAL Mining 
-Classification
-API provides methods for generating mining classified images.
+pycoal-mining provides a CLI which demonstrates how the COAL Mining
+Classification API provides methods for generating mining classified images.
 Mining classification runtime depends largely on the size of the spectral
-library and the available computing resources. More reading an this example 
-can be seen at
-https://capstone-coal.github.io/docs#usage
+library and the available computing resources. More reading an this example
+can be seen at https://capstone-coal.github.io/docs#usage
 
 @author:     COAL Developers
 

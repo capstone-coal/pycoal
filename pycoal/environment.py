@@ -52,8 +52,8 @@ class EnvironmentalCorrelation:
         start = time.time()
         logging.info(
             "Starting Environmental Correlation for mining image '%s', "
-            "with vector layer '%s' and proximity distance of '%s' meters." % (
-            mining_filename, vector_filename, proximity))
+            "with vector layer '%s' and proximity distance of '%s' meters.",
+            mining_filename, vector_filename, proximity)
         # get path and file names
         output_directory = dirname(abspath(correlated_filename))
         mining_name = splitext(basename(abspath(mining_filename)))[0]
@@ -61,8 +61,8 @@ class EnvironmentalCorrelation:
 
         # rasterize the vector features to the same dimensions as the mining
         # image
-        feature_header_name = output_directory + '/' + mining_name + '_' + \
-                              vector_name + '.hdr'
+        feature_header_name = output_directory + '/' + mining_name + '_' +\
+            vector_name + '.hdr'
         EnvironmentalCorrelation.create_empty_copy(mining_filename,
                                                    feature_header_name)
         feature_image_name = feature_header_name[:-4] + '.img'
@@ -70,7 +70,7 @@ class EnvironmentalCorrelation:
 
         # generate a proximity map from the features
         proximity_header_name = output_directory + '/' + mining_name + '_' +\
-                                vector_name + '_proximity.hdr'
+            vector_name + '_proximity.hdr'
         proximity_image_name = proximity_header_name[:-4] + '.img'
         EnvironmentalCorrelation.proximity(feature_image_name,
                                            proximity_image_name)
@@ -99,14 +99,20 @@ class EnvironmentalCorrelation:
 
         # save the environmental correlation image
         spectral.io.envi.save_classification(correlated_filename,
-            correlated_image,
-            class_names=mining_image.metadata.get('class names'),
-            metadata={'data ignore value': 0,
-                'description': 'COAL ' + pycoal.version + ' environmental '
-                                                          'correlation image.',
-                'map info': mining_image.metadata.get('map info')})
+                                             correlated_image,
+                                             class_names=mining_image.
+                                             metadata.get('class names'),
+                                             metadata={'data ignore value': 0,
+                                                       'description': 'COAL ' +
+                                                       pycoal.version + ' '
+                                                       'environmental '
+                                                       'correlation image.',
+                                                       'map info':
+                                                           mining_image.
+                                                           metadata.get(
+                                                               'map info')})
         logging.info(
-            "Successfully saved Environmental Correlation image to '%s'." %
+            "Successfully saved Environmental Correlation image to '%s'.",
             correlated_filename)
         end = time.time()
         seconds_elapsed = end - start
@@ -114,8 +120,7 @@ class EnvironmentalCorrelation:
         h, m = divmod(m, 60)
         logging.info(
             "Completed Environmental Correlation. Time elapsed: "
-            "'%d:%02d:%02d'" % (
-            h, m, s))
+            "'%d:%02d:%02d'", h, m, s)
 
     @staticmethod
     def create_empty_copy(source_filename, destination_filename):
@@ -128,8 +133,7 @@ class EnvironmentalCorrelation:
         """
         logging.info(
             "Creating an empty copy of classified image '%s' with the same "
-            "size. Saving to '%s'" % (
-            source_filename, destination_filename))
+            "size. Saving to '%s'", source_filename, destination_filename)
         # open the source image
         source = spectral.open_image(source_filename)
 
@@ -154,8 +158,8 @@ class EnvironmentalCorrelation:
             feature_filename (str): filename of the raster image
         """
         logging.info(
-            "Burning features from vector file: '%s' to raster file: '%s'" % (
-                vector_filename, feature_filename))
+            "Burning features from vector file: '%s' to raster file: '%s'",
+            vector_filename, feature_filename)
         # assume the layer has the same name as the image
         layer_name = splitext(basename(vector_filename))[0]
 
@@ -187,7 +191,7 @@ class EnvironmentalCorrelation:
         """
         logging.info(
             "Generating a proximity map from features of '%s', writing them "
-            "to '%s'" % (feature_filename, proximity_filename))
+            "to '%s'", feature_filename, proximity_filename)
 
         # search for gdal_proximity on macOS
         gdal_proximity = None
@@ -195,7 +199,7 @@ class EnvironmentalCorrelation:
             for file in glob.glob(
                     "/Library/Frameworks/GDAL.framework/**/gdal_proximity.py"):
                 if file is not None:
-                    logging.info("Located gdal_proximity.py at %s" % (file))
+                    logging.info("Located gdal_proximity.py at %s", file)
                     gdal_proximity = file
                 else:
                     logging.info(
