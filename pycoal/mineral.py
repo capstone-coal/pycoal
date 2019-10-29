@@ -160,7 +160,7 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
     
 
 
-    # jobLibStart = time.time()
+    start = time.time()
     scoredSingle = numpy.array(Parallel(n_jobs=num_cores)(delayed(CalculatePixel)(data[x,y], 
                         x, y, classified, library, threshold, resample, scores_file_name)
                         for x in range(M) for y in range(N)), dtype=numpy.float64)
@@ -172,61 +172,13 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
             if scoredSingle[k] is scoredSingle[k]:
                 scoredJobLib[i][j] = scoredSingle[k]
             k+=1
-    # jobLibEnd = time.time()
-    # print (scored.shape)
-
-    # regularStart = time.time()
-    # for x in range(M):
-    # #     # print(x)
-    # #     # testInnerLoop(x, N, data, classifiedDask, library, threshold, resample, scored, scores_file_name)
-    #     for y in range(N):
-    # #         scoredDask.append(dask.delayed(CalculatePixel(x, y, pixels, classified, library, threshold, resample, scores_file_name)))
-    # # scored = dask.compute(*scoredDask)
-    # #      # read the pixel from the file
-    #         pixel = data[x,y]
-
-    #         # if it is not a no data pixel
-    #         if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
-
-    #             # resample the pixel ignoring NaNs from target bands that don't overlap
-    #             # TODO fix spectral library so that bands are in order
-    #             resampled_pixel = numpy.nan_to_num(resample(pixel))
-    #             # calculate spectral angles
-    #             angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
-    #                                                              numpy.newaxis,
-    #                                                              ...],
-    #                                               library.spectra)
-    #             # angles = SpectralAngleReplacement(resampled_pixel[numpy.newaxis, numpy.newaxis, ...], library.spectra)
-    #             # normalize confidence values from [pi,0] to [0,1]
-    #             for z in range(angles.shape[2]):
-    #                 angles[0,0,z] = 1-angles[0,0,z]/math.pi
-    #             # get index of class with largest confidence value
-    #             index_of_max = numpy.argmax(angles)
-
-    #             # get confidence value of the classied pixel
-    #             score = angles[0,0,index_of_max]
-
-    #             # classify pixel if confidence above threshold
-    #             if score > threshold:
-
-    #                 # index from one (after zero for no data)
-    #                 classified[x,y] = index_of_max + 1
-
-    #                 if scores_file_name is not None:
-    #                     # store score value
-    #                     scored[x,y] = score
-    # classifiedDask.compute()
-    # save the classified image to a file
-    # regularEnd = time.time()
+    
     end = time.time()
     seconds = end - start
-    # for x in range(M):
-    #     for y in range(N):
-    #         if scoredJobLib[x][y] is not scored[x][y]:
-    #             print ("{} - {}".format(scoredJobLib[x][y], scored[x][y]), end=" ")
+   
 
 
-    print("time to run - {}".format(seconds))
+    print("Time to run: {} seconds".format(seconds))
     # print("time to run joblib - {}\ntime to run regular - {}".format(jobLibEnd-jobLibStart, regularEnd-regularStart))
     spectral.io.envi.save_classification(
         classified_file_name,
