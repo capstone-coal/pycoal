@@ -25,45 +25,12 @@ import time
 import fnmatch
 import shutil
 from pycoal import mineral
-import dask
-from dask import array as da
-import dask.delayed as delay
 import multiprocessing
 from joblib import Parallel, delayed
 
-def SpectralAngleReplacement(data, members):
-    assert members.shape[1] == data.shape[2], \
-        'Matrix dimensions are not aligned.'
-
-    (M, N, B) = data.shape
-    m = numpy.array(members, numpy.float64)
-    C = m.shape[0]
-
-    # Normalize endmembers
-    for i in range(C):
-        m[i] /= numpy.sqrt(m[i].dot(m[i]))
-
-
-    angles = numpy.zeros((M, N, C), numpy.float64)
-    num_cores = multiprocessing.cpu_count()
-
-    for i in range(M):
-        for j in range(N):
-            v = data[i, j].astype(float)
-            v = v / numpy.sqrt(v.dot(v))
-            angles[i, j] = numpy.array(Parallel(n_jobs=num_cores-1)(delayed(SpectralCLoop)(m, k, v)
-                                                for k in range(C)), dtype=numpy.float64)
-    return numpy.arccos(angles)
-
-def SpectralCLoop(m, k, v):
-    return numpy.clip(v.dot(m[k]), -1, 1)
-
-
 
 def CalculatePixel(pixel, x, y, classified, library, threshold, resample, scores_file_name):
-            # read the pixel from the file
-    # print(x)
-    # pixel = data[x,y]
+
 
     # if it is not a no data pixel
     if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
@@ -179,7 +146,6 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
 
 
     print("Time to run: {} seconds".format(seconds))
-    # print("time to run joblib - {}\ntime to run regular - {}".format(jobLibEnd-jobLibStart, regularEnd-regularStart))
     spectral.io.envi.save_classification(
         classified_file_name,
         classified,
