@@ -29,7 +29,7 @@ import multiprocessing
 from joblib import Parallel, delayed
 
 
-def CalculatePixelConfidenceValue(pixel, x, y, classified, library,
+def calculate_pixel_confidence_value(pixel, x, y, classified, library,
                                   threshold, resample, scores_file_name):
     """
     Calculate the confidence score for a pixel
@@ -43,7 +43,7 @@ def CalculatePixelConfidenceValue(pixel, x, y, classified, library,
         library (spectralLibrary):  spectral library
         threshold (float):          classification threshold
         resample (BandResampler):   defined resampler for bands
-        scores_file_name (str):     filename of the image to hold 
+        scores_file_name (str):     filename of the image to hold
                                     each pixel's classification score
 
     Returns:
@@ -160,9 +160,11 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     num_cores = multiprocessing.cpu_count()
 
     scored_single = numpy.array(Parallel(n_jobs=num_cores)(delayed(
-                                CalculatePixelConfidenceValue)(
-                                data[x, y], x, y, classified, library, threshold, resample, scores_file_name)
-                                for x in range(m) for y in range(n)), dtype=numpy.float64)
+                                calculate_pixel_confidence_value)(data[x, y],
+                                x, y, classified, library, threshold,
+                                resample, scores_file_name)
+                                for x in range(m) for y in range(n)),
+                                dtype=numpy.float64)
 
     # puts it all in one single array, need to make 2d array
     k = 0
@@ -760,6 +762,7 @@ class FullSpectralLibrary7Convert:
         # create a new mineral aster conversion instance
         spectral_aster = SpectalToAsterFileFormat()
         # List to check for duplicates
+        spectra_list = []
         # Convert all files
         files = os.listdir(directory + '/')
         for _, file in enumerate(files):
