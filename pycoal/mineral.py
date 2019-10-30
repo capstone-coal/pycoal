@@ -26,6 +26,8 @@ import spectral
 import time
 import fnmatch
 import shutil
+from pycoal import mineral
+from pycoal import config
 
 """
 Classifier callbacks functions must have at least the following args: library, 
@@ -66,6 +68,7 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
     """
 
     # load and optionally subset the spectral library
+    
     library = spectral.open_image(library_file_name)
     if class_names is not None:
         library = pycoal.mineral.MineralClassification.subset_spectral_library(library, class_names)
@@ -74,8 +77,12 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
     image = spectral.open_image(image_file_name)
     if subset_rows is not None and subset_cols is not None:
         subset_image = SubImage(image, subset_rows, subset_cols)
-        M = subset_rows[1]
-        N = subset_cols[1]
+        if in_memory:
+            data = subset_image.load()
+        else:
+        	data = image.asarray()
+        M = subset_rows[1] - subset_rows[0]
+        N = subset_cols[1] - subset_cols[0]
     else:
         if in_memory:
             data = image.load()
@@ -99,16 +106,17 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         # allocate a zero-initialized MxN array for the scores image
         scored = numpy.zeros(shape=(M, N), dtype=numpy.float64)
 
+    # universal calculations for angles
+    m = numpy.array(library.spectra, numpy.float64)
+    m /= numpy.sqrt(numpy.einsum('ij,ij->i', m, m))[:, numpy.newaxis]
+    
     # for each pixel in the image
     for x in range(M):
 
         for y in range(N):
-
+            
             # read the pixel from the file
-            if subset_rows is not None and subset_cols is not None:
-                pixel = subset_image.read_pixel(x, y)
-            else:
-                pixel = data[x, y]
+            pixel = data[x, y]
 
             # if it is not a no data pixel
             if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
@@ -117,15 +125,16 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
                 # TODO fix spectral library so that bands are in order
                 resampled_pixel = numpy.nan_to_num(resample(pixel))
 
-                # calculate spectral angles
-                angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
-                                                                  numpy.newaxis,
-                                                                  ...],
-                                                  library.spectra)
+                # calculate spectral angles: adapted from spectral.spectral_angles
+                angle_data = resampled_pixel[numpy.newaxis, numpy.newaxis,...]
+
+                norms = numpy.sqrt(numpy.einsum('ijk,ijk->ij', angle_data, angle_data))
+                dots = numpy.einsum('ijk,mk->ijm', angle_data, m)
+                dots = numpy.clip(dots / norms[:, :, numpy.newaxis], -1, 1)
+                angles = numpy.arccos(dots)
 
                 # normalize confidence values from [pi,0] to [0,1]
-                for z in range(angles.shape[2]):
-                    angles[0, 0, z] = 1 - angles[0, 0, z] / math.pi
+                angles = numpy.add(numpy.multiply(numpy.divide(angles, math.pi), -1), 1)
 
                 # get index of class with largest confidence value
                 index_of_max = numpy.argmax(angles)
@@ -142,6 +151,7 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
                     if scores_file_name is not None:
                         # store score value
                         scored[x, y] = score
+
 
     # save the classified image to a file
     spectral.io.envi.save_classification(
@@ -281,7 +291,6 @@ class MineralClassification:
             algorithm (function, optional): the classifier callback
             **kwargs: arguments that will be passed to the chosen classifier
         """
-
         # set the user's chosen classifier 
         self.algorithm = algorithm
 
