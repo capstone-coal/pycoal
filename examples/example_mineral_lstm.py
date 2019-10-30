@@ -16,13 +16,19 @@
 # encoding: utf-8
 
 '''
-example_mineral_lstm -- an example script which demonstrates COAL mineral classification
-                        using a binary classifier based on Recurrent Neural Network
+example_mineral_lstm -- an example script which demonstrates COAL mineral
+classification
+                        using a binary classifier based on Recurrent Neural
+                        Network
 
-example_mineral_lstm provides a CLI which demonstrates how the COAL Mineral Classification 
-API provides methods for generating visible-light and mineral classified images. 
-Mineral classification can take hours to days depending on the size of the spectral 
-library and the available computing resources, so running a script in the background 
+example_mineral_lstm provides a CLI which demonstrates how the COAL Mineral
+Classification
+API provides methods for generating visible-light and mineral classified
+images.
+Mineral classification can take hours to days depending on the size of the
+spectral
+library and the available computing resources, so running a script in the
+background
 is recommended. More reading an this example can be seen at 
 https://capstone-coal.github.io/docs#usage
 
@@ -35,12 +41,6 @@ https://capstone-coal.github.io/docs#usage
 @contact:    coal-capstone@googlegroups.com
 '''
 
-import sys
-import os
-from sys import path
-from os import getcwd
-import inspect
-
 from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 
@@ -48,42 +48,34 @@ import logging
 
 import sys
 import os
+import constants
 import pycoal
-sys.path.insert(0, '../pycoal')
-import mineral
-import mining
-import environment
+from pycoal import mineral
 
-__all__ = []
+model_filename = "../pycoal/tests/nn_models/lstm_Schwertmannite.h5"
 
-DEBUG = 1
-TESTRUN = 0
-PROFILE = 0
-
-
-input_filename = 'avng.jpl.nasa.gov/AVNG_2015_data_distribution/L2/ang20150420t182050_rfl_v1e/ang20150420t182050_corr_v1e_img.hdr'
-model_filename='../pycoal/tests/nn_models/lstm_Schwertmannite.h5'
-library_filename=''
 
 def run_mineral(input_filename, library_filename):
-    '''
-    ...
-    '''
-    logging.info("Starting mineral classification with input file '%s' and spectral library '%s'." %(input_filename, library_filename))
+    logging.info(
+        "Starting mineral classification with input file '%s' and spectral "
+        "library '%s'." % (
+        input_filename, library_filename))
     # path to save RGB image
-    rgb_filename = "ang20150420t182050_corr_v1e_img_rgb.hdr"
-    
+    rgb_filename = constants.INPUT_NAME + "_rgb.hdr"
+
     # path to save mineral classified image
-    classified_filename = "ang20150420t182050_corr_v1e_img_class.hdr"
+    classified_filename = constants.INPUT_NAME + "_class.hdr"
 
     # path to save classification scores image
-    scores_filename = "ang20150420t182050_corr_v1e_img_scores.hdr"
+    scores_filename = constants.INPUT_NAME + "_scores.hdr"
 
     # list containing the names of all considered classification classes
-    class_names = ["Schwertmannite","non-Schwertmannite"]
-    
+    class_names = ["Schwertmannite", "non-Schwertmannite"]
+
     # create a new mineral classification instance
-    mineral_classification = mineral.MineralClassification(algorithm=mineral.avngDNN, model_file_name=model_filename, class_names=class_names, scores_file_name=scores_filename)
+    mineral_classification = mineral.MineralClassification(
+        algorithm=mineral.avngDNN, model_file_name=model_filename,
+        class_names=class_names, scores_file_name=scores_filename)
 
     # generate a georeferenced visible-light image
     mineral_classification.to_rgb(input_filename, rgb_filename)
@@ -91,15 +83,17 @@ def run_mineral(input_filename, library_filename):
     # generate a mineral classified image
     mineral_classification.classify_image(input_filename, classified_filename)
 
+
 def main(argv=None):
     '''Command line options.'''
-    logging.basicConfig(filename='pycoal.log',level=logging.INFO, format='%(asctime)s %(message)s')
+    logging.basicConfig(filename='pycoal.log', level=logging.INFO,
+                        format='%(asctime)s %(message)s')
     if argv is None:
         argv = sys.argv
     else:
         sys.argv.extend(argv)
 
-    program_name = os.path.basename(sys.argv[0])
+    program_name = os.path.basename(argv[0])
     program_shortdesc = __import__('__main__').__doc__.split("\n")[1]
     program_license = '''%s
 
@@ -126,41 +120,51 @@ USAGE
 
     try:
         # Setup argument parser
-        parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-i", "--image", dest="image", default=input_filename, help="Input file to be processed [default: ang20150420t182050_corr_v1e_img.hdr]")
-        parser.add_argument("-s", "--slib", dest="slib", default=library_filename, help="Spectral Library filename [default: s06av95a_envi.hdr]")
+        parser = ArgumentParser(description=program_license,
+                                formatter_class=RawDescriptionHelpFormatter)
+        parser.add_argument("-i", "--image", dest="image",
+                            default=constants.INPUT_FILENAME,
+                            help="Input file to be processed [default: " +
+                                 constants.INPUT_FILENAME + "]")
+        parser.add_argument("-s", "--slib", dest="slib",
+                            default=constants.LIBRARY_FILENAME,
+                            help="Spectral Library filename [default: " +
+                                 constants.LIBRARY_FILENAME + "]")
 
         # Process arguments
-        args = parser.parse_args(['-i', input_filename, '-s', library_filename])
-        #args = parser.parse_args()
+        args = parser.parse_args(
+            ['-i', constants.INPUT_FILENAME, '-s', constants.LIBRARY_FILENAME])
 
         image = args.image
         slib = args.slib
-        
+
         run_mineral(image, slib)
 
     except KeyboardInterrupt:
         ### handle keyboard interrupt ###
         return 0
     except Exception as e:
-        if DEBUG or TESTRUN:
+        if constants.DEBUG or constants.TESTRUN:
             raise e
         indent = len(program_name) * " "
         sys.stderr.write(program_name + ": " + repr(e) + "\n")
         sys.stderr.write(indent + "  for help use --help")
         return 2
 
+
 if __name__ == "__main__":
-    if DEBUG:
+    if constants.DEBUG:
         sys.argv.append("-h")
         sys.argv.append("-v")
         sys.argv.append("-r")
-    if TESTRUN:
+    if constants.TESTRUN:
         import doctest
+
         doctest.testmod()
-    if PROFILE:
+    if constants.PROFILE:
         import cProfile
         import pstats
+
         profile_filename = 'example_mineral_profile.txt'
         cProfile.run('main()', profile_filename)
         statsfile = open("profile_stats.txt", "wb")

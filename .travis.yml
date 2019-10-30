@@ -1,54 +1,29 @@
-# Copyright (C) 2017-2018 COAL Developers
-#
-# This program is free software; you can redistribute it and/or 
-# modify it under the terms of the GNU General Public License 
-# as published by the Free Software Foundation; version 2.
-#
-# This program is distributed in the hope that it will be useful, 
-# but WITHOUT ANY WARRANTY; without even the implied warranty 
-# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
-# See the GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public 
-# License along with this program; if not, write to the Free 
-# Software Foundation, Inc., 51 Franklin Street, Fifth 
-# Floor, Boston, MA 02110-1301, USA.
-dist: xenial   # required for Python >= 3.7
+dist: xenial
 language: python
 python:
-  - '3.6'
-  - '3.7'
+- '3.6'
+- '3.7'
 notifications:
   email: coal-capstone@googlegroups.com
+  slack:
+    secure: QmVT4vcgQDGpUHWFsJTYxhvr50srdr+aPpiavmFEwnVG3cq78pX1vTueT/Iy+hV3LFpownYu4cvzKNVw2U9UuHdqnuPdIRp+3ggYuEtHJXyn6mMFR1N52zeDvELmskiOEqgHBrrGuqFTgi67jpnCRTrjebYf2YPEUVHyyI0f5isRCo9/rWeK1uUqlICjPLyu/ixBKxyUShQjg8je9PW/9XdtqdqNipLOC4Ppp3JGh6J4B5hK5g5Z5g6ZGBBbq+H6+Spm/vL5FvL/7QRGWWysWTo8b8d5VThzWaHhDZC6PU32+178z4n6/MyDro5metWhjttcdgzjDRw+MLHtdgtlRwKR72zesM1RdbgfC/Uj3xdI8sZ1d05p5TnAj+YRwJ+Qe2WEgJ5Ypu1d+qJYd4P4uYHuIYnkJLcW8593WUJXwK13hY4AZ3n4nLLrJfiPz+iZnZVBxusPF6lVOsxtA28DeCLpEN4I4ut1EOxLC3sIa6vYF7a6sK2ELl3koLhjxfiTm9klDe4WvYZmh/6ofVbRMYQ/8zZr2aXqaSYf2wqVycHHuXfdB+TlifnL63HJO5PpyTGZSucVj+9X1HsDKpZSfhKBGk4vtKGUP6SLDGC/Py4F4h2dZ9i1tyM0Fr7QkJ138joIna5PWY5ZqzqnnJhqmJ+gju7rPNc4hnHtOpoa7LE=
 cache:
-  - pip
+- pip
 install:
-  - sudo apt-get update
-  - sudo apt-get -y install python-dev python-pip
-  - python setup.py install
-  - pip install spectral coverage python-coveralls #pylint
-
+- sudo apt-get update
+- sudo apt-get -y install python-dev python-pip
+- python setup.py install
+- pip install spectral coverage python-coveralls
 script:
-  - nosetests  --with-coverage --cover-package=pycoal -v
-  #- pylint pycoal
-after_success: # Generate coverage reports only on success
-  - coveralls
-deploy: # Runs on every commit to master branch
-  # test pypi
-  # - provider: pypi
-  #   server: https://test.pypi.org/legacy/ 
-  #   user: lewismc
-  #   password:
-  #       secure: Q4BwpJPlAR4WSeAmS4Q20dy35RHdfdzA6nQHC+5f76zDfKiebhFc7JZ6dl5Rsqpq0yJtmhoaLlj7qBbFtk1JjEkJhj7/M7jinYdaY0v3JMDuZPx/ReLmCtWtOcre9qb0x/XoGDO4hJfklvqesmIk9Ai9YVJq46BlRRLwM2M5ys08EGobr/3++B2lyMsexjhBMWzWzYGFFq26iHdEHKGskxjNkNCkTcZWnfCsMAPoG0ZxyCwhO0TGT8W7kloqN40q/+/l6DwrrAmYWvckrFy0ItHbtCVDNK1jxlijr1IrbXpMtpzyaCCsHc+21AbsJyMG9oyuMJw/e6YfzIoA3gAnUv99iFTAk5LQh6DIYeGRjggSjX9H4oelEc1c9LC3mfI0LqahIUDZQPiWGWBlHqRSUzrT9zhwiBs/5fBsQPLWSz8TvlqwSixYTwN9xm+D9Bczwftr8h4R3ucxuBbntGtmvMGBEHE14IrJcrleUBkZ1aWNEXkE/sos0bardMukM1FRlBIFTk9NCsAVBKOUvcZvdGQlVu1lVJ+nxeSROTMIFvRRs3n2L8Tpr4/uMslVW2zq66+gNES9f0B+kW+V77RVeii+B8sB9HFS1i56rV85rVURI15QPlx9L+5wbFTofnJNzdNCRr7WIlT133oMzn3cjRCS9mztSen+ywyPI7ZDmHI=
-  #   on:
-  #       branch: master
-  #       tags: false
-  # Runs only on tagged commits to master branch
-  - provider: pypi
-    user: lewismc
-    password:
-        secure: Q4BwpJPlAR4WSeAmS4Q20dy35RHdfdzA6nQHC+5f76zDfKiebhFc7JZ6dl5Rsqpq0yJtmhoaLlj7qBbFtk1JjEkJhj7/M7jinYdaY0v3JMDuZPx/ReLmCtWtOcre9qb0x/XoGDO4hJfklvqesmIk9Ai9YVJq46BlRRLwM2M5ys08EGobr/3++B2lyMsexjhBMWzWzYGFFq26iHdEHKGskxjNkNCkTcZWnfCsMAPoG0ZxyCwhO0TGT8W7kloqN40q/+/l6DwrrAmYWvckrFy0ItHbtCVDNK1jxlijr1IrbXpMtpzyaCCsHc+21AbsJyMG9oyuMJw/e6YfzIoA3gAnUv99iFTAk5LQh6DIYeGRjggSjX9H4oelEc1c9LC3mfI0LqahIUDZQPiWGWBlHqRSUzrT9zhwiBs/5fBsQPLWSz8TvlqwSixYTwN9xm+D9Bczwftr8h4R3ucxuBbntGtmvMGBEHE14IrJcrleUBkZ1aWNEXkE/sos0bardMukM1FRlBIFTk9NCsAVBKOUvcZvdGQlVu1lVJ+nxeSROTMIFvRRs3n2L8Tpr4/uMslVW2zq66+gNES9f0B+kW+V77RVeii+B8sB9HFS1i56rV85rVURI15QPlx9L+5wbFTofnJNzdNCRr7WIlT133oMzn3cjRCS9mztSen+ywyPI7ZDmHI=
-    distributions: sdist bdist_wheel
-    on:
-        tags: true # Deploy only on tagged commits
-        branch: master
+- nosetests  --with-coverage --cover-package=pycoal -v
+after_success:
+- coveralls
+deploy:
+- provider: pypi
+  user: lewismc
+  password:
+    secure: Q4BwpJPlAR4WSeAmS4Q20dy35RHdfdzA6nQHC+5f76zDfKiebhFc7JZ6dl5Rsqpq0yJtmhoaLlj7qBbFtk1JjEkJhj7/M7jinYdaY0v3JMDuZPx/ReLmCtWtOcre9qb0x/XoGDO4hJfklvqesmIk9Ai9YVJq46BlRRLwM2M5ys08EGobr/3++B2lyMsexjhBMWzWzYGFFq26iHdEHKGskxjNkNCkTcZWnfCsMAPoG0ZxyCwhO0TGT8W7kloqN40q/+/l6DwrrAmYWvckrFy0ItHbtCVDNK1jxlijr1IrbXpMtpzyaCCsHc+21AbsJyMG9oyuMJw/e6YfzIoA3gAnUv99iFTAk5LQh6DIYeGRjggSjX9H4oelEc1c9LC3mfI0LqahIUDZQPiWGWBlHqRSUzrT9zhwiBs/5fBsQPLWSz8TvlqwSixYTwN9xm+D9Bczwftr8h4R3ucxuBbntGtmvMGBEHE14IrJcrleUBkZ1aWNEXkE/sos0bardMukM1FRlBIFTk9NCsAVBKOUvcZvdGQlVu1lVJ+nxeSROTMIFvRRs3n2L8Tpr4/uMslVW2zq66+gNES9f0B+kW+V77RVeii+B8sB9HFS1i56rV85rVURI15QPlx9L+5wbFTofnJNzdNCRr7WIlT133oMzn3cjRCS9mztSen+ywyPI7ZDmHI=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    branch: master

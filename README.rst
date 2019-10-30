@@ -1,5 +1,5 @@
 ======
-COAL
+Pycoal
 ======
 
 **Development**
@@ -137,6 +137,8 @@ See the `quickstart documentation <https://capstone-coal.github.io/docs#usage>`_
 
 If you would like to run the examples yourself, head over to the **examples** module.
 
+**WARNING** Running the examples requires `additional downloads <https://github.com/capstone-coal/pycoal/tree/master/examples#aviris-ng-data>`_. Ensure you have sufficient storage (~20 GB).
+
 Documentation
 -------------
 
@@ -152,6 +154,13 @@ Documentation can then be located in **_build/html/index.html**
 
 Community and Development
 -------------------------
+
+Slack
+^^^^^^^^^^^^
+
+|Slack|
+
+Questions, concerns, and general communication is all encouraged in our `Slack organization <https://capstone-coal.slack.com>`_.
 
 Mailing list
 ^^^^^^^^^^^^
@@ -176,6 +185,10 @@ COAL is licensed under the |license| a copy of which ships with this source code
    :target: https://www.python.org/downloads/
 .. |PyPI| image:: https://img.shields.io/pypi/v/pycoal.svg?maxAge=2592000?style=plastic
    :target: https://pypi.python.org/pypi/pycoal
+.. |Slack| image:: https://cdn.brandfolder.io/5H442O3W/as/pnlpsg-beh8pk-2mgxnk/appIcon_desktop.png
+    :height: 10px
+    :width: 10px
+    :target: https://capstone-coal.slack.com
 .. |GoogleGroup| image:: https://img.shields.io/badge/-Google%20Group-lightgrey.svg
    :target: https://groups.google.com/forum/#!forum/coal-capstone
 .. |documentation| image:: https://readthedocs.org/projects/pycoal/badge/?version=latest

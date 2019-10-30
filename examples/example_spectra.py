@@ -18,7 +18,8 @@
 '''
 example_spectra -- Reflectance of Coal Mining Proxy Classes
 
-The images ``spectra.png`` and ``spectra.svg`` are saved in the current directory.
+The images ``spectra.png`` and ``spectra.svg`` are saved in the current
+directory.
 
 @author:     COAL Developers
 
@@ -29,17 +30,18 @@ The images ``spectra.png`` and ``spectra.svg`` are saved in the current director
 @contact:    coal-capstone@googlegroups.com
 '''
 
+import constants
 import spectral
 import matplotlib
 import matplotlib.pyplot as plt
 
 # load library
-library_filename = '../pycoal/tests/s06av95a_envi.hdr'
+library_filename = constants.LIBRARY_FILENAME
 library = spectral.open_image(library_filename)
 schwert_index = library.names.index(u'Schwertmannite BZ93-1 s06av95a=b')
 sldgwet_index = library.names.index(u'Renyolds_TnlSldgWet SM93-15w s06av95a=a')
-sludge_index  = library.names.index(u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a')
-bands = [1000*band for band in library.bands.centers]
+sludge_index = library.names.index(u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a')
+bands = [1000 * band for band in library.bands.centers]
 
 # customize figure
 plt.rcParams['font.size'] = 8
@@ -58,18 +60,21 @@ plt.rcParams['figure.edgecolor'] = 'black'
 plt.rcParams['savefig.facecolor'] = 'black'
 plt.rcParams['savefig.edgecolor'] = 'black'
 plt.rcParams['savefig.dpi'] = 300
-plt.rcParams['figure.figsize'] = 5.5,3.5
+plt.rcParams['figure.figsize'] = 5.5, 3.5
 plt.rcParams['grid.color'] = 'white'
 
 # generate figure
-plt.plot(bands, library.spectra[schwert_index], 'orange', label=u'Schwertmannite BZ93-1 s06av95a=b')
-plt.plot(bands, library.spectra[sludge_index], 'red', label=u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a')
-plt.plot(bands, library.spectra[sldgwet_index], 'yellow', label=u'Renyolds_TnlSldgWet SM93-15w s06av95a=a')
+plt.plot(bands, library.spectra[schwert_index], 'orange',
+         label=u'Schwertmannite BZ93-1 s06av95a=b')
+plt.plot(bands, library.spectra[sludge_index], 'red',
+         label=u'Renyolds_Tnl_Sludge SM93-15 s06av95a=a')
+plt.plot(bands, library.spectra[sldgwet_index], 'yellow',
+         label=u'Renyolds_TnlSldgWet SM93-15w s06av95a=a')
 plt.title('Reflectance of Coal Mining Proxy Classes')
 plt.ylabel('Reflectance')
 plt.xlabel('Wavelength (nm)')
 plt.legend()
-plt.axis([min(bands),max(bands),0,0.8])
+plt.axis([min(bands), max(bands), 0, 0.8])
 plt.grid()
 plt.savefig('spectra.png')
 plt.savefig('spectra.svg')
