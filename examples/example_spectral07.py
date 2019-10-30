@@ -1,5 +1,5 @@
 #!/usr/bin/python
-#Copyright (C) 2017-2019 COAL Developers
+# Copyright (C) 2017-2019 COAL Developers
 #
 # This program is free software; you can redistribute it and/or 
 # modify it under the terms of the GNU General Public License 
@@ -17,14 +17,16 @@
 # encoding: utf-8
 
 '''
-example_spectral07.py -- a script which will generate envi .sli and .hdr convolved library
-files of `USGS Spectral Library Version 7 <https://speclab.cr.usgs.gov/spectral-lib.html>`_
+example_spectral07.py -- a script which will generate envi .sli and .hdr
+convolved library files of `USGS Spectral Library Version 7
+<https://speclab.cr.usgs.gov/spectral-lib.html>`_
 
 Dependencies
-`USGS Spectral Library Version 7 <https://speclab.cr.usgs.gov/spectral-lib.html>`_
+`USGS Spectral Library Version 7
+<https://speclab.cr.usgs.gov/spectral-lib.html>`_
 must be downloaded and unzipped to the examples directory
 
-All files generated will be located in the examples directory
+All files generated will be located in the examples directory.
 
 
 @author:     COAL Developers

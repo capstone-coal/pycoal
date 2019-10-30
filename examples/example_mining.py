@@ -15,10 +15,13 @@
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
 '''
-example_mining -- an example script which demonstrates COAL mining classification
+example_mining -- an example script which demonstrates COAL mining
+classification
 
-example_mining provides a CLI which demonstrates how the COAL Mining Classification 
-API filters mineral classified images to identify specific classes of interest, 
+example_mining provides a CLI which demonstrates how the COAL Mining
+Classification
+API filters mineral classified images to identify specific classes of
+interest,
 by default proxies for coal mining in the USGS Digital Spectral Library 06. 
 More reading an this example can be seen at 
 https://capstone-coal.github.io/docs#usage
@@ -44,7 +47,6 @@ import constants
 import pycoal
 from pycoal import mining
 
-
 '''
     # path to mineral classified image
     mineral_filename = constants"ang20150420t182050_corr_v1e_img_class.hdr"
@@ -52,7 +54,8 @@ from pycoal import mining
     # path to save mining classified image
     mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
     
-    #Spectral Library Verison Number, Change to 7 if you want to use USGS Spectral Library Version 7
+    #Spectral Library Verison Number, Change to 7 if you want to use USGS 
+    Spectral Library Version 7
 '''
 
 
@@ -63,19 +66,22 @@ def run_mining(mineral_filename=constants.INPUT_NAME + "_class.hdr",
 
     :param mineral_filename: The name of the mineral file
     :param mining_filename: The name of the mining file
-    :param spectral_version: 6 by default. Use 7 if you want to use USGS Spectral Library Version 7
+    :param spectral_version: 6 by default. Use 7 if you want to use USGS
+    Spectral Library Version 7
     """
 
     # create a new mining classification instance
     mining_classification = mining.MiningClassification()
 
     # generate a mining classified image
-    mining_classification.classify_image(mineral_filename, mining_filename, spectral_version)
+    mining_classification.classify_image(mineral_filename, mining_filename,
+                                         spectral_version)
 
 
 def main(argv=None):  # IGNORE:C0111
-    '''Command line options.'''
-    logging.basicConfig(filename='pycoal.log', level=logging.INFO, format='%(asctime)s %(message)s')
+    # Command line options
+    logging.basicConfig(filename='pycoal.log', level=logging.INFO,
+                        format='%(asctime)s %(message)s')
     if argv is None:
         argv = sys.argv
     else:
@@ -108,19 +114,26 @@ USAGE
 
     try:
         # Setup argument parser
-        parser = ArgumentParser(description=program_license, formatter_class=RawDescriptionHelpFormatter)
-        parser.add_argument("-mi", "--mineral_input", dest="input", default=constants.INPUT_NAME + "_class.hdr",
-                            help="Input classified mineral file to be processed [default: " + constants.INPUT_NAME + "_class.hdr]")
+        parser = ArgumentParser(description=program_license,
+                                formatter_class=RawDescriptionHelpFormatter)
+        parser.add_argument("-mi", "--mineral_input", dest="input",
+                            default=constants.INPUT_NAME + "_class.hdr",
+                            help="Input classified mineral file to be "
+                                 "processed [default: " +
+                                 constants.INPUT_NAME + "_class.hdr]")
         parser.add_argument("-mo", "--mining_output", dest="output",
                             default=constants.INPUT_NAME + "_class_mining.hdr",
-                            help="Output mining classified image filename [default: " + constants.INPUT_NAME + "_class_mining.hdr]")
-        parser.add_argument("-v", "--spectral_version", dest="spectral_version", default='6',
+                            help="Output mining classified image filename ["
+                                 "default: " + constants.INPUT_NAME +
+                                 "_class_mining.hdr]")
+        parser.add_argument("-v", "--spectral_version",
+                            dest="spectral_version", default='6',
                             help="USGS Spectral Library Version Number")
 
         # Process arguments
         args = parser.parse_args(
-            ['-mi', constants.INPUT_NAME + "_class.hdr", '-mo', constants.INPUT_NAME + "_class_mining.hdr",
-             '-v', '6'])
+            ['-mi', constants.INPUT_NAME + "_class.hdr", '-mo',
+             constants.INPUT_NAME + "_class_mining.hdr", '-v', '6'])
         # args = parser.parse_args()
 
         mineral_filename = args.input
@@ -130,7 +143,7 @@ USAGE
         run_mining(mineral_filename, mining_filename, spectral_version)
         return 0
     except KeyboardInterrupt:
-        ### handle keyboard interrupt ###
+        # handle keyboard interrupt
         return 0
     except Exception as e:
         if constants.DEBUG or constants.TESTRUN:

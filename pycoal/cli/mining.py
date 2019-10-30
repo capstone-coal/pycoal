@@ -15,14 +15,14 @@
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
 
-program_description = '''
+PROGRAM_DESCRIPTION = '''
 pycoal-mining -- a CLI for COAL mining classification
 
-pycoal-mining provides a CLI which demonstrates how the COAL Mining Classification
-API provides methods for generating mining classified images.
+pycoal-mining provides a CLI which demonstrates how the COAL Mining
+Classification API provides methods for generating mining classified images.
 Mining classification runtime depends largely on the size of the spectral
-library and the available computing resources. More reading an this example can be seen at
-https://capstone-coal.github.io/docs#usage
+library and the available computing resources. More reading an this example
+can be seen at https://capstone-coal.github.io/docs#usage
 
 @author:     COAL Developers
 
@@ -37,16 +37,21 @@ from argparse import ArgumentParser
 from argparse import RawDescriptionHelpFormatter
 from pycoal.mining import MiningClassification
 
-def main(argv=None):  # IGNORE:C0111
+
+def main():  # IGNORE:C0111
     # Setup argument parser
-    parser = ArgumentParser(description=program_description,formatter_class=RawDescriptionHelpFormatter)
-    parser.add_argument("-mi", "--mineral_input", dest="input", help="Input classified mineral file to be processed")
-    parser.add_argument("-mo", "--mining_output", dest="output", help="Output mining classified image filename")
-    parser.add_argument("-v", "--spectral_version", dest="spectral_version", help="USGS Spectral Library Version Number (6 or 7)")
+    parser = ArgumentParser(description=PROGRAM_DESCRIPTION,
+                            formatter_class=RawDescriptionHelpFormatter)
+    parser.add_argument("-mi", "--mineral_input", dest="input",
+                        help="Input classified mineral file to be processed")
+    parser.add_argument("-mo", "--mining_output", dest="output",
+                        help="Output mining classified image filename")
+    parser.add_argument("-v", "--spectral_version", dest="spectral_version",
+                        help="USGS Spectral Library Version Number (6 or 7)")
 
     # Process arguments
     args = parser.parse_args()
-    
+
     mineral_filename = args.input
     mining_filename = args.output
     spectral_version = args.spectral_version
@@ -55,7 +60,8 @@ def main(argv=None):  # IGNORE:C0111
     mining_classification = MiningClassification()
 
     # generate a mining classified image
-    mining_classification.classify_image(mineral_filename, mining_filename, spectral_version)
+    mining_classification.classify_image(mineral_filename, mining_filename,
+                                         spectral_version)
 
 
 if __name__ == '__main__':
