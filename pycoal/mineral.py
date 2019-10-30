@@ -19,47 +19,63 @@ import os
 import logging
 import math
 import numpy
+from spectral.io.spyfile import SubImage
+
 import pycoal
 import spectral
 import time
 import fnmatch
 import shutil
-from pycoal import mineral
 import multiprocessing
 from joblib import Parallel, delayed
 
 
-def CalculatePixel(pixel, x, y, classified, library, threshold, resample, scores_file_name):
 
+def CalculatePixelConfidenceValue(pixel, x, y, classified, library, 
+                                threshold, resample, scores_file_name):
+    """
+    Calculate the confidence score for a pixel
+    Is run in parallel on CPU through joblib
 
+    Args:
+        pixel (int[]):              numpy memmap of pixel's values
+        x (int):                    x position of pixel in image
+        y (int):                    y position of pixel in image
+        classified (int[][]):       array for the classified image
+        library (spectralLibrary):  spectral library
+        threshold (float):          classification threshold
+        resample (BandResampler):   defined resampler for bands
+        scores_file_name (str):     filename of the image to hold each pixel's classification score
+
+    Returns:
+        confidence value (float)
+
+    """
     # if it is not a no data pixel
-    if not numpy.isclose(pixel[0], -0.005) and not pixel[0]==-50:
+    if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
 
         # resample the pixel ignoring NaNs from target bands that don't overlap
-        # TODO fix spectral library so that bands are in order
         resampled_pixel = numpy.nan_to_num(resample(pixel))
         # calculate spectral angles
-        # angles = SpectralAngleReplacement(resampled_pixel[numpy.newaxis, numpy.newaxis, ...], library.spectra)
-        angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis, numpy.newaxis, ...], library.spectra)
+        angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis, 
+                                            numpy.newaxis, ...], library.spectra)
         # normalize confidence values from [pi,0] to [0,1]
         for z in range(angles.shape[2]):
-            angles[0,0,z] = 1-angles[0,0,z]/math.pi
+            angles[0, 0, z] = 1 - angles[0, 0, z] / math.pi
         # get index of class with largest confidence value
         index_of_max = numpy.argmax(angles)
 
-        # get confidence value of the classied pixel
-        score = angles[0,0,index_of_max]
+        # get confidence value of the classified pixel
+        score = angles[0, 0, index_of_max]
 
         # classify pixel if confidence above threshold
         if score > threshold:
 
             # index from one (after zero for no data)
-            classified[x,y] = index_of_max + 1
-
+            classified[x, y] = index_of_max + 1
             if scores_file_name is not None:
                 # store score value
                 return score
-
 
 
 """
@@ -69,7 +85,10 @@ method (MineralClassification.classify_image). The remaining arguments, specific
 of each classifier function, will also be passed by the calling function, but are 
 optionals and may vary from one classifier to another.
 """
-def SAM(image_file_name, classified_file_name, library_file_name, scores_file_name=None, class_names=None, threshold=0.0, in_memory=False):
+
+
+def SAM(image_file_name, classified_file_name, library_file_name, scores_file_name=None, class_names=None,
+        threshold=0.0, in_memory=False, subset_rows=None, subset_cols=None):
     """
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the 
@@ -90,6 +109,8 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
         class_names (str[], optional):      list of classes' names to include
         threshold (float, optional):        classification threshold
         in_memory (boolean, optional):      enable loading entire image
+        subset_rows (2-tuple, optional):        range of rows to read (empty to read the whole image)
+        subset_cols (2-tuple, optional):        range of columns to read (empty to read the whole image)
 
     Returns:
         None
@@ -98,37 +119,41 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
     # load and optionally subset the spectral library
     library = spectral.open_image(library_file_name)
     if class_names is not None:
-            library = pycoal.mineral.MineralClassification.subset_spectral_library(library, class_names)
+        library = pycoal.mineral.MineralClassification.subset_spectral_library(library, class_names)
 
     # open the image
     image = spectral.open_image(image_file_name)
-    if in_memory:
-        data = image.load()
+    if subset_rows is not None and subset_cols is not None:
+        subset_image = SubImage(image, subset_rows, subset_cols)
+        M = subset_rows[1]
+        N = subset_cols[1]
     else:
-        data = image.asarray()
-    M = image.shape[0]
-    N = image.shape[1]
+        if in_memory:
+            data = image.load()
+        else:
+            data = image.asarray()
+        M = image.shape[0]
+        N = image.shape[1]
+
+    logging.info("Classifying a %iX%i image" % (M, N))
 
     # define a resampler
     # TODO detect and scale units
     # TODO band resampler should do this
-    resample = spectral.BandResampler([x/1000 for x in image.bands.centers],
+    resample = spectral.BandResampler([x / 1000 for x in image.bands.centers],
                                       library.bands.centers)
 
     # allocate a zero-initialized MxN array for the classified image
-    classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+    classified = numpy.zeros(shape=(M, N), dtype=numpy.uint16)
 
     if scores_file_name is not None:
         # allocate a zero-initialized MxN array for the scores image
         scored = numpy.zeros(shape=(M,N), dtype=numpy.float64)
-        scoredJobLib = numpy.zeros(shape=(M,N), dtype=numpy.float64)
+        scored_job_lib = numpy.zeros(shape=(M,N), dtype=numpy.float64)
        
     num_cores = multiprocessing.cpu_count()
-    
 
-
-    start = time.time()
-    scoredSingle = numpy.array(Parallel(n_jobs=num_cores)(delayed(CalculatePixel)(data[x,y], 
+    scored_single = numpy.array(Parallel(n_jobs=num_cores)(delayed(CalculatePixelConfidenceValue)(data[x,y], 
                         x, y, classified, library, threshold, resample, scores_file_name)
                         for x in range(M) for y in range(N)), dtype=numpy.float64)
 
@@ -136,23 +161,20 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
     k = 0
     for i in range(M):
         for j in range(N):
-            if scoredSingle[k] is scoredSingle[k]:
-                scoredJobLib[i][j] = scoredSingle[k]
+            if scored_single[k] is scored_single[k]:
+                scored_job_lib[i][j] = scored_single[k]
             k+=1
     
-    end = time.time()
-    seconds = end - start
    
 
 
-    print("Time to run: {} seconds".format(seconds))
     spectral.io.envi.save_classification(
         classified_file_name,
         classified,
-        class_names=['No data']+library.names,
+        class_names=['No data'] + library.names,
         metadata={
             'data ignore value': 0,
-            'description': 'COAL '+pycoal.version+' mineral classified image.',
+            'description': 'COAL ' + pycoal.version + ' mineral classified image.',
             'map info': image.metadata.get('map info')
         })
 
@@ -167,11 +189,13 @@ def SAM(image_file_name, classified_file_name, library_file_name, scores_file_na
             dtype=numpy.float64,
             metadata={
                 'data ignore value': -50,
-                'description': 'COAL '+pycoal.version+' mineral scored image.',
+                'description': 'COAL ' + pycoal.version + ' mineral scored image.',
                 'map info': image.metadata.get('map info')
             })
 
-def avngDNN(image_file_name, classified_file_name, model_file_name, class_names=None, scores_file_name=None, in_memory=False):
+
+def avngDNN(image_file_name, classified_file_name, model_file_name, class_names=None, scores_file_name=None,
+            in_memory=False):
     """
     This callback function takes a Keras model, trained to classify pixels from AVIRIS-NG
     imagery, and assigns a class for every single pixel of the input image.
@@ -193,10 +217,10 @@ def avngDNN(image_file_name, classified_file_name, model_file_name, class_names=
 
     Returns:
         None
-    """    
+    """
 
     from keras.models import load_model
-    
+
     # open the image
     image = spectral.open_image(image_file_name)
     if in_memory:
@@ -207,11 +231,11 @@ def avngDNN(image_file_name, classified_file_name, model_file_name, class_names=
     N = image.shape[1]
 
     # allocate a zero-initialized MxN array for the classified image
-    classified = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+    classified = numpy.zeros(shape=(M, N), dtype=numpy.uint16)
 
     if scores_file_name is not None:
         # allocate a zero-initialized MxN array for the scores image
-        scored = numpy.zeros(shape=(M,N), dtype=numpy.float64)
+        scored = numpy.zeros(shape=(M, N), dtype=numpy.float64)
 
     model = load_model(model_file_name)
 
@@ -221,10 +245,10 @@ def avngDNN(image_file_name, classified_file_name, model_file_name, class_names=
         for y in range(N):
 
             # read the pixel from the file
-            pixel = numpy.array(data[x,y])
+            pixel = numpy.array(data[x, y])
 
             # adjust shape to comprise the AVIRIS-NG bands and comply with Keras model input format
-            pixel = numpy.reshape(pixel,(1,432,1))
+            pixel = numpy.reshape(pixel, (1, 432, 1))
 
             # get the scores for each class considered
             predict = model.predict(pixel)
@@ -233,20 +257,20 @@ def avngDNN(image_file_name, classified_file_name, model_file_name, class_names=
             index_of_max = numpy.argmax(predict).astype(numpy.uint16)
 
             # store the class index (0 meaning nodata)
-            classified[x,y] = index_of_max+1
+            classified[x, y] = index_of_max + 1
 
             # store the outcome score
             if scores_file_name is not None:
-                scored[x,y] = predict[0][index_of_max]
+                scored[x, y] = predict[0][index_of_max]
 
     # save the classified image to a file
     spectral.io.envi.save_classification(
         classified_file_name,
         classified,
-        class_names=['No data']+class_names,
+        class_names=['No data'] + class_names,
         metadata={
             'data ignore value': 0,
-            'description': 'COAL '+pycoal.version+' mineral classified image.',
+            'description': 'COAL ' + pycoal.version + ' mineral classified image.',
             'map info': image.metadata.get('map info')
         })
 
@@ -258,9 +282,10 @@ def avngDNN(image_file_name, classified_file_name, model_file_name, class_names=
             dtype=numpy.float64,
             metadata={
                 'data ignore value': -50,
-                'description': 'COAL '+pycoal.version+' mineral scored image.',
+                'description': 'COAL ' + pycoal.version + ' mineral scored image.',
                 'map info': image.metadata.get('map info')
             })
+
 
 class MineralClassification:
 
@@ -279,17 +304,17 @@ class MineralClassification:
         Args:
             algorithm (function, optional): the classifier callback
             **kwargs: arguments that will be passed to the chosen classifier
-        """  
+        """
 
         # set the user's chosen classifier 
-        self.algorithm=algorithm
+        self.algorithm = algorithm
 
         # hold the remaining arguments that will be passed to self.algorithm
-        self.args=kwargs
+        self.args = kwargs
 
         logging.info("Instantiated Mineral Classifier with following specification: " \
-         "-classifier function '%s'" 
-            %(self.algorithm.__name__, ))
+                     "-classifier function '%s'"
+                     % (self.algorithm.__name__,))
 
     def classify_image(self, image_file_name, classified_file_name):
         """
@@ -304,9 +329,9 @@ class MineralClassification:
             None
         """
         start = time.time()
-        logging.info("Starting Mineral Classification for image '%s', saving classified image to '%s'" 
-            %(image_file_name, classified_file_name))
-        
+        logging.info("Starting Mineral Classification for image '%s', saving classified image to '%s'"
+                     % (image_file_name, classified_file_name))
+
         # run the classifier callback expanding self.args to fulfill the specific args of the function
         self.algorithm(image_file_name, classified_file_name, **self.args)
 
@@ -315,7 +340,6 @@ class MineralClassification:
         m, s = divmod(seconds_elapsed, 60)
         h, m = divmod(m, 60)
         logging.info("Completed Mineral Classification. Time elapsed: '%d:%02d:%02d'" % (h, m, s))
-
 
     @staticmethod
     def filter_classes(classified_file_name):
@@ -336,7 +360,7 @@ class MineralClassification:
         N = classified.shape[1]
 
         # allocate a copy for reindexed pixels
-        copy = numpy.zeros(shape=(M,N), dtype=numpy.uint16)
+        copy = numpy.zeros(shape=(M, N), dtype=numpy.uint16)
 
         # find classes actually present in the image
         classes = sorted(set(classified.asarray().flatten().tolist()))
@@ -345,7 +369,7 @@ class MineralClassification:
         # reindex each pixel
         for x in range(M):
             for y in range(N):
-                copy[x,y] = lookup[data[x,y,0]]
+                copy[x, y] = lookup[data[x, y, 0]]
 
         # overwrite the file
         spectral.io.envi.save_classification(
@@ -373,9 +397,12 @@ class MineralClassification:
 
         # find the index of the first element in a list greater than the value
         start = time.time()
-        logging.info("Starting generation of three-band RGB image from input file: '%s' with following RGB values R: '%s', G: '%s', B: '%s'" %(image_file_name, red, green, blue))
+        logging.info(
+            "Starting generation of three-band RGB image from input file: '%s' with following RGB values R: '%s', G: '%s', B: '%s'" % (
+            image_file_name, red, green, blue))
+
         def index_of_greater_than(elements, value):
-            for index,element in enumerate(elements):
+            for index, element in enumerate(elements):
                 if element > value:
                     return index
 
@@ -392,23 +419,23 @@ class MineralClassification:
         blue_index = index_of_greater_than(wavelength_floats, blue)
 
         # read the red, green, and blue bands from the image
-        red_band = image[:,:,red_index]
-        green_band = image[:,:,green_index]
-        blue_band = image[:,:,blue_index]
+        red_band = image[:, :, red_index]
+        green_band = image[:, :, green_index]
+        blue_band = image[:, :, blue_index]
 
         # remove no data pixels
         for band in [red_band, green_band, blue_band]:
             for x in range(band.shape[0]):
                 for y in range(band.shape[1]):
-                    if numpy.isclose(band[x,y,0], -0.005) or band[x,y,0]==-50:
-                        band[x,y] = 0
+                    if numpy.isclose(band[x, y, 0], -0.005) or band[x, y, 0] == -50:
+                        band[x, y] = 0
 
         # combine the red, green, and blue bands into a three-band RGB image
-        rgb = numpy.concatenate([red_band,green_band,blue_band], axis=2)
+        rgb = numpy.concatenate([red_band, green_band, blue_band], axis=2)
 
         # update the metadata
         rgb_metadata = image.metadata
-        rgb_metadata['description'] = 'COAL '+pycoal.version+' three-band RGB image.'
+        rgb_metadata['description'] = 'COAL ' + pycoal.version + ' three-band RGB image.'
         rgb_metadata['data ignore value'] = 0
         if wavelength_strings:
             rgb_metadata['wavelength'] = [
@@ -476,7 +503,7 @@ class MineralClassification:
         # copy metadata
         metadata = {'wavelength units': spectral_library.metadata.get('wavelength units'),
                     'spectra names': names,
-                    'wavelength': spectral_library.bands.centers }
+                    'wavelength': spectral_library.bands.centers}
 
         # return new spectral library
         return spectral.io.envi.SpectralLibrary(spectra, metadata, {})
@@ -532,8 +559,9 @@ class AsterConversion:
 
         library.save(hdr_file)
 
+
 class SpectalToAsterFileFormat:
-    
+
     def __init__(self):
         """
             This class provides a method for converting `USGS Spectral Library Version 7
@@ -544,7 +572,7 @@ class SpectalToAsterFileFormat:
                 none
             """
         pass
-    
+
     @classmethod
     def convert(cls, library_filename=""):
         """
@@ -560,21 +588,21 @@ class SpectalToAsterFileFormat:
             """
         if not library_filename:
             raise ValueError("Must provide path for Spectral File.")
-        
+
         line_count = 1
-        with open(library_filename,'r') as input_file:
+        with open(library_filename, 'r') as input_file:
             for line_count, l in enumerate(input_file):
                 pass
-            
-        input_file = open(library_filename,'r')
-        #Read Name of Spectra on first line of the file
+
+        input_file = open(library_filename, 'r')
+        # Read Name of Spectra on first line of the file
         spectra_line = input_file.readline()
         spectra_name = spectra_line[23:]
         k = 0
-        #Loop through file and store all wavelength values for the given Spectra
-        spectra_values_file = open('SpectraValues.txt','w')
+        # Loop through file and store all wavelength values for the given Spectra
+        spectra_values_file = open('SpectraValues.txt', 'w')
         spectra_wave_length = 0
-        while(k < line_count):
+        while (k < line_count):
             spectra_wave_length = float(input_file.readline()) * 100
             spectra_wave_length = spectra_wave_length / 1000
             spectra_wave_length = float("{0:.5f}".format(spectra_wave_length))
@@ -582,10 +610,10 @@ class SpectalToAsterFileFormat:
             line = str(spectra_wave_length) + '  ' + str(spectra_y_value)
             spectra_values_file.write(line)
             spectra_values_file.write('\n')
-            k = k+1
-        #Write new file in the form of an ASTER .spectrum.txt file while using stored
-        #Spectra Name and stored Spectra Wavelength values`
-        input_file = open(library_filename,'w')
+            k = k + 1
+        # Write new file in the form of an ASTER .spectrum.txt file while using stored
+        # Spectra Name and stored Spectra Wavelength values`
+        input_file = open(library_filename, 'w')
         input_file.write('Name:')
         input_file.write(spectra_name)
         input_file.write('Type:\n')
@@ -615,19 +643,20 @@ class SpectalToAsterFileFormat:
         input_file.write('\n')
         j = 0
         spectra_values_file.close()
-        #Read in values saved in SpectraValues.txt and output them to the library_filename
-        spectra_values_file = open('SpectraValues.txt','r')
-        while(j < line_count):
+        # Read in values saved in SpectraValues.txt and output them to the library_filename
+        spectra_values_file = open('SpectraValues.txt', 'r')
+        while (j < line_count):
             spectra_wave_length = spectra_values_file.readline()
             input_file.write(spectra_wave_length)
-            j = j+1
-        #Close all open files
+            j = j + 1
+        # Close all open files
         input_file.close()
         spectra_values_file.close()
-        #Rename library_filename to match ASTER .spectrum.txt file format
-        os.rename(library_filename,library_filename + '.spectrum.txt')
-        #Remove temporary file for storing wavelength data
+        # Rename library_filename to match ASTER .spectrum.txt file format
+        os.rename(library_filename, library_filename + '.spectrum.txt')
+        # Remove temporary file for storing wavelength data
         os.remove('SpectraValues.txt')
+
 
 class FullSpectralLibrary7Convert:
     def __init__(self):
@@ -655,10 +684,10 @@ class FullSpectralLibrary7Convert:
             """
         if not library_filename:
             raise ValueError("Must provide path for USGS Spectral Library Version 7.")
-        
-        #This will take all the necessary .txt files for spectra in USGS
-        #Spectral Library Version 7 and put them in a new directory called
-        #"usgs_splib07_modified" in the examples directory
+
+        # This will take all the necessary .txt files for spectra in USGS
+        # Spectral Library Version 7 and put them in a new directory called
+        # "usgs_splib07_modified" in the examples directory
         directory = 'usgs_splib07_modified'
         if not os.path.exists(directory):
             os.makedirs(directory)
@@ -670,28 +699,28 @@ class FullSpectralLibrary7Convert:
                     if "errorbars" not in items:
                         if "Wave" not in items:
                             if "SpectraValues" not in items:
-                                shutil.copy2(os.path.join(root,items), directory)
+                                shutil.copy2(os.path.join(root, items), directory)
 
-        #This will take the .txt files for Spectra in USGS Spectral Version 7 and
-        #convert their format to match that of ASTER .spectrum.txt files for spectra
+        # This will take the .txt files for Spectra in USGS Spectral Version 7 and
+        # convert their format to match that of ASTER .spectrum.txt files for spectra
         # create a new mineral aster conversion instance
         spectral_aster = SpectalToAsterFileFormat()
-        #List to check for duplicates
+        # List to check for duplicates
         spectra_list = []
         # Convert all files
-        files = os.listdir(directory +'/')
+        files = os.listdir(directory + '/')
         for x in range(0, len(files)):
-            name = directory+'/' + files[x]
-            #Get name
-            input_file = open(name,'r')
+            name = directory + '/' + files[x]
+            # Get name
+            input_file = open(name, 'r')
             spectra_line = input_file.readline()
             spectra_cut = spectra_line[23:]
             spectra_name = spectra_cut[:-14]
-            #Remove first and last char in case extra spaces are added
+            # Remove first and last char in case extra spaces are added
             spectra_first_space = spectra_name[1:]
             spectra_last_space = spectra_first_space[:-1]
-            
-            #Check if Spectra is unique
+
+            # Check if Spectra is unique
             set_spectra = set(spectra_list)
             if not any(spectra_name in s for s in set_spectra):
                 if not any(spectra_last_space in a for a in set_spectra):
@@ -701,15 +730,15 @@ class FullSpectralLibrary7Convert:
         set_spectra = set(spectra_list)
         print(set_spectra)
 
-        #This will generate three files s07AV95a_envi.hdr, s07AV95a_envi.hdr.sli,splib.db and dataSplib07.db
-        #For a library in `ASTER Spectral Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ format
+        # This will generate three files s07AV95a_envi.hdr, s07AV95a_envi.hdr.sli,splib.db and dataSplib07.db
+        # For a library in `ASTER Spectral Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ format
         data_dir = "dataSplib07.db"
-        #Avoid overwrite during nosetests of full .hdr and .sli files with sample .hdr and .sli
+        # Avoid overwrite during nosetests of full .hdr and .sli files with sample .hdr and .sli
         if (os.path.isfile('s07_AV95_envi.hdr')):
             header_name = "s07_AV95_envi_sample"
-        else :
+        else:
             header_name = "s07_AV95_envi"
         # create a new mineral aster conversion instance
         spectral_envi = AsterConversion()
         # Generate .sli and .hdr
-        spectral_envi.convert(directory,data_dir,header_name)
+        spectral_envi.convert(directory, data_dir, header_name)
