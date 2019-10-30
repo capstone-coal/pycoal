@@ -29,9 +29,8 @@ import multiprocessing
 from joblib import Parallel, delayed
 
 
-
-def CalculatePixelConfidenceValue(pixel, x, y, classified, library, 
-                                threshold, resample, scores_file_name):
+def CalculatePixelConfidenceValue(pixel, x, y, classified, library,
+                                  threshold, resample, scores_file_name):
     """
     Calculate the confidence score for a pixel
     Is run in parallel on CPU through joblib
@@ -44,20 +43,22 @@ def CalculatePixelConfidenceValue(pixel, x, y, classified, library,
         library (spectralLibrary):  spectral library
         threshold (float):          classification threshold
         resample (BandResampler):   defined resampler for bands
-        scores_file_name (str):     filename of the image to hold each pixel's classification score
+        scores_file_name (str):     filename of the image to hold 
+                                    each pixel's classification score
 
     Returns:
         confidence value (float)
 
     """
+
     # if it is not a no data pixel
     if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
 
         # resample the pixel ignoring NaNs from target bands that don't overlap
         resampled_pixel = numpy.nan_to_num(resample(pixel))
         # calculate spectral angles
-        angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis, 
-                                            numpy.newaxis, ...], library.spectra)
+        angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
+                                          numpy.newaxis, ...], library.spectra)
         # normalize confidence values from [pi,0] to [0,1]
         for z in range(angles.shape[2]):
             angles[0, 0, z] = 1 - angles[0, 0, z] / math.pi
@@ -75,6 +76,7 @@ def CalculatePixelConfidenceValue(pixel, x, y, classified, library,
             if scores_file_name is not None:
                 # store score value
                 return score
+
 
 """
 Classifier callbacks functions must have at least the following args: library,
@@ -128,7 +130,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     # open the image
     image = spectral.open_image(image_file_name)
     if subset_rows is not None and subset_cols is not None:
-        subset_image = SubImage(image, subset_rows, subset_cols)
+        data = SubImage(image, subset_rows, subset_cols)
         m = subset_rows[1]
         n = subset_cols[1]
     else:
@@ -154,21 +156,22 @@ def SAM(image_file_name, classified_file_name, library_file_name,
         # allocate a zero-initialized MxN array for the scores image
         scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
         scored_job_lib = numpy.zeros(shape=(m, n), dtype=numpy.float64)
-       
+
     num_cores = multiprocessing.cpu_count()
 
-    scored_single = numpy.array(Parallel(n_jobs=num_cores)(delayed(CalculatePixelConfidenceValue)(data[x,y], 
-                        x, y, classified, library, threshold, resample, scores_file_name)
-                        for x in range(M) for y in range(N)), dtype=numpy.float64)
+    scored_single = numpy.array(Parallel(n_jobs=num_cores)(delayed(
+                                CalculatePixelConfidenceValue)(
+                                data[x, y], x, y, classified, library, threshold, resample, scores_file_name)
+                                for x in range(m) for y in range(n)), dtype=numpy.float64)
 
-    #puts it all in one single array, need to make 2d array
+    # puts it all in one single array, need to make 2d array
     k = 0
-    for i in range(M):
-        for j in range(N):
+    for i in range(m):
+        for j in range(n):
             if scored_single[k] is scored_single[k]:
                 scored_job_lib[i][j] = scored_single[k]
-            k+=1
-    
+            k += 1
+
     # save the classified image to a file
     spectral.io.envi.save_classification(classified_file_name, classified,
                                          class_names=['No data'] +
@@ -295,7 +298,6 @@ def avngDNN(image_file_name, classified_file_name, model_file_name,
                                                                'image.',
                                               'map info': image.metadata.get(
                                                   'map info')})
-
 
 
 class MineralClassification:
@@ -749,14 +751,12 @@ class FullSpectralLibrary7Convert:
                     if "errorbars" not in items:
                         if "Wave" not in items:
                             if "SpectraValues" not in items:
-<<<<<<< HEAD
                                 shutil.copy2(os.path.join(root, items), directory)
 
         # This will take the .txt files for Spectra in USGS Spectral Version 7 and
         # 7 and
         # convert their format to match that of ASTER .spectrum.txt files
         # for spectra
->>>>>>> master
         # create a new mineral aster conversion instance
         spectral_aster = SpectalToAsterFileFormat()
         # List to check for duplicates
