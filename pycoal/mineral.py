@@ -29,8 +29,8 @@ import multiprocessing
 from joblib import Parallel, delayed
 
 
-def calculate_pixel_confidence_value(pixel, x, y, classified, library,
-                                  threshold, resample, scores_file_name):
+def calculate_pixel_confidence_value(pixel, x, y, library, threshold,
+                                     resample, scores_file_name):
     """
     Calculate the confidence score for a pixel
     Is run in parallel on CPU through joblib
@@ -39,7 +39,6 @@ def calculate_pixel_confidence_value(pixel, x, y, classified, library,
         pixel (int[]):              numpy memmap of pixel's values
         x (int):                    x position of pixel in image
         y (int):                    y position of pixel in image
-        classified (int[][]):       array for the classified image
         library (spectralLibrary):  spectral library
         threshold (float):          classification threshold
         resample (BandResampler):   defined resampler for bands
@@ -53,7 +52,6 @@ def calculate_pixel_confidence_value(pixel, x, y, classified, library,
 
     # if it is not a no data pixel
     if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
-
         # resample the pixel ignoring NaNs from target bands that don't overlap
         resampled_pixel = numpy.nan_to_num(resample(pixel))
         # calculate spectral angles
@@ -72,10 +70,13 @@ def calculate_pixel_confidence_value(pixel, x, y, classified, library,
         if score > threshold:
 
             # index from one (after zero for no data)
-            classified[x, y] = index_of_max + 1
+            classified_value = index_of_max + 1
             if scores_file_name is not None:
                 # store score value
-                return score
+                return score, classified_value
+            else:
+                return 0.0, classified_value
+    return 0.0, 0
 
 
 """
@@ -151,29 +152,26 @@ def SAM(image_file_name, classified_file_name, library_file_name,
 
     # allocate a zero-initialized MxN array for the classified image
     classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
-
+    
     if scores_file_name is not None:
         # allocate a zero-initialized MxN array for the scores image
         scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
-        scored_job_lib = numpy.zeros(shape=(m, n), dtype=numpy.float64)
 
     num_cores = multiprocessing.cpu_count()
-
-    scored_single = numpy.array(Parallel(n_jobs=num_cores)(delayed(
+    pixel_confidences = numpy.array(Parallel(n_jobs=num_cores)(delayed(
                                 calculate_pixel_confidence_value)(data[x, y],
-                                x, y, classified, library, threshold,
+                                x, y, library, threshold,
                                 resample, scores_file_name)
-                                for x in range(m) for y in range(n)),
-                                dtype=numpy.float64)
+                                for x in range(m) for y in range(n)))
 
     # puts it all in one single array, need to make 2d array
     k = 0
     for i in range(m):
         for j in range(n):
-            if scored_single[k] is scored_single[k]:
-                scored_job_lib[i][j] = scored_single[k]
+            if scores_file_name is not None:
+                scored[i][j] = pixel_confidences[k][0]
+            classified[i][j] = pixel_confidences[k][1]
             k += 1
-
     # save the classified image to a file
     spectral.io.envi.save_classification(classified_file_name, classified,
                                          class_names=['No data'] +
