@@ -60,3 +60,19 @@ LIBRARY_FILENAME = "../pycoal/tests/" + LIBRARY_FILENAME_7
 # columns)
 MINERAL_SUBSET_ROWS = [0, 75]
 MINERAL_SUBSET_COLS = [0, 75]
+
+# Paths to the flowlines of streams and whatever other hydrography data
+# should be correlated with a mining classified image.
+# Note that GRanD dam and reservoir data are not included in Pycoal by default
+# because of their file size. They require an account and can be downloaded at
+# https://sedac.ciesin.columbia.edu/data/set/grand-v1-dams-rev01 and
+# https://sedac.ciesin.columbia.edu/data/set/grand-v1-reservoirs-rev01
+# Note that the SHP and SHX (.shp and .shx) files must both be in the same
+# directory. The download from the linked website includes both of these files.
+# Also note that the path should be relative to where you're running the
+# examples from. These defaults assume that you're running
+# `python3 example_environment.py` from the root project directory.
+ENVIRONMENT_VECTOR_PATHS = ["pycoal/tests/images/NHDFlowline_cut.shp",
+                            "pycoal/tests/images/GRanD_dams_v1_1.shp",
+                            "pycoal/tests/images/GRanD_reservoirs_v1_1.shp"]
+
