@@ -29,7 +29,7 @@ import multiprocessing
 from joblib import Parallel, delayed
 
 
-def calculate_pixel_confidence_value(pixel, x, y, library, threshold,
+def calculate_pixel_confidence_value(pixel, library, threshold,
                                      resample, scores_file_name):
     """
     Calculate the confidence score for a pixel
@@ -37,8 +37,6 @@ def calculate_pixel_confidence_value(pixel, x, y, library, threshold,
 
     Args:
         pixel (int[]):              numpy memmap of pixel's values
-        x (int):                    x position of pixel in image
-        y (int):                    y position of pixel in image
         library (spectralLibrary):  spectral library
         threshold (float):          classification threshold
         resample (BandResampler):   defined resampler for bands
@@ -74,8 +72,7 @@ def calculate_pixel_confidence_value(pixel, x, y, library, threshold,
             if scores_file_name is not None:
                 # store score value
                 return score, classified_value
-            else:
-                return 0.0, classified_value
+            return 0.0, classified_value
     return 0.0, 0
 
 
@@ -160,8 +157,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     num_cores = multiprocessing.cpu_count()
     pixel_confidences = numpy.array(Parallel(n_jobs=num_cores)(delayed(
                                 calculate_pixel_confidence_value)(data[x, y],
-                                x, y, library, threshold,
-                                resample, scores_file_name)
+                                library, threshold, resample, scores_file_name)
                                 for x in range(m) for y in range(n)))
 
     # puts it all in one single array, need to make 2d array
