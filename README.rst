@@ -4,7 +4,7 @@ Pycoal
 
 **Development**
 
-|license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads|
+|license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Anaconda-Server Version| |Anaconda-Server Downloads|
 
 **Docker**
 
@@ -199,8 +199,6 @@ COAL is licensed under the |license| a copy of which ships with this source code
    :target: https://coveralls.io/github/capstone-coal/pycoal?branch=master
 .. |Requirements Status| image:: https://requires.io/github/capstone-coal/pycoal/requirements.svg?branch=master
    :target: https://requires.io/github/capstone-coal/pycoal/requirements/?branch=master
-.. |Code Health| image:: https://landscape.io/github/capstone-coal/pycoal/master/landscape.svg?style=plastic
-   :target: https://landscape.io/github/capstone-coal/pycoal/master
 .. |Anaconda-Server Version| image:: https://anaconda.org/conda-forge/pycoal/badges/version.svg
    :target: https://anaconda.org/conda-forge/pycoal
 .. |Anaconda-Server Downloads| image:: https://anaconda.org/conda-forge/pycoal/badges/downloads.svg
