@@ -425,11 +425,7 @@ class MineralClassification:
 
         # remove no data pixels
         for band in [red_band, green_band, blue_band]:
-            for x in range(band.shape[0]):
-                for y in range(band.shape[1]):
-                    if numpy.isclose(band[x, y, 0], -0.005) \
-                            or band[x, y, 0] == -50:
-                        band[x, y] = 0
+            band[numpy.where(numpy.logical_or(numpy.isclose(band[:,:,0], -0.005),band[:,:,0] == -50))] = 0
 
         # combine the red, green, and blue bands into a three-band RGB image
         rgb = numpy.concatenate([red_band, green_band, blue_band], axis=2)
