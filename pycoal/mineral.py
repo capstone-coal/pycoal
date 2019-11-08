@@ -25,7 +25,6 @@ import spectral
 import time
 import fnmatch
 import shutil
-import tqdm
 
 """
 Classifier callbacks functions must have at least the following args: library,
@@ -105,8 +104,13 @@ def SAM(image_file_name, classified_file_name, library_file_name,
         # allocate a zero-initialized MxN array for the scores image
         scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
 
+    # universal calculations for angles
+    # Adapted from Spectral library
+    angles_m = numpy.array(library.spectra, dtype=numpy.float64)
+    angles_m /= numpy.sqrt(numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
+
     # for each pixel in the image
-    for x in tqdm.tqdm(range(m)):
+    for x in range(m):
 
         for y in range(n):
 
@@ -125,9 +129,12 @@ def SAM(image_file_name, classified_file_name, library_file_name,
                 resampled_pixel = numpy.nan_to_num(resample(pixel))
 
                 # calculate spectral angles
-                angles = spectral.spectral_angles(
-                    resampled_pixel[numpy.newaxis, numpy.newaxis, ...],
-                    library.spectra)
+                # Adapted from Spectral library
+                resampled_data = resampled_pixel[numpy.newaxis, numpy.newaxis, ...]
+                norms = numpy.sqrt(numpy.einsum('ijk,ijk->ij', resampled_data, resampled_data))
+                dots = numpy.einsum('ijk,mk->ijm', resampled_data, angles_m)
+                dots = numpy.clip(dots / norms[:, :, numpy.newaxis], -1, 1)
+                angles = numpy.arccos(dots)
 
                 # normalize confidence values from [pi,0] to [0,1]
                 for z in range(angles.shape[2]):
