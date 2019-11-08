@@ -137,8 +137,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
                 angles = numpy.arccos(dots)
 
                 # normalize confidence values from [pi,0] to [0,1]
-                for z in range(angles.shape[2]):
-                    angles[0, 0, z] = 1 - angles[0, 0, z] / math.pi
+                angles[0, 0, :] = 1 - angles[0, 0, :] / math.pi 
 
                 # get index of class with largest confidence value
                 index_of_max = numpy.argmax(angles)
