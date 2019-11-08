@@ -25,6 +25,7 @@ import spectral
 import time
 import fnmatch
 import shutil
+import tqdm
 
 """
 Classifier callbacks functions must have at least the following args: library,
@@ -105,7 +106,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
         scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
 
     # for each pixel in the image
-    for x in range(m):
+    for x in tqdm.tqdm(range(m)):
 
         for y in range(n):
 
