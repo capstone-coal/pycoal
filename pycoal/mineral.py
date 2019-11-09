@@ -26,7 +26,6 @@ import spectral
 import time
 import fnmatch
 import shutil
-import torch
 import tqdm
 """
 Classifier callbacks functions must have at least the following args: library,
@@ -98,17 +97,16 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     # TODO band resampler should do this
     resampling_matrix = create_resampling_matrix(
         [x / 1000 for x in image.bands.centers], library.bands.centers)
-    resampling_matrix = torch.from_numpy(resampling_matrix)
 
     # allocate a zero-initialized MxN array for the classified image
     classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
+
     scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
 
     # universal calculations for angles
     # Adapted from Spectral library
     angles_m = numpy.array(library.spectra, dtype=numpy.float64)
     angles_m /= numpy.sqrt(numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
-    angles_m = torch.from_numpy(angles_m)
 
     # for each pixel in the image
     for x in tqdm.tqdm(range(m)):
@@ -117,32 +115,37 @@ def SAM(image_file_name, classified_file_name, library_file_name,
 
             # read the pixel from the file
             if subset_rows is not None and subset_cols is not None:
-                pixel = torch.from_numpy(subset_image.read_pixel(x, y).astype(numpy.float64))
+                pixel = subset_image.read_pixel(x, y)
             else:
-                pixel = torch.from_numpy(data[x, y].astype(numpy.float64))
+                pixel = data[x, y]
 
+            # if it is not a no data pixel
             if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
 
                 # resample the pixel ignoring NaNs from target bands that
                 # don't overlap
                 # TODO fix spectral library so that bands are in order
-                resampled_data = torch.einsum('ij,j->i', resampling_matrix, pixel)
-                resampled_data[resampled_data != resampled_data] = 0 
+                resampled_data = numpy.einsum('ij,j->i', resampling_matrix, pixel)
+                resampled_data = numpy.nan_to_num(resampled_data)
 
                 # calculate spectral angles
                 # Adapted from Spectral library
-                dots = torch.einsum('i,ji->j', resampled_data, angles_m) / torch.norm(resampled_data)
-                angles = torch.acos(torch.clamp(dots, -1, 1))
+                norms = numpy.sqrt(numpy.einsum('i,i->', resampled_data, resampled_data))
+                dots = numpy.einsum('i,ji->j', resampled_data, angles_m)
+                dots = numpy.clip(dots / norms, -1, 1)
+                angles = numpy.arccos(dots)
 
                 # normalize confidence values from [pi,0] to [0,1]
-                angles = 1 - (angles / math.pi)
-
+                angles = 1 - angles / math.pi 
+                
                 # get index of class with largest confidence value
+                classified[x,y] = numpy.argmax(angles)
+
                 # get confidence value of the classified pixel
-                scored[x,y],classified[x,y] = torch.max(angles, 0)
+                scored[x,y] = angles[classified[x,y]]
 
     classified = classified + 1
-    
+
     indices = numpy.where(scored[:][:] <= threshold)
 
     classified[indices] = 0
