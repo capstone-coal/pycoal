@@ -21,11 +21,13 @@ import numpy
 from spectral.io.spyfile import SubImage
 
 import pycoal
+from pycoal.resampler import *
 import spectral
 import time
 import fnmatch
 import shutil
-
+import torch
+import tqdm
 """
 Classifier callbacks functions must have at least the following args: library,
 image_file_name, classified_file_name; which will always be passed by the
@@ -94,66 +96,57 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     # define a resampler
     # TODO detect and scale units
     # TODO band resampler should do this
-    resample = spectral.BandResampler([x / 1000 for x in image.bands.centers],
-                                      library.bands.centers)
+    resampling_matrix = create_resampling_matrix(
+        [x / 1000 for x in image.bands.centers], library.bands.centers)
+    resampling_matrix = torch.from_numpy(resampling_matrix)
 
     # allocate a zero-initialized MxN array for the classified image
     classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
-
-    if scores_file_name is not None:
-        # allocate a zero-initialized MxN array for the scores image
-        scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
+    scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
 
     # universal calculations for angles
     # Adapted from Spectral library
     angles_m = numpy.array(library.spectra, dtype=numpy.float64)
     angles_m /= numpy.sqrt(numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
+    angles_m = torch.from_numpy(angles_m)
 
     # for each pixel in the image
-    for x in range(m):
+    for x in tqdm.tqdm(range(m)):
 
         for y in range(n):
 
             # read the pixel from the file
             if subset_rows is not None and subset_cols is not None:
-                pixel = subset_image.read_pixel(x, y)
+                pixel = torch.from_numpy(subset_image.read_pixel(x, y).astype(numpy.float64))
             else:
-                pixel = data[x, y]
+                pixel = torch.from_numpy(data[x, y].astype(numpy.float64))
 
-            # if it is not a no data pixel
             if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
 
                 # resample the pixel ignoring NaNs from target bands that
                 # don't overlap
                 # TODO fix spectral library so that bands are in order
-                resampled_pixel = numpy.nan_to_num(resample(pixel))
+                resampled_data = torch.einsum('ij,j->i', resampling_matrix, pixel)
+                resampled_data[resampled_data != resampled_data] = 0 
 
                 # calculate spectral angles
                 # Adapted from Spectral library
-                resampled_data = resampled_pixel[numpy.newaxis, numpy.newaxis, ...]
-                norms = numpy.sqrt(numpy.einsum('ijk,ijk->ij', resampled_data, resampled_data))
-                dots = numpy.einsum('ijk,mk->ijm', resampled_data, angles_m)
-                dots = numpy.clip(dots / norms[:, :, numpy.newaxis], -1, 1)
-                angles = numpy.arccos(dots)
+                dots = torch.einsum('i,ji->j', resampled_data, angles_m) / torch.norm(resampled_data)
+                angles = torch.acos(torch.clamp(dots, -1, 1))
 
                 # normalize confidence values from [pi,0] to [0,1]
-                angles[0, 0, :] = 1 - angles[0, 0, :] / math.pi 
+                angles = 1 - (angles / math.pi)
 
                 # get index of class with largest confidence value
-                index_of_max = numpy.argmax(angles)
-
                 # get confidence value of the classified pixel
-                score = angles[0, 0, index_of_max]
+                scored[x,y],classified[x,y] = torch.max(angles, 0)
 
-                # classify pixel if confidence above threshold
-                if score > threshold:
+    classified = classified + 1
+    
+    indices = numpy.where(scored[:][:] <= threshold)
 
-                    # index from one (after zero for no data)
-                    classified[x, y] = index_of_max + 1
-
-                    if scores_file_name is not None:
-                        # store score value
-                        scored[x, y] = score
+    classified[indices] = 0
+    scored[indices] = 0
 
     # save the classified image to a file
     spectral.io.envi.save_classification(classified_file_name, classified,
