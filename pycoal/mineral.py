@@ -26,7 +26,7 @@ import spectral
 import time
 import fnmatch
 import shutil
-import tqdm
+
 """
 Classifier callbacks functions must have at least the following args: library,
 image_file_name, classified_file_name; which will always be passed by the
@@ -109,7 +109,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     angles_m /= numpy.sqrt(numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
 
     # for each pixel in the image
-    for x in tqdm.tqdm(range(m)):
+    for x in range(m):
 
         for y in range(n):
 
