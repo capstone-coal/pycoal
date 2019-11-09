@@ -27,7 +27,7 @@ import time
 import fnmatch
 import shutil
 import torch
-import tqdm
+
 """
 Classifier callbacks functions must have at least the following args: library,
 image_file_name, classified_file_name; which will always be passed by the
@@ -111,7 +111,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     angles_m = torch.from_numpy(angles_m)
 
     # for each pixel in the image
-    for x in tqdm.tqdm(range(m)):
+    for x in range(m):
 
         for y in range(n):
 
