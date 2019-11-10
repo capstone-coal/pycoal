@@ -119,35 +119,32 @@ def SAM(image_file_name, classified_file_name, library_file_name,
 
     # for each pixel in the image
     for x in range(m):
+        pixel_data = torch.from_numpy(data[x].astype(numpy.float64))
 
-        for y in range(n):
+        resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
+        resampled_data[resampled_data != resampled_data] = 0 
+        
+        # calculate spectral angles
+        # Adapted from Spectral library
+        norms = torch.norm(resampled_data, dim=1)
+        dots = (torch.einsum('ki,ji->jk', resampled_data, angles_m) / norms).t()
+        angles = torch.acos(torch.clamp(dots, -1, 1))
 
-            # read the pixel from the file
-            pixel = torch.from_numpy(data[x, y].astype(numpy.float64))
+        # normalize confidence values from [pi,0] to [0,1]
+        angles = 1 - (angles / math.pi)
+        
+        # get index of class with largest confidence value
+        # get confidence value of the classified pixel
+        scored[x],classified[x] = torch.max(angles, 1)
+        classified[x] = classified[x] + 1
 
-            if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
 
-                # resample the pixel ignoring NaNs from target bands that
-                # don't overlap
-                # TODO fix spectral library so that bands are in order
-                resampled_data = torch.einsum('ij,j->i', resampling_matrix, pixel)
-                resampled_data[resampled_data != resampled_data] = 0 
+    noPixel_indices = numpy.where(numpy.logical_or(numpy.isclose(data[:,:,0], -0.005), data[:,:,0] == -50))  
 
-                # calculate spectral angles
-                # Adapted from Spectral library
-                dots = torch.einsum('i,ji->j', resampled_data, angles_m) / torch.norm(resampled_data)
-                angles = torch.acos(torch.clamp(dots, -1, 1))
+    classified[noPixel_indices] = 0
+    scored[noPixel_indices] = 0
 
-                # normalize confidence values from [pi,0] to [0,1]
-                angles = 1 - (angles / math.pi)
-
-                # get index of class with largest confidence value
-                # get confidence value of the classified pixel
-                scored[x,y],classified[x,y] = torch.max(angles, 0)
-
-    classified = classified + 1
-    
-    indices = numpy.where(scored[:][:] <= threshold)
+    belowThreshold_indices = numpy.where(scored[:][:] <= threshold)
 
     classified[indices] = 0
     scored[indices] = 0
