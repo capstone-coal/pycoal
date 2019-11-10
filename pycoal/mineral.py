@@ -146,8 +146,8 @@ def SAM(image_file_name, classified_file_name, library_file_name,
 
     belowThreshold_indices = numpy.where(scored[:][:] <= threshold)
 
-    classified[indices] = 0
-    scored[indices] = 0
+    classified[belowThreshold_indices] = 0
+    scored[belowThreshold_indices] = 0
 
     # save the classified image to a file
     spectral.io.envi.save_classification(classified_file_name, classified,
