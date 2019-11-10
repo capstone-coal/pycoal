@@ -79,9 +79,16 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     # open the image
     image = spectral.open_image(image_file_name)
     if subset_rows is not None and subset_cols is not None:
-        subset_image = SubImage(image, subset_rows, subset_cols)
-        m = subset_rows[1]
-        n = subset_cols[1]
+        # Creates list of rows and columns to create subset image from
+        rows = numpy.linspace(subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
+        cols = numpy.linspace(subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
+        
+        # Reads subset of image image into memory
+        data = image.read_subimage(rows, cols)
+        
+        # Determines dimensions for subset image
+        m = subset_rows[1] - subset_rows[0] + 1
+        n = subset_cols[1] - subset_cols[0] + 1
     else:
         if in_memory:
             data = image.load()
@@ -114,10 +121,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
         for y in range(n):
 
             # read the pixel from the file
-            if subset_rows is not None and subset_cols is not None:
-                pixel = subset_image.read_pixel(x, y)
-            else:
-                pixel = data[x, y]
+            pixel = data[x, y]
 
             # if it is not a no data pixel
             if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
