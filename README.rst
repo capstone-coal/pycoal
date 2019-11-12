@@ -186,8 +186,8 @@ COAL is licensed under the |license| a copy of which ships with this source code
 .. |PyPI| image:: https://img.shields.io/pypi/v/pycoal.svg?maxAge=2592000?style=plastic
    :target: https://pypi.python.org/pypi/pycoal
 .. |Slack| image:: https://cdn.brandfolder.io/5H442O3W/as/pnlpsg-beh8pk-2mgxnk/appIcon_desktop.png
-    :height: 50px
-    :width: 50px
+    :height: 1px
+    :width: 1px
     :target: https://capstone-coal.slack.com
 .. |GoogleGroup| image:: https://img.shields.io/badge/-Google%20Group-lightgrey.svg
    :target: https://groups.google.com/forum/#!forum/coal-capstone
