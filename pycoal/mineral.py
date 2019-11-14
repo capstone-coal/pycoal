@@ -21,10 +21,12 @@ import numpy
 from spectral.io.spyfile import SubImage
 
 import pycoal
+from pycoal.resampler import *
 import spectral
 import time
 import fnmatch
 import shutil
+import torch
 
 """
 Classifier callbacks functions must have at least the following args: library,
@@ -78,9 +80,16 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     # open the image
     image = spectral.open_image(image_file_name)
     if subset_rows is not None and subset_cols is not None:
-        subset_image = SubImage(image, subset_rows, subset_cols)
-        m = subset_rows[1]
-        n = subset_cols[1]
+        # Creates list of rows and columns to create subset image from
+        rows = numpy.linspace(subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
+        cols = numpy.linspace(subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
+        
+        # Reads subset of image image into memory
+        data = image.read_subimage(rows, cols)
+        
+        # Determines dimensions for subset image
+        m = subset_rows[1] - subset_rows[0] + 1
+        n = subset_cols[1] - subset_cols[0] + 1
     else:
         if in_memory:
             data = image.load()
@@ -94,66 +103,51 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     # define a resampler
     # TODO detect and scale units
     # TODO band resampler should do this
-    resample = spectral.BandResampler([x / 1000 for x in image.bands.centers],
-                                      library.bands.centers)
+    resampling_matrix = create_resampling_matrix(
+        [x / 1000 for x in image.bands.centers], library.bands.centers)
+    resampling_matrix = torch.from_numpy(resampling_matrix)
 
     # allocate a zero-initialized MxN array for the classified image
     classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
-
-    if scores_file_name is not None:
-        # allocate a zero-initialized MxN array for the scores image
-        scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
+    scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
 
     # universal calculations for angles
     # Adapted from Spectral library
     angles_m = numpy.array(library.spectra, dtype=numpy.float64)
     angles_m /= numpy.sqrt(numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
+    angles_m = torch.from_numpy(angles_m)
 
     # for each pixel in the image
     for x in range(m):
+        pixel_data = torch.from_numpy(data[x].astype(numpy.float64))
 
-        for y in range(n):
+        resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
+        resampled_data[resampled_data != resampled_data] = 0 
+        
+        # calculate spectral angles
+        # Adapted from Spectral library
+        norms = torch.norm(resampled_data, dim=1)
+        dots = (torch.einsum('ki,ji->jk', resampled_data, angles_m) / norms).t()
+        angles = torch.acos(torch.clamp(dots, -1, 1))
 
-            # read the pixel from the file
-            if subset_rows is not None and subset_cols is not None:
-                pixel = subset_image.read_pixel(x, y)
-            else:
-                pixel = data[x, y]
+        # normalize confidence values from [pi,0] to [0,1]
+        angles = 1 - (angles / math.pi)
+        
+        # get index of class with largest confidence value
+        # get confidence value of the classified pixel
+        scored[x],classified[x] = torch.max(angles, 1)
+        classified[x] = classified[x] + 1
 
-            # if it is not a no data pixel
-            if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
 
-                # resample the pixel ignoring NaNs from target bands that
-                # don't overlap
-                # TODO fix spectral library so that bands are in order
-                resampled_pixel = numpy.nan_to_num(resample(pixel))
+    noPixel_indices = numpy.where(numpy.logical_or(numpy.isclose(data[:,:,0], -0.005), data[:,:,0] == -50))  
 
-                # calculate spectral angles
-                # Adapted from Spectral library
-                resampled_data = resampled_pixel[numpy.newaxis, numpy.newaxis, ...]
-                norms = numpy.sqrt(numpy.einsum('ijk,ijk->ij', resampled_data, resampled_data))
-                dots = numpy.einsum('ijk,mk->ijm', resampled_data, angles_m)
-                dots = numpy.clip(dots / norms[:, :, numpy.newaxis], -1, 1)
-                angles = numpy.arccos(dots)
+    classified[noPixel_indices] = 0
+    scored[noPixel_indices] = 0
 
-                # normalize confidence values from [pi,0] to [0,1]
-                angles[0, 0, :] = 1 - angles[0, 0, :] / math.pi 
+    belowThreshold_indices = numpy.where(scored[:][:] <= threshold)
 
-                # get index of class with largest confidence value
-                index_of_max = numpy.argmax(angles)
-
-                # get confidence value of the classified pixel
-                score = angles[0, 0, index_of_max]
-
-                # classify pixel if confidence above threshold
-                if score > threshold:
-
-                    # index from one (after zero for no data)
-                    classified[x, y] = index_of_max + 1
-
-                    if scores_file_name is not None:
-                        # store score value
-                        scored[x, y] = score
+    classified[belowThreshold_indices] = 0
+    scored[belowThreshold_indices] = 0
 
     # save the classified image to a file
     spectral.io.envi.save_classification(classified_file_name, classified,
