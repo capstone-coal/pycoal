@@ -15,7 +15,7 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 # Adapted from Spectral Library: resampling.py
-
+# https://github.com/spectralpython/spectral/blob/master/spectral/algorithms/resampling.py
 
 from spectral.spectral import BandInfo
 from math import erf
