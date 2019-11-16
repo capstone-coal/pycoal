@@ -29,7 +29,7 @@ import multiprocessing
 from joblib import Parallel, delayed
 
 
-def calculate_pixel_confidence_value(pixel, library, threshold,
+def calculate_pixel_confidence_value(pixel, angles_m, threshold,
                                      resample, scores_file_name):
     """
     Calculate the confidence score for a pixel
@@ -37,7 +37,7 @@ def calculate_pixel_confidence_value(pixel, library, threshold,
 
     Args:
         pixel (int[]):              numpy memmap of pixel's values
-        library (spectralLibrary):  spectral library
+        angles_m (numpy array):     universal calculated angles
         threshold (float):          classification threshold
         resample (BandResampler):   defined resampler for bands
         scores_file_name (str):     filename of the image to hold
@@ -53,11 +53,17 @@ def calculate_pixel_confidence_value(pixel, library, threshold,
         # resample the pixel ignoring NaNs from target bands that don't overlap
         resampled_pixel = numpy.nan_to_num(resample(pixel))
         # calculate spectral angles
-        angles = spectral.spectral_angles(resampled_pixel[numpy.newaxis,
-                                          numpy.newaxis, ...], library.spectra)
+        # calculate spectral angles
+        # Adapted from Spectral library
+        resampled_data = resampled_pixel[numpy.newaxis, numpy.newaxis, ...]
+        norms = numpy.sqrt(numpy.einsum('ijk,ijk->ij', resampled_data, resampled_data))
+        dots = numpy.einsum('ijk,mk->ijm', resampled_data, angles_m)
+        dots = numpy.clip(dots / norms[:, :, numpy.newaxis], -1, 1)
+        angles = numpy.arccos(dots)
+
         # normalize confidence values from [pi,0] to [0,1]
-        for z in range(angles.shape[2]):
-            angles[0, 0, z] = 1 - angles[0, 0, z] / math.pi
+        angles[0, 0, :] = 1 - angles[0, 0, :] / math.pi 
+
         # get index of class with largest confidence value
         index_of_max = numpy.argmax(angles)
 
@@ -153,11 +159,15 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     if scores_file_name is not None:
         # allocate a zero-initialized MxN array for the scores image
         scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
+    # universal calculations for angles
+    # Adapted from Spectral library
+    angles_m = numpy.array(library.spectra, dtype=numpy.float64)
+    angles_m /= numpy.sqrt(numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
 
     num_cores = multiprocessing.cpu_count()
     pixel_confidences = numpy.array(Parallel(n_jobs=num_cores)(delayed(
                                 calculate_pixel_confidence_value)(data[x, y],
-                                library, threshold, resample, scores_file_name)
+                                angles_m, threshold, resample, scores_file_name)
                                 for x in range(m) for y in range(n)))
 
     # puts it all in one single array, need to make 2d array
@@ -445,11 +455,7 @@ class MineralClassification:
 
         # remove no data pixels
         for band in [red_band, green_band, blue_band]:
-            for x in range(band.shape[0]):
-                for y in range(band.shape[1]):
-                    if numpy.isclose(band[x, y, 0], -0.005) \
-                            or band[x, y, 0] == -50:
-                        band[x, y] = 0
+            band[numpy.where(numpy.logical_or(numpy.isclose(band[:,:,0], -0.005),band[:,:,0] == -50))] = 0
 
         # combine the red, green, and blue bands into a three-band RGB image
         rgb = numpy.concatenate([red_band, green_band, blue_band], axis=2)
