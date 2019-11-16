@@ -23,6 +23,7 @@ import os
 import numpy
 import spectral
 import pycoal
+import configparser
 from pycoal import conversion
 from pycoal import mineral
 from pycoal import mining
@@ -81,7 +82,15 @@ def test_classify_image():
         # verify that every pixel has the same classification
         assert numpy.array_equal(expected.asarray(), actual.asarray())
 
-
+# verify that classified images have valid classifications when using config file
+@with_setup(None, _test_classify_image_teardown)
+def test_classify_image_dask():
+    # set our config file to dask
+    config = configparser.ConfigParser()
+    config.read('config.py')
+    config['parallel_method'] = 'dask'
+    test_classify_image()
+    
 # verify classification when loading entire images into memory
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_in_memory():
