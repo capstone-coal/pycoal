@@ -79,8 +79,12 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     image = spectral.open_image(image_file_name)
     if subset_rows is not None and subset_cols is not None:
         # Creates list of rows and columns to create subset image from
-        rows = numpy.linspace(subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
-        cols = numpy.linspace(subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
+        rows = numpy.linspace(
+            subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1)
+        .astype(numpy.int32)
+        cols = numpy.linspace(
+            subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1)
+        .astype(numpy.int32)
 
         # Reads subset of image image into memory
         data = image.read_subimage(rows, cols)
@@ -117,8 +121,8 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     angles_m = torch.from_numpy(angles_m)
 
     # for each pixel in the image
-    for x in range(m):
-        pixel_data = torch.from_numpy(data[x].astype(numpy.float64))
+    for x_pixel in range(m):
+        pixel_data = torch.from_numpy(data[x_pixel].astype(numpy.float64))
 
         resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
         resampled_data[resampled_data != resampled_data] = 0 
@@ -134,8 +138,8 @@ def SAM(image_file_name, classified_file_name, library_file_name,
 
         # get index of class with largest confidence value
         # get confidence value of the classified pixel
-        scored[x], classified[x] = torch.max(angles, 1)
-        classified[x] = classified[x] + 1
+        scored[x_pixel], classified[x_pixel] = torch.max(angles, 1)
+        classified[x_pixel] = classified[x_pixel] + 1
 
     nopixel_indices = numpy.where(
         numpy.logical_or(

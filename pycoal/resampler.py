@@ -18,6 +18,7 @@
 # https://github.com/spectralpython/spectral/blob/master/spectral/algorithms/resampling.py
 
 from spectral.spectral import BandInfo
+from spectral.algorithms.resampling import build_fwhm, create_resampling_matrix, normal_integral, overlap, ranges_overlap
 import numpy
 
 
@@ -42,35 +43,35 @@ def create_resampling_matrix(centers1, centers2):
 
     sqrt_8log2 = 2.3548200450309493
 
-    n1 = len(centers1)
-    n2 = len(centers2)
+    n_centers1 = len(centers1)
+    n_centers2 = len(centers2)
     bounds1 = [[centers1[i] - fwhm1[i] / 2.0, centers1[i] + fwhm1[i] /
-                2.0] for i in range(n1)]
+                2.0] for i in range(n_centers1)]
     bounds2 = [[centers2[i] - fwhm2[i] / 2.0, centers2[i] + fwhm2[i] /
-                2.0] for i in range(n2)]
+                2.0] for i in range(n_centers2)]
 
-    M = numpy.zeros([n2, n1])
+    shape = numpy.zeros([n_centers2, n_centers1])
 
     j_start = 0
     nan = float('nan')
-    for i in range(n2):
+    for i in range(n_centers2):
         stdev = fwhm2[i] / sqrt_8log2
         j = j_start
 
         # Find the first original band that overlaps the new band
-        while j < n1 and bounds1[j][1] < bounds2[i][0]:
+        while j < n_centers1 and bounds1[j][1] < bounds2[i][0]:
             j += 1
 
-        if j == n1:
+        if j == n_centers1:
             print(('No overlap for target band %d (%f / %f)' % (
                 i, centers2[i], fwhm2[i])))
-            M[i, 0] = nan
+            shape[i, 0] = nan
             continue
 
         matches = []
 
         # Get indices for all original bands that overlap the new band
-        while j < n1 and bounds1[j][0] < bounds2[i][1]:
+        while j < n_centers1 and bounds1[j][0] < bounds2[i][1]:
             if ranges_overlap(bounds1[j], bounds2[i]):
                 matches.append(j)
             j += 1
@@ -80,7 +81,7 @@ def create_resampling_matrix(centers1, centers2):
         if not matches:
             print(('No overlap for target band %d (%f / %f)' % (
                 i, centers2[i], fwhm2[i])))
-            M[i, 0] = nan
+            shape[i, 0] = nan
             continue
 
         # Determine the weights for the original bands that overlap the new
@@ -90,13 +91,13 @@ def create_resampling_matrix(centers1, centers2):
 
         overlaps = [overlap(bounds1[k], bounds2[i]) for k in matches]
         contribs = numpy.zeros(len(matches))
-        A = 0.
+        count = 0.
         for k in range(len(matches)):
-            (a, b) = [(x - centers2[i]) / stdev for x in overlaps[k]]
-            dA = normal_integral(a, b)
-            contribs[k] = dA
-            A += dA
-        contribs = contribs / A
+            (first, second) = [(x - centers2[i]) / stdev for x in overlaps[k]]
+            integral = normal_integral(first, second)
+            contribs[k] = integral
+            count += integral
+        contribs = contribs / count
         for k in enumerate(matches):
-            M[i, matches[k]] = contribs[k]
-    return M
+            shape[i, matches[k]] = contribs[k]
+    return shape
