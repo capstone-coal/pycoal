@@ -18,10 +18,8 @@ import os
 import logging
 import math
 import numpy
-from spectral.io.spyfile import SubImage
 
 import pycoal
-from pycoal.resampler import *
 import spectral
 import time
 import fnmatch
@@ -83,10 +81,10 @@ def SAM(image_file_name, classified_file_name, library_file_name,
         # Creates list of rows and columns to create subset image from
         rows = numpy.linspace(subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
         cols = numpy.linspace(subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
-        
+
         # Reads subset of image image into memory
         data = image.read_subimage(rows, cols)
-        
+
         # Determines dimensions for subset image
         m = subset_rows[1] - subset_rows[0] + 1
         n = subset_cols[1] - subset_cols[0] + 1
@@ -114,7 +112,8 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     # universal calculations for angles
     # Adapted from Spectral library
     angles_m = numpy.array(library.spectra, dtype=numpy.float64)
-    angles_m /= numpy.sqrt(numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
+    angles_m /= numpy.sqrt(
+        numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
     angles_m = torch.from_numpy(angles_m)
 
     # for each pixel in the image
@@ -123,7 +122,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
 
         resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
         resampled_data[resampled_data != resampled_data] = 0 
-        
+
         # calculate spectral angles
         # Adapted from Spectral library
         norms = torch.norm(resampled_data, dim=1)
@@ -132,22 +131,23 @@ def SAM(image_file_name, classified_file_name, library_file_name,
 
         # normalize confidence values from [pi,0] to [0,1]
         angles = 1 - (angles / math.pi)
-        
+
         # get index of class with largest confidence value
         # get confidence value of the classified pixel
-        scored[x],classified[x] = torch.max(angles, 1)
+        scored[x], classified[x] = torch.max(angles, 1)
         classified[x] = classified[x] + 1
 
+    nopixel_indices = numpy.where(
+        numpy.logical_or(
+            numpy.isclose(data[:, :, 0], -0.005), data[:, :, 0] == -50))
 
-    noPixel_indices = numpy.where(numpy.logical_or(numpy.isclose(data[:,:,0], -0.005), data[:,:,0] == -50))  
+    classified[nopixel_indices] = 0
+    scored[nopixel_indices] = 0
 
-    classified[noPixel_indices] = 0
-    scored[noPixel_indices] = 0
+    below_threshold_indices = numpy.where(scored[:][:] <= threshold)
 
-    belowThreshold_indices = numpy.where(scored[:][:] <= threshold)
-
-    classified[belowThreshold_indices] = 0
-    scored[belowThreshold_indices] = 0
+    classified[below_threshold_indices] = 0
+    scored[below_threshold_indices] = 0
 
     # save the classified image to a file
     spectral.io.envi.save_classification(classified_file_name, classified,
