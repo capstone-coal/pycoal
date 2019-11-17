@@ -18,7 +18,8 @@
 # https://github.com/spectralpython/spectral/blob/master/spectral/algorithms/resampling.py
 
 from spectral.spectral import BandInfo
-from spectral.algorithms.resampling import build_fwhm, normal_integral, overlap, ranges_overlap
+from spectral.algorithms.resampling import build_fwhm, normal_integral
+from spectral.algorithms.resampling import overlap, ranges_overlap
 import numpy
 
 
