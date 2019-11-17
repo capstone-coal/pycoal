@@ -20,6 +20,7 @@ import math
 import numpy
 
 import pycoal
+from pycoal.resampler import create_resampling_matrix
 import spectral
 import time
 import fnmatch
@@ -125,7 +126,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
         pixel_data = torch.from_numpy(data[x_pixel].astype(numpy.float64))
 
         resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
-        resampled_data[resampled_data != resampled_data] = 0 
+        resampled_data[resampled_data != resampled_data] = 0
 
         # calculate spectral angles
         # Adapted from Spectral library
