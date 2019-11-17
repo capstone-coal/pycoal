@@ -81,10 +81,10 @@ def SAM(image_file_name, classified_file_name, library_file_name,
         # Creates list of rows and columns to create subset image from
         rows = numpy.linspace(
             subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1)
-        .astype(numpy.int32)
+                .astype(numpy.int32)
         cols = numpy.linspace(
             subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1)
-        .astype(numpy.int32)
+                .astype(numpy.int32)
 
         # Reads subset of image image into memory
         data = image.read_subimage(rows, cols)
