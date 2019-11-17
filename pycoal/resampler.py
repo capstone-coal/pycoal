@@ -18,48 +18,10 @@
 # https://github.com/spectralpython/spectral/blob/master/spectral/algorithms/resampling.py
 
 from spectral.spectral import BandInfo
+from spectral.algorithms.resampling import *
 from math import erf
 import math
 import numpy
-
-def erfc(z):
-    '''Complement of the error function.'''
-    return 1.0 - erf(z)
-
-def normal_cdf(x):
-    '''CDF of the normal distribution.'''
-    sqrt2 = 1.4142135623730951
-    return 0.5 * erfc(-x / sqrt2)
-
-def normal_integral(a, b):
-    '''Integral of the normal distribution from a to b.'''
-    return normal_cdf(b) - normal_cdf(a)
-
-def ranges_overlap(R1, R2):
-    '''Returns True if there is overlap between ranges of pairs R1 and R2.'''
-    if (R1[0] < R2[0] and R1[1] < R2[0]) or \
-       (R1[0] > R2[1] and R1[1] > R2[1]):
-        return False
-    return True
-
-def overlap(R1, R2):
-    '''Returns (min, max) of overlap between the ranges of pairs R1 and R2.'''
-    return (max(R1[0], R2[0]), min(R1[1], R2[1]))
-
-def normal(mean, stdev, x):
-    from math import exp, pi
-    sqrt_2pi = 2.5066282746310002
-    return exp(-((x - mean) / stdev)**2 / 2.0) / (sqrt_2pi * stdev)
-
-def build_fwhm(centers):
-    '''Returns FWHM list, assuming FWHM is midway between adjacent bands.
-    '''
-    fwhm = [0] * len(centers)
-    fwhm[0] = centers[1] - centers[0]
-    fwhm[-1] = centers[-1] - centers[-2]
-    for i in range(1, len(centers) - 1):
-        fwhm[i] = (centers[i + 1] - centers[i - 1]) / 2.0
-    return fwhm
 
 def create_resampling_matrix(centers1, centers2):
     '''
