@@ -125,7 +125,10 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     for x_pixel in range(m):
         pixel_data = torch.from_numpy(data[x_pixel].astype(numpy.float64))
 
+        # Resample the Data
         resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
+
+        # Set all NaN values to 0
         resampled_data[resampled_data != resampled_data] = 0
 
         # calculate spectral angles
