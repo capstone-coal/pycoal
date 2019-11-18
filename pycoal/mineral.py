@@ -121,9 +121,9 @@ def SAM(image_file_name, classified_file_name, library_file_name,
         numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
     angles_m = torch.from_numpy(angles_m)
 
-    # for each pixel in the image
-    for x_pixel in range(m):
-        pixel_data = torch.from_numpy(data[x_pixel].astype(numpy.float64))
+    # for each coumn of pixels in the image
+    for x_column in range(m):
+        pixel_data = torch.from_numpy(data[x_column].astype(numpy.float64))
 
         # Resample the Data
         resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
@@ -142,18 +142,22 @@ def SAM(image_file_name, classified_file_name, library_file_name,
 
         # get index of class with largest confidence value
         # get confidence value of the classified pixel
-        scored[x_pixel], classified[x_pixel] = torch.max(angles, 1)
-        classified[x_pixel] = classified[x_pixel] + 1
+        scored[x_column], classified[x_column] = torch.max(angles, 1)
+        classified[x_column] = classified[x_column] + 1
 
+    # Find indices where the pixel values should be ignored
     nopixel_indices = numpy.where(
         numpy.logical_or(
             numpy.isclose(data[:, :, 0], -0.005), data[:, :, 0] == -50))
 
+    # Set classifid and scored values for ignored pixels to 0 
     classified[nopixel_indices] = 0
     scored[nopixel_indices] = 0
 
+    # Find indices where the scored values are below threshold
     below_threshold_indices = numpy.where(scored[:][:] <= threshold)
 
+    # Set classifid and scored values for values below threshold to 0 
     classified[below_threshold_indices] = 0
     scored[below_threshold_indices] = 0
 
