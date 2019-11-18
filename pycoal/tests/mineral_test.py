@@ -48,6 +48,11 @@ def _test_classify_image_teardown():
                           f[:-4] + '_class_test.img' for f in
                           test_classifyImage_testFilenames])
 
+# initialize config parser, read in config.ini
+def _init_config_parser():
+    config = configparser.ConfigParser()
+    config.read('config.ini')
+    return config
 
 # verify that classified images have valid classifications
 @with_setup(None, _test_classify_image_teardown)
@@ -87,30 +92,24 @@ def test_classify_image():
 
 # currently dask not supported in config file
 '''
-@with_setup(None, _test_classify_image_teardown)
-def test_classify_image_dask():
+@with_setup(_init_config_parser, _test_classify_image_teardown)
+def test_classify_image_dask(config):
     # set our config file parameter ['processing']['impl'] to 'dask'
-    config = configparser.ConfigParser()
-    config.read('config.py')
     config['parallel_method'] = 'dask'
     test_classify_image()
     test_classify_image_in_memory()
 '''
 
-@with_setup(None, _test_classify_image_teardown)
+@with_setup(_init_config_parser, _test_classify_image_teardown)
 def test_classify_image_pytorch():
     # set our config file parameter ['processing']['impl'] to pytorch
-    config = configparser.ConfigParser()
-    config.read('config.py')
     config['parallel_method'] = 'pytorch'
     test_classify_image()
     test_classify_image_in_memory()
 
-@with_setup(None, _test_classify_image_teardown)
-def test_classify_image_joblib():
+@with_setup(_init_config_parser, _test_classify_image_teardown)
+def test_classify_image_joblib(config):
     # set our config file parameter ['processing']['impl'] to joblib
-    config = configparser.ConfigParser()
-    config.read('config.py')
     config['parallel_method'] = 'joblib'
     test_classify_image()
     test_classify_image_in_memory()
