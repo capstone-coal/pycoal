@@ -95,7 +95,7 @@ def test_classify_image():
 @with_setup(_init_config_parser, _test_classify_image_teardown)
 def test_classify_image_dask(config):
     # set our config file parameter ['processing']['impl'] to 'dask'
-    config['parallel_method'] = 'dask'
+    config['processing']['impl'] = 'dask'
     test_classify_image()
     test_classify_image_in_memory()
 '''
@@ -103,14 +103,14 @@ def test_classify_image_dask(config):
 @with_setup(_init_config_parser, _test_classify_image_teardown)
 def test_classify_image_pytorch():
     # set our config file parameter ['processing']['impl'] to pytorch
-    config['parallel_method'] = 'pytorch'
+    config['processing']['impl'] = 'pytorch'
     test_classify_image()
     test_classify_image_in_memory()
 
 @with_setup(_init_config_parser, _test_classify_image_teardown)
 def test_classify_image_joblib(config):
     # set our config file parameter ['processing']['impl'] to joblib
-    config['parallel_method'] = 'joblib'
+    config['processing']['impl'] = 'joblib'
     test_classify_image()
     test_classify_image_in_memory()
 
