@@ -25,6 +25,7 @@ import spectral
 import time
 import fnmatch
 import shutil
+import configparser
 
 """
 Classifier callbacks functions must have at least the following args: library,
@@ -285,7 +286,7 @@ def avngDNN(image_file_name, classified_file_name, model_file_name,
 
 class MineralClassification:
 
-    def __init__(self, algorithm=SAM, **kwargs):
+    def __init__(self, '''algorithm=SAM,''' **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral
         library
@@ -303,8 +304,13 @@ class MineralClassification:
             **kwargs: arguments that will be passed to the chosen classifier
         """
 
+        # parse config file
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+
         # set the user's chosen classifier 
-        self.algorithm = algorithm
+        if config['processing']['algo'] == 'SAM':
+                self.algorithm = SAM
 
         # hold the remaining arguments that will be passed to self.algorithm
         self.args = kwargs
