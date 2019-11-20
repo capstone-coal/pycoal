@@ -99,6 +99,6 @@ def create_resampling_matrix(centers1, centers2):
             contribs[k] = integral
             count += integral
         contribs = contribs / count
-        for k in enumerate(matches):
+        for k in range(len(matches)):
             shape[i, matches[k]] = contribs[k]
     return shape
