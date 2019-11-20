@@ -308,10 +308,31 @@ class MineralClassification:
         config = configparser.ConfigParser()
         config.read('config.ini')
 
-        # set the user's chosen classifier 
-        if config['processing']['algo'] == 'SAM':
-                self.algorithm = SAM
-
+        # use the user's chosen classifier
+        set_algo = config['processing']['algo']
+        
+        # use the user's chosen implementation
+        set_impl = config['processing']['impl']
+        
+        if set_algo == 'SAM':
+                if set_impl == 'serial':
+                        self.algorithm = SAM
+                        '''
+                elif set_impl == 'pytorch':
+                        self.algorithm = SAM_pytorch
+                elif set_impl == 'joblib':
+                        self.algorithm = SAM_joblib
+                        '''
+        elif set_algo == 'avngDNN':
+                if set_impl == 'serial':
+                        self.algorithm = avngDNN
+                        '''
+                elif set_impl == 'pytorch':
+                        self.algorithm = avngDNN_pytorch
+                elif set_impl == 'joblib':
+                        self.algorithm = avngDNN_joblib
+                '''
+        
         # hold the remaining arguments that will be passed to self.algorithm
         self.args = kwargs
 
