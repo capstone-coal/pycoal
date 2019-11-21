@@ -25,6 +25,62 @@ import spectral
 import time
 import fnmatch
 import shutil
+import multiprocessing
+from joblib import Parallel, delayed
+
+
+def calculate_pixel_confidence_value(pixel, angles_m, threshold,
+                                     resample, scores_file_name):
+    """
+    Calculate the confidence score for a pixel
+    Is run in parallel on CPU through joblib
+
+    Args:
+        pixel (int[]):              numpy memmap of pixel's values
+        angles_m (numpy array):     universal calculated angles
+        threshold (float):          classification threshold
+        resample (BandResampler):   defined resampler for bands
+        scores_file_name (str):     filename of the image to hold
+                                    each pixel's classification score
+
+    Returns:
+        confidence value (float)
+
+    """
+
+    # if it is not a no data pixel
+    if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
+        # resample the pixel ignoring NaNs from target bands that don't overlap
+        resampled_pixel = numpy.nan_to_num(resample(pixel))
+        # calculate spectral angles
+        # calculate spectral angles
+        # Adapted from Spectral library
+        resampled_data = resampled_pixel[numpy.newaxis, numpy.newaxis, ...]
+        norms = numpy.sqrt(numpy.einsum('ijk,ijk->ij', resampled_data, resampled_data))
+        dots = numpy.einsum('ijk,mk->ijm', resampled_data, angles_m)
+        dots = numpy.clip(dots / norms[:, :, numpy.newaxis], -1, 1)
+        angles = numpy.arccos(dots)
+
+        # normalize confidence values from [pi,0] to [0,1]
+        angles[0, 0, :] = 1 - angles[0, 0, :] / math.pi 
+
+        # get index of class with largest confidence value
+        index_of_max = numpy.argmax(angles)
+
+        # get confidence value of the classified pixel
+        score = angles[0, 0, index_of_max]
+
+        # classify pixel if confidence above threshold
+        if score > threshold:
+
+            # index from one (after zero for no data)
+            classified_value = index_of_max + 1
+            if scores_file_name is not None:
+                # store score value
+                return score, classified_value
+            return 0.0, classified_value
+    return 0.0, 0
+
 
 """
 Classifier callbacks functions must have at least the following args: library,
@@ -78,7 +134,7 @@ def SAM(image_file_name, classified_file_name, library_file_name,
     # open the image
     image = spectral.open_image(image_file_name)
     if subset_rows is not None and subset_cols is not None:
-        subset_image = SubImage(image, subset_rows, subset_cols)
+        data = SubImage(image, subset_rows, subset_cols)
         m = subset_rows[1]
         n = subset_cols[1]
     else:
@@ -99,62 +155,29 @@ def SAM(image_file_name, classified_file_name, library_file_name,
 
     # allocate a zero-initialized MxN array for the classified image
     classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
-
+    
     if scores_file_name is not None:
         # allocate a zero-initialized MxN array for the scores image
         scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
-
     # universal calculations for angles
     # Adapted from Spectral library
     angles_m = numpy.array(library.spectra, dtype=numpy.float64)
     angles_m /= numpy.sqrt(numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
 
-    # for each pixel in the image
-    for x in range(m):
+    num_cores = multiprocessing.cpu_count()
+    pixel_confidences = numpy.array(Parallel(n_jobs=num_cores)(delayed(
+                                calculate_pixel_confidence_value)(data[x, y],
+                                angles_m, threshold, resample, scores_file_name)
+                                for x in range(m) for y in range(n)))
 
-        for y in range(n):
-
-            # read the pixel from the file
-            if subset_rows is not None and subset_cols is not None:
-                pixel = subset_image.read_pixel(x, y)
-            else:
-                pixel = data[x, y]
-
-            # if it is not a no data pixel
-            if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
-
-                # resample the pixel ignoring NaNs from target bands that
-                # don't overlap
-                # TODO fix spectral library so that bands are in order
-                resampled_pixel = numpy.nan_to_num(resample(pixel))
-
-                # calculate spectral angles
-                # Adapted from Spectral library
-                resampled_data = resampled_pixel[numpy.newaxis, numpy.newaxis, ...]
-                norms = numpy.sqrt(numpy.einsum('ijk,ijk->ij', resampled_data, resampled_data))
-                dots = numpy.einsum('ijk,mk->ijm', resampled_data, angles_m)
-                dots = numpy.clip(dots / norms[:, :, numpy.newaxis], -1, 1)
-                angles = numpy.arccos(dots)
-
-                # normalize confidence values from [pi,0] to [0,1]
-                angles[0, 0, :] = 1 - angles[0, 0, :] / math.pi 
-
-                # get index of class with largest confidence value
-                index_of_max = numpy.argmax(angles)
-
-                # get confidence value of the classified pixel
-                score = angles[0, 0, index_of_max]
-
-                # classify pixel if confidence above threshold
-                if score > threshold:
-
-                    # index from one (after zero for no data)
-                    classified[x, y] = index_of_max + 1
-
-                    if scores_file_name is not None:
-                        # store score value
-                        scored[x, y] = score
-
+    # puts it all in one single array, need to make 2d array
+    k = 0
+    for i in range(m):
+        for j in range(n):
+            if scores_file_name is not None:
+                scored[i][j] = pixel_confidences[k][0]
+            classified[i][j] = pixel_confidences[k][1]
+            k += 1
     # save the classified image to a file
     spectral.io.envi.save_classification(classified_file_name, classified,
                                          class_names=['No data'] +
@@ -730,10 +753,9 @@ class FullSpectralLibrary7Convert:
                     if "errorbars" not in items:
                         if "Wave" not in items:
                             if "SpectraValues" not in items:
-                                shutil.copy2(os.path.join(root, items),
-                                             directory)
+                                shutil.copy2(os.path.join(root, items), directory)
 
-        # This will take the .txt files for Spectra in USGS Spectral Version
+        # This will take the .txt files for Spectra in USGS Spectral Version 7 and
         # 7 and
         # convert their format to match that of ASTER .spectrum.txt files
         # for spectra
