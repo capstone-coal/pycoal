@@ -25,6 +25,8 @@ import spectral
 import time
 import fnmatch
 import shutil
+import configparser
+import errno
 import multiprocessing
 from joblib import Parallel, delayed
 
@@ -81,7 +83,6 @@ def calculate_pixel_confidence_value(pixel, angles_m, threshold,
             return 0.0, classified_value
     return 0.0, 0
 
-
 """
 Classifier callbacks functions must have at least the following args: library,
 image_file_name, classified_file_name; which will always be passed by the
@@ -90,6 +91,9 @@ arguments, specific of each classifier function, will also be passed by the
 calling function but are optionals and may vary from one classifier to another.
 """
 
+# to be merged
+def SAM_pytorch():
+        pass
 
 def SAM(image_file_name, classified_file_name, library_file_name,
         scores_file_name=None, class_names=None, threshold=0.0,
@@ -308,7 +312,7 @@ def avngDNN(image_file_name, classified_file_name, model_file_name,
 
 class MineralClassification:
 
-    def __init__(self, algorithm=SAM, **kwargs):
+    def __init__(self, algorithm=SAM_pytorch, **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral
         library
@@ -326,9 +330,38 @@ class MineralClassification:
             **kwargs: arguments that will be passed to the chosen classifier
         """
 
-        # set the user's chosen classifier 
-        self.algorithm = algorithm
+        # parse config file
+        config = configparser.ConfigParser()
+        
+        try:
+            with open('config.ini') as config_file:
+                config.read_file(config_file)
+        except IOError:
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), 'config.ini')
 
+        set_algo = None
+        set_impl = None
+        self.algorithm = algorithm
+        
+        # use the user's chosen classifier
+        try:
+            set_algo = config['processing']['algo']
+        except KeyError:
+            raise KeyError('Algorithm not set in config file')        
+        
+        # use the user's chosen implementation
+        try:
+            set_impl = config['processing']['impl']
+        except KeyError:
+            raise KeyError('Implementation not set in config file')
+        
+        
+        if None not in (set_algo, set_impl):
+            try:
+                self.algorithm = globals()[set_algo + "_" + set_impl]
+            except KeyError:
+                raise KeyError('Algorithm or implementation set incorrectly in config file')
+                
         # hold the remaining arguments that will be passed to self.algorithm
         self.args = kwargs
 
