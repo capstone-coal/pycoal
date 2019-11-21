@@ -26,6 +26,7 @@ import time
 import fnmatch
 import shutil
 import configparser
+import errno
 
 """
 Classifier callbacks functions must have at least the following args: library,
@@ -286,7 +287,7 @@ def avngDNN(image_file_name, classified_file_name, model_file_name,
 
 class MineralClassification:
 
-    def __init__(self, '''algorithm=SAM,''' **kwargs):
+    def __init__(self, algorithm=SAM_pytorch, **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral
         library
@@ -306,32 +307,30 @@ class MineralClassification:
 
         # parse config file
         config = configparser.ConfigParser()
-        config.read('config.ini')
+        
+        try:
+            with open('config.ini') as config_file:
+                config.read_file(config_file)
+        except IOError:
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), 'config.ini')
 
+        set_algo = None
+        set_impl = None
+        
         # use the user's chosen classifier
-        set_algo = config['processing']['algo']
+        try:
+            set_algo = config['processing']['algo']
+        except KeyError:
+            raise KeyError('Algorithm not set in config file')        
         
         # use the user's chosen implementation
-        set_impl = config['processing']['impl']
+        try:
+            set_impl = config['processing']['impl']
+        except KeyError:
+            raise KeyError('Implementation not set in config file')
         
-        if set_algo == 'SAM':
-                if set_impl == 'serial':
-                        self.algorithm = SAM
-                        '''
-                elif set_impl == 'pytorch':
-                        self.algorithm = SAM_pytorch
-                elif set_impl == 'joblib':
-                        self.algorithm = SAM_joblib
-                        '''
-        elif set_algo == 'avngDNN':
-                if set_impl == 'serial':
-                        self.algorithm = avngDNN
-                        '''
-                elif set_impl == 'pytorch':
-                        self.algorithm = avngDNN_pytorch
-                elif set_impl == 'joblib':
-                        self.algorithm = avngDNN_joblib
-                '''
+        if None not in (set_algo, set_impl):
+            self.algorithm = globals()[set_algo + "_" + set_impl]
         
         # hold the remaining arguments that will be passed to self.algorithm
         self.args = kwargs
