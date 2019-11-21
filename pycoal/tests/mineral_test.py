@@ -48,10 +48,20 @@ def _test_classify_image_teardown():
                           f[:-4] + '_class_test.img' for f in
                           test_classifyImage_testFilenames])
 
-# initialize config parser, read in config.ini
+# initialize config parser, create config file programmatically
 def _init_config_parser():
     config = configparser.ConfigParser()
-    config.read('config.ini')
+    config['processing'] = {'algo': 'SAM', 'impl': 'pytorch'}
+    return config
+
+def _init_config_parser_wrong_algo():
+    config = configparser.ConfigParser()
+    config['processing'] = {'algo': 'MAS', 'impl': 'pytorch'}
+    return config
+
+def _init_config_parser_wrong_impl():
+    config = configparser.ConfigParser()
+    config['processing'] = {'algo': 'SAM', 'impl': 'p'}
     return config
 
 # verify that classified images have valid classifications
