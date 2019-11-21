@@ -316,6 +316,7 @@ class MineralClassification:
 
         set_algo = None
         set_impl = None
+        self.algorithm = algorithm
         
         # use the user's chosen classifier
         try:
@@ -328,6 +329,7 @@ class MineralClassification:
             set_impl = config['processing']['impl']
         except KeyError:
             raise KeyError('Implementation not set in config file')
+        
         
         if None not in (set_algo, set_impl):
             try:
