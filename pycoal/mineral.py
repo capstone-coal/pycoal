@@ -330,8 +330,11 @@ class MineralClassification:
             raise KeyError('Implementation not set in config file')
         
         if None not in (set_algo, set_impl):
-            self.algorithm = globals()[set_algo + "_" + set_impl]
-        
+            try:
+                self.algorithm = globals()[set_algo + "_" + set_impl]
+            except KeyError:
+                raise KeyError('Algorithm or implementation set incorrectly in config file')
+                
         # hold the remaining arguments that will be passed to self.algorithm
         self.args = kwargs
 
