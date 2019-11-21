@@ -15,8 +15,8 @@
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
 
-DEBUG = 1
-TESTRUN = 1
+DEBUG = 0
+TESTRUN = 0
 PROFILE = 0
 
 # TODO: Also demonstrate this functionality in a Jupyter Notebook
@@ -58,5 +58,5 @@ LIBRARY_FILENAME = "../pycoal/tests/" + LIBRARY_FILENAME_7
 # Only applies to example_mineral.py
 # For reference, the small image has the shape 931X339 (931 rows and 339
 # columns)
-MINERAL_SUBSET_ROWS = [0, 75]
-MINERAL_SUBSET_COLS = [0, 75]
+MINERAL_SUBSET_ROWS = None #[0, 75]
+MINERAL_SUBSET_COLS = None #[0, 75]
