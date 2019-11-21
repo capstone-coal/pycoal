@@ -36,6 +36,9 @@ arguments, specific of each classifier function, will also be passed by the
 calling function but are optionals and may vary from one classifier to another.
 """
 
+# to be merged
+def SAM_pytorch():
+        pass
 
 def SAM(image_file_name, classified_file_name, library_file_name,
         scores_file_name=None, class_names=None, threshold=0.0,
