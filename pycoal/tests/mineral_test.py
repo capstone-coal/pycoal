@@ -23,6 +23,7 @@ import os
 import numpy
 import spectral
 import pycoal
+import configparser
 from pycoal import conversion
 from pycoal import mineral
 from pycoal import mining
@@ -47,6 +48,21 @@ def _test_classify_image_teardown():
                           f[:-4] + '_class_test.img' for f in
                           test_classifyImage_testFilenames])
 
+# initialize config parser, create config file programmatically
+def _init_config_parser():
+    config = configparser.ConfigParser()
+    config['processing'] = {'algo': 'SAM', 'impl': 'pytorch'}
+    return config
+
+def _init_config_parser_wrong_algo():
+    config = configparser.ConfigParser()
+    config['processing'] = {'algo': 'MAS', 'impl': 'pytorch'}
+    return config
+
+def _init_config_parser_wrong_impl():
+    config = configparser.ConfigParser()
+    config['processing'] = {'algo': 'SAM', 'impl': 'p'}
+    return config
 
 # verify that classified images have valid classifications
 @with_setup(None, _test_classify_image_teardown)
@@ -81,7 +97,34 @@ def test_classify_image():
         # verify that every pixel has the same classification
         assert numpy.array_equal(expected.asarray(), actual.asarray())
 
+# verify that classified images have valid classifications when using config file
+# three basic tests w/ diff parallel methods and loading image in mem
 
+# currently dask not supported in config file
+'''
+@with_setup(_init_config_parser, _test_classify_image_teardown)
+def test_classify_image_dask(config):
+    # set our config file parameter ['processing']['impl'] to 'dask'
+    config['processing']['impl'] = 'dask'
+    test_classify_image()
+    test_classify_image_in_memory()
+'''
+
+@with_setup(_init_config_parser, _test_classify_image_teardown)
+def test_classify_image_pytorch():
+    # set our config file parameter ['processing']['impl'] to pytorch
+    config['processing']['impl'] = 'pytorch'
+    test_classify_image()
+    test_classify_image_in_memory()
+
+@with_setup(_init_config_parser, _test_classify_image_teardown)
+def test_classify_image_joblib(config):
+    # set our config file parameter ['processing']['impl'] to joblib
+    config['processing']['impl'] = 'joblib'
+    test_classify_image()
+    test_classify_image_in_memory()
+
+    
 # verify classification when loading entire images into memory
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_in_memory():
