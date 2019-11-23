@@ -70,9 +70,14 @@ def run_mineral(input_filename=constants.INPUT_FILENAME,
 
     # path to save classification scores image
     scores_filename = constants.INPUT_NAME + "_scores.hdr"
-
+    
+    # path to config.ini file w/ configuration parameters
+    config_filename = os.path.join(os.path.dirname(__file__),  "..", "pycoal", "config.ini")
+    cf = open(config_filename)
+    
     # create a new mineral classification instance (defaults to SAM algorithm)
     mineral_classification = mineral.MineralClassification(
+        config_file=cf,
         library_file_name=library_filename, scores_file_name=scores_filename,
         subset_rows=constants.MINERAL_SUBSET_ROWS,
         subset_cols=constants.MINERAL_SUBSET_COLS)
