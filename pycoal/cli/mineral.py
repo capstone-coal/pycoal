@@ -52,6 +52,8 @@ def main():
     parser.add_argument("-c", "--classified_filename",
                         dest="classified_filename",
                         help="Classified File Name")
+    parser.add_argument("-cf", "--config_filename", dest="config_filename",
+                        help="Configuration File Name")
 
     # Process arguments
     args = parser.parse_args()
