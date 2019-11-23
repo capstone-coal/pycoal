@@ -62,9 +62,10 @@ def main():
     slib = args.slib
     rgb_filename = args.rgb_filename
     classified_filename = args.classified_filename
+    config_filename = args.config_filename
 
     # create a new mineral classification instance
-    mineral_classification = MineralClassification(slib)
+    mineral_classification = MineralClassification(slib, config_filename)
 
     # generate a georeferenced visible-light image
     mineral_classification.to_rgb(image, rgb_filename)
