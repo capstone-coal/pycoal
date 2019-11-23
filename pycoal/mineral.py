@@ -312,7 +312,7 @@ def avngDNN(image_file_name, classified_file_name, model_file_name,
 
 class MineralClassification:
 
-    def __init__(self, algorithm=SAM_pytorch, config_file, **kwargs):
+    def __init__(self, algorithm=SAM_pytorch, config_file=None, **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral
         library
@@ -334,14 +334,21 @@ class MineralClassification:
         # parse config file
         config = configparser.ConfigParser()
         
-        try:
-            config.read_file(config_file)
-        except OSError:
-            print("Could not open/read config file")
-            sys.exit()
-        except IOError:
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), 'config.ini')
-
+        if config_file:
+            try:
+                config.read_file(config_file)
+            except OSError:
+                print("Could not open/read config file")
+                sys.exit()
+            except IOError:
+                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), 'config.ini')
+        else:
+            try:
+                with open(os.path.join(os.path.dirname(__file__),  "config.ini")) as config_file:	            
+                    config.read_file(config_file)
+            except IOError:
+                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), os.path.join(os.path.dirname(__file__),  "config.ini"))
+                
         set_algo = None
         set_impl = None
         self.algorithm = algorithm
