@@ -317,10 +317,8 @@ def SAM_joblib(image_file_name, classified_file_name, library_file_name,
     # define a resampler
     # TODO detect and scale units
     # TODO band resampler should do this
-    resampling_matrix = create_resampling_matrix(
-        [x / 1000 for x in image.bands.centers], library.bands.centers)
-    resampling_matrix = torch.from_numpy(resampling_matrix)
-
+    resample = spectral.BandResampler([x / 1000 for x in image.bands.centers],
+                                      library.bands.centers)
     # allocate a zero-initialized MxN array for the classified image
     classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
     
