@@ -92,10 +92,10 @@ arguments, specific of each classifier function, will also be passed by the
 calling function but are optionals and may vary from one classifier to another.
 """
 
-# to be merged
+
 def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
-        scores_file_name=None, class_names=None, threshold=0.0,
-        in_memory=False, subset_rows=None, subset_cols=None):
+            scores_file_name=None, class_names=None, threshold=0.0,
+            in_memory=False, subset_rows=None, subset_cols=None):
     """
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the
@@ -126,7 +126,7 @@ def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
     Returns:
         None
     """
-    
+
     # load and optionally subset the spectral library
     library = spectral.open_image(library_file_name)
     if class_names is not None:
@@ -208,14 +208,14 @@ def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
         numpy.logical_or(
             numpy.isclose(data[:, :, 0], -0.005), data[:, :, 0] == -50))
 
-    # Set classifid and scored values for ignored pixels to 0 
+    # Set classifid and scored values for ignored pixels to 0
     classified[nopixel_indices] = 0
     scored[nopixel_indices] = 0
 
     # Find indices where the scored values are below threshold
     below_threshold_indices = numpy.where(scored[:][:] <= threshold)
 
-    # Set classifid and scored values for values below threshold to 0 
+    # Set classifid and scored values for values below threshold to 0
     classified[below_threshold_indices] = 0
     scored[below_threshold_indices] = 0
 
@@ -248,8 +248,8 @@ def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
 
 
 def SAM_joblib(image_file_name, classified_file_name, library_file_name,
-        scores_file_name=None, class_names=None, threshold=0.0,
-        in_memory=False, subset_rows=None, subset_cols=None):
+            scores_file_name=None, class_names=None, threshold=0.0,
+            in_memory=False, subset_rows=None, subset_cols=None):
     """
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the
@@ -373,9 +373,10 @@ def SAM_joblib(image_file_name, classified_file_name, library_file_name,
                                               'map info': image.metadata.get(
                                                   'map info')})
 
+
 def SAM_serial(image_file_name, classified_file_name, library_file_name,
-        scores_file_name=None, class_names=None, threshold=0.0,
-        in_memory=False, subset_rows=None, subset_cols=None):
+           scores_file_name=None, class_names=None, threshold=0.0,
+           in_memory=False, subset_rows=None, subset_cols=None):
     """
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the
@@ -413,12 +414,16 @@ def SAM_serial(image_file_name, classified_file_name, library_file_name,
     image = spectral.open_image(image_file_name)
     if subset_rows is not None and subset_cols is not None:
         # Creates list of rows and columns to create subset image from
-        rows = numpy.linspace(subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
-        cols = numpy.linspace(subset_rows[0], subset_rows[1], subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
-        
+        rows = numpy.linspace(
+            subset_rows[0], subset_rows[1],
+            subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
+        cols = numpy.linspace(
+            subset_cols[0], subset_cols[1],
+            subset_cols[1] - subset_cols[0] + 1).astype(numpy.int32)
+
         # Reads subset of image image into memory
         data = image.read_subimage(rows, cols)
-        
+
         # Determines dimensions for subset image
         m = subset_rows[1] - subset_rows[0] + 1
         n = subset_cols[1] - subset_cols[0] + 1
@@ -445,8 +450,8 @@ def SAM_serial(image_file_name, classified_file_name, library_file_name,
 
     # universal calculations for angles
     # Adapted from Spectral library
-    angles_m = numpy.array(library.spectra, dtype=numpy.float64)
-    angles_m /= numpy.sqrt(numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
+    ang_m = numpy.array(library.spectra, dtype=numpy.float64)
+    ang_m /= numpy.sqrt(numpy.einsum('ij,ij->i', ang_m, ang_m))[:, numpy.newaxis]
 
     # for each pixel in the image
     for x in range(m):
@@ -462,24 +467,24 @@ def SAM_serial(image_file_name, classified_file_name, library_file_name,
                 # resample the pixel ignoring NaNs from target bands that
                 # don't overlap
                 # TODO fix spectral library so that bands are in order
-                resampled_data = numpy.einsum('ij,j->i', resampling_matrix, pixel)
-                resampled_data = numpy.nan_to_num(resampled_data)
+                resample_data = numpy.einsum('ij,j->i', resampling_matrix, pixel)
+                resample_data = numpy.nan_to_num(resampled_data)
 
                 # calculate spectral angles
                 # Adapted from Spectral library
-                norms = numpy.sqrt(numpy.einsum('i,i->', resampled_data, resampled_data))
-                dots = numpy.einsum('i,ji->j', resampled_data, angles_m)
+                norms = numpy.sqrt(numpy.einsum('i,i->', resample_data, resample_data))
+                dots = numpy.einsum('i,ji->j', resample_data, ang_m)
                 dots = numpy.clip(dots / norms, -1, 1)
                 angles = numpy.arccos(dots)
 
                 # normalize confidence values from [pi,0] to [0,1]
-                angles = 1 - angles / math.pi 
-                
+                angles = 1 - angles / math.pi
+
                 # get index of class with largest confidence value
-                classified[x,y] = numpy.argmax(angles)
+                classified[x, y] = numpy.argmax(angles)
 
                 # get confidence value of the classified pixel
-                scored[x,y] = angles[classified[x,y]]
+                scored[x, y] = angles[classified[x, y]]
 
     classified = classified + 1
 
@@ -516,7 +521,7 @@ def SAM_serial(image_file_name, classified_file_name, library_file_name,
                                                   'map info')})
 
 def avngDNN_serial(image_file_name, classified_file_name, model_file_name,
-            class_names=None, scores_file_name=None, in_memory=False):
+                class_names=None, scores_file_name=None, in_memory=False):
     """
     This callback function takes a Keras model, trained to classify pixels
     from AVIRIS-NG
