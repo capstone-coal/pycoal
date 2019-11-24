@@ -94,8 +94,8 @@ calling function but are optionals and may vary from one classifier to another.
 
 
 def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
-            scores_file_name=None, class_names=None, threshold=0.0,
-            in_memory=False, subset_rows=None, subset_cols=None):
+                scores_file_name=None, class_names=None, threshold=0.0,
+                in_memory=False, subset_rows=None, subset_cols=None):
     """
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the
@@ -248,8 +248,8 @@ def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
 
 
 def SAM_joblib(image_file_name, classified_file_name, library_file_name,
-            scores_file_name=None, class_names=None, threshold=0.0,
-            in_memory=False, subset_rows=None, subset_cols=None):
+                scores_file_name=None, class_names=None, threshold=0.0,
+                in_memory=False, subset_rows=None, subset_cols=None):
     """
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the
@@ -375,8 +375,8 @@ def SAM_joblib(image_file_name, classified_file_name, library_file_name,
 
 
 def SAM_serial(image_file_name, classified_file_name, library_file_name,
-           scores_file_name=None, class_names=None, threshold=0.0,
-           in_memory=False, subset_rows=None, subset_cols=None):
+                scores_file_name=None, class_names=None, threshold=0.0,
+                in_memory=False, subset_rows=None, subset_cols=None):
     """
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the
@@ -468,7 +468,7 @@ def SAM_serial(image_file_name, classified_file_name, library_file_name,
                 # don't overlap
                 # TODO fix spectral library so that bands are in order
                 resample_data = numpy.einsum('ij,j->i', resampling_matrix, pixel)
-                resample_data = numpy.nan_to_num(resampled_data)
+                resample_data = numpy.nan_to_num(resample_data)
 
                 # calculate spectral angles
                 # Adapted from Spectral library
@@ -520,8 +520,9 @@ def SAM_serial(image_file_name, classified_file_name, library_file_name,
                                               'map info': image.metadata.get(
                                                   'map info')})
 
+
 def avngDNN_serial(image_file_name, classified_file_name, model_file_name,
-                class_names=None, scores_file_name=None, in_memory=False):
+                    class_names=None, scores_file_name=None, in_memory=False):
     """
     This callback function takes a Keras model, trained to classify pixels
     from AVIRIS-NG
