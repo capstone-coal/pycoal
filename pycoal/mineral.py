@@ -15,6 +15,7 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 import os
+import sys
 import logging
 import math
 import numpy
@@ -340,8 +341,6 @@ class MineralClassification:
         except OSError:
             print("Could not open/read config file")
             sys.exit()
-        except IOError:
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), config_file)
         
         set_algo = None
         set_impl = None
