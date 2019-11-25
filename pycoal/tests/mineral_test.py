@@ -51,7 +51,7 @@ def _test_classify_image_teardown():
 def test_config_file_wrong_algo():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no MAS_pytorch function in globals array
-    config = 'test_config_files/config_test_wrong_algo.ini'
+    config = 'tests/test_config_files/config_test_wrong_algo.ini'
     with assert_raises(KeyError):
         _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
@@ -62,7 +62,7 @@ def test_config_file_wrong_algo():
 def test_config_file_wrong_impl():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no SAM_p function in globals array
-    config = 'test_config_files/config_test_wrong_impl.ini'
+    config = 'tests/test_config_files/config_test_wrong_impl.ini'
     with assert_raises(KeyError):
         _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
@@ -145,14 +145,14 @@ def test_classify_image_config(config_filename):
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_pytorch():
     # use our test config file with algo set to pytorch
-    config = 'test_config_files/config_test.ini'
+    config = 'tests/test_config_files/config_test.ini'
     test_classify_image_config(config)
-    test_classify_image_in_memory_config()
+    test_classify_image_in_memory_config(config)
 
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_joblib(config):
     # use our test config file with algo set to joblib
-    config = 'test_config_files/config_test_joblib.ini'
+    config = 'tests/test_config_files/config_test_joblib.ini'
     test_classify_image_config(config)
     test_classify_image_in_memory_config(config)
 
