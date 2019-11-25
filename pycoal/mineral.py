@@ -312,7 +312,7 @@ def avngDNN(image_file_name, classified_file_name, model_file_name,
 
 class MineralClassification:
 
-    def __init__(self, algorithm=SAM_pytorch, config_file=None, **kwargs):
+    def __init__(self, algorithm=SAM_pytorch, config_file='config.ini', **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral
         library
@@ -327,28 +327,22 @@ class MineralClassification:
 
         Args:
             algorithm (function, optional): the classifier callback
-            config_file: the configuration file object with appropriate params to be parsed
+            config_file: the file name of the configuration file with appropriate parameters to be parsed
             **kwargs: arguments that will be passed to the chosen classifier
         """
 
         # parse config file
         config = configparser.ConfigParser()
         
-        if config_file:
-            try:
-                config.read_file(config_file)
-            except OSError:
-                print("Could not open/read config file")
-                sys.exit()
-            except IOError:
-                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), 'config.ini')
-        else:
-            try:
-                with open(os.path.join(os.path.dirname(__file__),  "config.ini")) as config_file:	            
-                    config.read_file(config_file)
-            except IOError:
-                raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), os.path.join(os.path.dirname(__file__),  "config.ini"))
-                
+        try:
+            with open(os.path.join(os.path.dirname(__file__),  config_file)) as c_file:	            
+                config.read_file(c_file)
+        except OSError:
+            print("Could not open/read config file")
+            sys.exit()
+        except IOError:
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), config_file)
+        
         set_algo = None
         set_impl = None
         self.algorithm = algorithm
