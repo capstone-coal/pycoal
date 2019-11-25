@@ -339,7 +339,7 @@ class MineralClassification:
             with open(os.path.join(os.path.dirname(__file__),  config_file)) as c_file:	            
                 config.read_file(c_file)
         except OSError:
-            print("Could not open/read config file")
+            print("Could not open/read config file" + config_file)
             sys.exit()
  
         set_algo = None
