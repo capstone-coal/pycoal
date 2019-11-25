@@ -68,7 +68,7 @@ def _init_config_parser_wrong_impl():
 def test_config_file_wrong_algo():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no MAS_pytorch function in globals array
-    config = _init_config_parser_wrong_algo
+    config = _init_config_parser_wrong_algo()
     with assert_raises(KeyError):
         _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
@@ -79,7 +79,7 @@ def test_config_file_wrong_algo():
 def test_config_file_wrong_algo():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no SAM_p function in globals array
-    config = _init_config_parser_wrong_impl
+    config = _init_config_parser_wrong_impl()
     with assert_raises(KeyError):
         _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
@@ -124,26 +124,19 @@ def test_classify_image():
 # verify that classified images have valid classifications when using config file
 # three basic tests w/ diff parallel methods and loading image in mem
 
-# currently dask not supported in config file
-'''
-@with_setup(_init_config_parser, _test_classify_image_teardown)
-def test_classify_image_dask(config):
-    # set our config file parameter ['processing']['impl'] to 'dask'
-    config['processing']['impl'] = 'dask'
-    test_classify_image()
-    test_classify_image_in_memory()
-'''
 
-@with_setup(_init_config_parser, _test_classify_image_teardown)
+@with_setup(None, _test_classify_image_teardown)
 def test_classify_image_pytorch():
     # set our config file parameter ['processing']['impl'] to pytorch
+    config = _init_config_parser()
     config['processing']['impl'] = 'pytorch'
     test_classify_image()
     test_classify_image_in_memory()
 
-@with_setup(_init_config_parser, _test_classify_image_teardown)
+@with_setup(None, _test_classify_image_teardown)
 def test_classify_image_joblib(config):
     # set our config file parameter ['processing']['impl'] to joblib
+    config = _init_config_parser()
     config['processing']['impl'] = 'joblib'
     test_classify_image()
     test_classify_image_in_memory()
