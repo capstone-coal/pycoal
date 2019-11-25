@@ -64,20 +64,22 @@ def _init_config_parser_wrong_impl():
     config['processing'] = {'algo': 'SAM', 'impl': 'p'}
     return config
 
-@with_setup(_init_config_parser_wrong_algo, _test_classify_image_teardown)
+@with_setup(None, _test_classify_image_teardown)
 def test_config_file_wrong_algo():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no MAS_pytorch function in globals array
+    config = _init_config_parser_wrong_algo
     with assert_raises(KeyError):
         _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
             config_file = config
             )
 
-@with_setup(_init_config_parser_wrong_impl, _test_classify_image_teardown)
+@with_setup(None, _test_classify_image_teardown)
 def test_config_file_wrong_algo():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no SAM_p function in globals array
+    config = _init_config_parser_wrong_impl
     with assert_raises(KeyError):
         _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
