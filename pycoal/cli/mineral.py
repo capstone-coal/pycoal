@@ -53,7 +53,7 @@ def main():
                         dest="classified_filename",
                         help="Classified File Name")
     parser.add_argument("-cf", "--config_filename", dest="config_filename",
-                        help="Configuration File Name")
+                        help="Configuration File Name. Can be passed as an absolute or relative path. Defaults to ./config.ini")
 
     # Process arguments
     args = parser.parse_args()
