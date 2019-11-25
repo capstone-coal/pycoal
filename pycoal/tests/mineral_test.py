@@ -69,7 +69,7 @@ def test_config_file_wrong_algo():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no MAS_pytorch function in globals array
     with assert_raises(KeyError):
-        mc = mineral.MineralClassification(
+        _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
             config_file = config
             )
@@ -79,7 +79,7 @@ def test_config_file_wrong_algo():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no SAM_p function in globals array
     with assert_raises(KeyError):
-        mc = mineral.MineralClassification(
+        _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
             config_file = config
             )
