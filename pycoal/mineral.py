@@ -27,7 +27,6 @@ import time
 import fnmatch
 import shutil
 import configparser
-import errno
 import multiprocessing
 from joblib import Parallel, delayed
 
@@ -328,7 +327,8 @@ class MineralClassification:
 
         Args:
             algorithm (function, optional): the classifier callback
-            config_file: the file name of the configuration file with appropriate parameters to be parsed
+            config_file: the file name of the configuration file with 
+            appropriate parameters to be parsed
             **kwargs: arguments that will be passed to the chosen classifier
         """
 
@@ -341,7 +341,7 @@ class MineralClassification:
         except OSError:
             print("Could not open/read config file")
             sys.exit()
-        
+ 
         set_algo = None
         set_impl = None
         self.algorithm = algorithm
