@@ -43,7 +43,7 @@ class MiningClassification:
         """
 
         if class_names is None:
-            class_names = PROXY_CLASS_NAMES_USGSV6
+            class_names = PROXY_CLASS_NAMES_USGSV7
         self.class_names = class_names
         logging.info(
             "Instantiated Mining Classifier with following specification: "
@@ -64,13 +64,13 @@ class MiningClassification:
         Returns:
             None
         """
-        if spectral_version == "7":
-            class_names = PROXY_CLASS_NAMES_USGSV7
-            self.class_names = class_names
-            logging.info(
-                "Instantiated Mining Classifier with following "
-                "specification: "
-                "-proxy class names '%s'", class_names)
+        class_names = PROXY_CLASS_NAMES_USGSV6 if spectral_version == "6" \
+            else PROXY_CLASS_NAMES_USGSV7
+        self.class_names = class_names
+        logging.info(
+            "Instantiated Mining Classifier with following "
+            "specification: "
+            "-proxy class names '%s'", class_names)
         start = time.time()
         logging.info(
             "Starting Mining Classification for image '%s', saving "

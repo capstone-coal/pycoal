@@ -79,7 +79,7 @@ def run_mineral(input_filename=constants.INPUT_FILENAME,
 
     # generate a georeferenced visible-light image
     mineral_classification.to_rgb(input_filename, rgb_filename)
-
+    
     # generate a mineral classified image
     mineral_classification.classify_image(input_filename, classified_filename)
 

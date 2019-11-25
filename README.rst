@@ -4,7 +4,7 @@ Pycoal
 
 **Development**
 
-|license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Code Health| |Anaconda-Server Version| |Anaconda-Server Downloads|
+|license| |PyPI| |Python3| |GoogleGroup| |documentation| |Travis| |Coveralls| |Requirements Status| |Anaconda-Server Version| |Anaconda-Server Downloads|
 
 **Docker**
 
@@ -185,9 +185,7 @@ COAL is licensed under the |license| a copy of which ships with this source code
    :target: https://www.python.org/downloads/
 .. |PyPI| image:: https://img.shields.io/pypi/v/pycoal.svg?maxAge=2592000?style=plastic
    :target: https://pypi.python.org/pypi/pycoal
-.. |Slack| image:: https://cdn.brandfolder.io/5H442O3W/as/pnlpsg-beh8pk-2mgxnk/appIcon_desktop.png
-    :height: 10px
-    :width: 10px
+.. |Slack| image:: https://assets.brandfolder.com/pl546j-7le8zk-6gwiyo/element.png?v=1547165361
     :target: https://capstone-coal.slack.com
 .. |GoogleGroup| image:: https://img.shields.io/badge/-Google%20Group-lightgrey.svg
    :target: https://groups.google.com/forum/#!forum/coal-capstone
@@ -199,8 +197,6 @@ COAL is licensed under the |license| a copy of which ships with this source code
    :target: https://coveralls.io/github/capstone-coal/pycoal?branch=master
 .. |Requirements Status| image:: https://requires.io/github/capstone-coal/pycoal/requirements.svg?branch=master
    :target: https://requires.io/github/capstone-coal/pycoal/requirements/?branch=master
-.. |Code Health| image:: https://landscape.io/github/capstone-coal/pycoal/master/landscape.svg?style=plastic
-   :target: https://landscape.io/github/capstone-coal/pycoal/master
 .. |Anaconda-Server Version| image:: https://anaconda.org/conda-forge/pycoal/badges/version.svg
    :target: https://anaconda.org/conda-forge/pycoal
 .. |Anaconda-Server Downloads| image:: https://anaconda.org/conda-forge/pycoal/badges/downloads.svg

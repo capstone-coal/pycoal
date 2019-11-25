@@ -15,8 +15,8 @@
 # Floor, Boston, MA 02110-1301, USA.
 # encoding: utf-8
 
-DEBUG = 1
-TESTRUN = 1
+DEBUG = 0
+TESTRUN = 0
 PROFILE = 0
 
 # TODO: Also demonstrate this functionality in a Jupyter Notebook
@@ -57,9 +57,9 @@ LIBRARY_FILENAME = "../pycoal/tests/" + LIBRARY_FILENAME_7
 # Set to None to classify the entire image.
 # Only applies to example_mineral.py
 # For reference, the small image has the shape 931X339 (931 rows and 339
-# columns)
-MINERAL_SUBSET_ROWS = [0, 75]
-MINERAL_SUBSET_COLS = [0, 75]
+# columns). This would translate to [0, 931] rows and [0, 339] columns below
+MINERAL_SUBSET_ROWS = None
+MINERAL_SUBSET_COLS = None
 
 # Paths to the flowlines of streams and whatever other hydrography data
 # should be correlated with a mining classified image.
@@ -75,4 +75,3 @@ MINERAL_SUBSET_COLS = [0, 75]
 ENVIRONMENT_VECTOR_PATHS = ["pycoal/tests/images/NHDFlowline_cut.shp",
                             "pycoal/tests/images/GRanD_dams_v1_1.shp",
                             "pycoal/tests/images/GRanD_reservoirs_v1_1.shp"]
-
