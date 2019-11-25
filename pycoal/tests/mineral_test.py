@@ -48,27 +48,11 @@ def _test_classify_image_teardown():
                           f[:-4] + '_class_test.img' for f in
                           test_classifyImage_testFilenames])
 
-# initialize config parser, create config file programmatically
-def _init_config_parser():
-    config = configparser.ConfigParser()
-    config['processing'] = {'algo': 'SAM', 'impl': 'pytorch'}
-    return config
-
-def _init_config_parser_wrong_algo():
-    config = configparser.ConfigParser()
-    config['processing'] = {'algo': 'MAS', 'impl': 'pytorch'}
-    return config
-
-def _init_config_parser_wrong_impl():
-    config = configparser.ConfigParser()
-    config['processing'] = {'algo': 'SAM', 'impl': 'p'}
-    return config
-
 @with_setup(None, _test_classify_image_teardown)
 def test_config_file_wrong_algo():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no MAS_pytorch function in globals array
-    config = _init_config_parser_wrong_algo()
+    config = 'test_config_files/config_test_wrong_algo.ini'
     with assert_raises(KeyError):
         _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
@@ -76,10 +60,10 @@ def test_config_file_wrong_algo():
             )
 
 @with_setup(None, _test_classify_image_teardown)
-def test_config_file_wrong_algo():
+def test_config_file_wrong_impl():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no SAM_p function in globals array
-    config = _init_config_parser_wrong_impl()
+    config = 'test_config_files/config_test_wrong_impl.ini'
     with assert_raises(KeyError):
         _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
@@ -127,17 +111,15 @@ def test_classify_image():
 
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_pytorch():
-    # set our config file parameter ['processing']['impl'] to pytorch
-    config = _init_config_parser()
-    config['processing']['impl'] = 'pytorch'
+    # use our test config file with algo set to pytorch
+    config = 'test_config_files/config_test.ini'
     test_classify_image()
     test_classify_image_in_memory()
 
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_joblib(config):
-    # set our config file parameter ['processing']['impl'] to joblib
-    config = _init_config_parser()
-    config['processing']['impl'] = 'joblib'
+    # use our test config file with algo set to joblib
+    config = 'test_config_files/config_test_joblib.ini'
     test_classify_image()
     test_classify_image_in_memory()
 
