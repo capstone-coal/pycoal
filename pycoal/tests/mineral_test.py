@@ -105,12 +105,18 @@ def test_classify_image():
         # verify that every pixel has the same classification
         assert numpy.array_equal(expected.asarray(), actual.asarray())
         
-# verify that classified images have valid classifications
+        
+# verify that classified images have valid classifications when using config file
+# three basic tests w/ diff parallel methods and loading image in mem
+@unittest.skip("SAM_pytorch not implemented in branch")
 @with_setup(None, _test_classify_image_teardown)
-def test_classify_image_config(config_filename):
+def test_classify_image_pytorch():
+    # use our test config file with algo set to pytorch
+    config = 'tests/test_config_files/config_test.ini'
+    
     # create mineral classifier instance
     mc = mineral.MineralClassification(
-        config_file = config_filename,
+        config_file = config,
         library_file_name=test.libraryFilenames[0])
     
     # for each of the test images
@@ -138,26 +144,80 @@ def test_classify_image_config(config_filename):
 
         # verify that every pixel has the same classification
         assert numpy.array_equal(expected.asarray(), actual.asarray())
+        
+    # create mineral classifier instance with image loading enabled
+    mc = mineral.MineralClassification(
+         config_filename=config, library_file_name=test.libraryFilenames[0], in_memory=True)
 
+    # for each of the test images
+    for image_file_name in test_classifyImage_testFilenames:
+        # classify the test image
+        classified_file_name = image_file_name[:-4] + "_class_test.hdr"
+        mc.classify_image(image_file_name, classified_file_name)
+        actual = spectral.open_image(classified_file_name)
 
-# verify that classified images have valid classifications when using config file
-# three basic tests w/ diff parallel methods and loading image in mem
+        # classified image for comparison
+        expected = spectral.open_image(image_file_name[:-4] + "_class.hdr")
 
-@unittest.skip("SAM_pytorch not implemented in branch")
-@with_setup(None, _test_classify_image_teardown)
-def test_classify_image_pytorch():
-    # use our test config file with algo set to pytorch
-    config = 'tests/test_config_files/config_test.ini'
-    test_classify_image_config(config_filename=config)
-    test_classify_image_in_memory_config(config_filename=config)
+        # verify that every pixel has the same classification
+        assert numpy.array_equal(expected.asarray(), actual.asarray())
+    
 
 @unittest.skip("SAM_joblib not implemented in branch")
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_joblib(config):
     # use our test config file with algo set to joblib
     config = 'tests/test_config_files/config_test_joblib.ini'
-    test_classify_image_config(config_filename=config)
-    test_classify_image_in_memory_config(config_filename=config)
+    
+    # create mineral classifier instance
+    mc = mineral.MineralClassification(
+        config_file = config,
+        library_file_name=test.libraryFilenames[0])
+    
+    # for each of the test images
+    for image_file_name in test_classifyImage_testFilenames:
+        # classify the test image
+        classified_file_name = image_file_name[:-4] + "_class_test.hdr"
+        mc.classify_image(image_file_name, classified_file_name)
+        actual = spectral.open_image(classified_file_name)
+
+        # classified image for comparison
+        expected = spectral.open_image(image_file_name[:-4] + "_class.hdr")
+
+        # validate metadata
+        assert actual.metadata.get(
+            u'description') == 'COAL ' + pycoal.version + ' mineral ' \
+                                                          'classified image.'
+        assert expected.metadata.get(u'file type') == actual.metadata.get(
+            u'file type')
+        assert expected.metadata.get(u'map info') == actual.metadata.get(
+            u'map info')
+        assert expected.metadata.get(u'class names') == actual.metadata.get(
+            u'class names')
+        assert expected.metadata.get(u'classes') == actual.metadata.get(
+            u'classes')
+
+        # verify that every pixel has the same classification
+        assert numpy.array_equal(expected.asarray(), actual.asarray())
+        
+    # create mineral classifier instance with image loading enabled
+    mc = mineral.MineralClassification(
+         config_filename=config, library_file_name=test.libraryFilenames[0], in_memory=True)
+
+    # for each of the test images
+    for image_file_name in test_classifyImage_testFilenames:
+        # classify the test image
+        classified_file_name = image_file_name[:-4] + "_class_test.hdr"
+        mc.classify_image(image_file_name, classified_file_name)
+        actual = spectral.open_image(classified_file_name)
+
+        # classified image for comparison
+        expected = spectral.open_image(image_file_name[:-4] + "_class.hdr")
+
+        # verify that every pixel has the same classification
+        assert numpy.array_equal(expected.asarray(), actual.asarray())
+        
+    
 
     
 # verify classification when loading entire images into memory
@@ -179,27 +239,6 @@ def test_classify_image_in_memory():
 
         # verify that every pixel has the same classification
         assert numpy.array_equal(expected.asarray(), actual.asarray())
-        
-# verify classification when loading entire images into memory
-@with_setup(None, _test_classify_image_teardown)
-def test_classify_image_in_memory_config(config_filename):
-    # create mineral classifier instance with image loading enabled
-    mc = mineral.MineralClassification(
-         config_filename=config_filename, library_file_name=test.libraryFilenames[0], in_memory=True)
-
-    # for each of the test images
-    for image_file_name in test_classifyImage_testFilenames:
-        # classify the test image
-        classified_file_name = image_file_name[:-4] + "_class_test.hdr"
-        mc.classify_image(image_file_name, classified_file_name)
-        actual = spectral.open_image(classified_file_name)
-
-        # classified image for comparison
-        expected = spectral.open_image(image_file_name[:-4] + "_class.hdr")
-
-        # verify that every pixel has the same classification
-        assert numpy.array_equal(expected.asarray(), actual.asarray())
-
 
 # test files for classify image threshold and subset tests
 test_classifyImage_threshold_subset_imageFilename = \
