@@ -106,13 +106,12 @@ def test_classify_image():
         assert numpy.array_equal(expected.asarray(), actual.asarray())
         
 # verify that classified images have valid classifications
-@with_setup(None, _test_classify_image_teardown)
 def test_classify_image_config(config_filename):
     # create mineral classifier instance
     mc = mineral.MineralClassification(
-         config_filename)
-        #library_file_name=test.libraryFilenames[0])
-'''
+         config_filename,
+        library_file_name=test.libraryFilenames[0])
+    
     # for each of the test images
     for image_file_name in test_classifyImage_testFilenames:
         # classify the test image
@@ -138,7 +137,7 @@ def test_classify_image_config(config_filename):
 
         # verify that every pixel has the same classification
         assert numpy.array_equal(expected.asarray(), actual.asarray())
-'''
+
 
 # verify that classified images have valid classifications when using config file
 # three basic tests w/ diff parallel methods and loading image in mem
@@ -181,7 +180,6 @@ def test_classify_image_in_memory():
         assert numpy.array_equal(expected.asarray(), actual.asarray())
         
 # verify classification when loading entire images into memory
-@with_setup(None, _test_classify_image_teardown)
 def test_classify_image_in_memory_config(config_filename):
     # create mineral classifier instance with image loading enabled
     mc = mineral.MineralClassification(
