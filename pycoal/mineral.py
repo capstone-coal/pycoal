@@ -15,6 +15,7 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 import os
+import sys
 import logging
 import math
 import numpy
@@ -26,7 +27,6 @@ import time
 import fnmatch
 import shutil
 import configparser
-import errno
 import multiprocessing
 from joblib import Parallel, delayed
 
@@ -95,7 +95,7 @@ calling function but are optionals and may vary from one classifier to another.
 def SAM_pytorch():
         pass
 
-def SAM(image_file_name, classified_file_name, library_file_name,
+def SAM_serial(image_file_name, classified_file_name, library_file_name,
         scores_file_name=None, class_names=None, threshold=0.0,
         in_memory=False, subset_rows=None, subset_cols=None):
     """
@@ -312,7 +312,7 @@ def avngDNN(image_file_name, classified_file_name, model_file_name,
 
 class MineralClassification:
 
-    def __init__(self, algorithm=SAM_pytorch, **kwargs):
+    def __init__(self, algorithm=SAM_pytorch, config_file='config.ini', **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral
         library
@@ -327,6 +327,8 @@ class MineralClassification:
 
         Args:
             algorithm (function, optional): the classifier callback
+            config_file: the file name of the configuration file with 
+            appropriate parameters to be parsed
             **kwargs: arguments that will be passed to the chosen classifier
         """
 
@@ -334,11 +336,12 @@ class MineralClassification:
         config = configparser.ConfigParser()
         
         try:
-            with open('config.ini') as config_file:
-                config.read_file(config_file)
-        except IOError:
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), 'config.ini')
-
+            with open(os.path.join(os.path.dirname(__file__),  config_file)) as c_file:	            
+                config.read_file(c_file)
+        except OSError:
+            print("Could not open/read config file" + config_file)
+            sys.exit()
+ 
         set_algo = None
         set_impl = None
         self.algorithm = algorithm
