@@ -23,6 +23,7 @@ import os
 import numpy
 import spectral
 import pycoal
+import unittest
 from pycoal import conversion
 from pycoal import mineral
 from pycoal import mining
