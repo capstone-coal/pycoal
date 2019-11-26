@@ -109,9 +109,9 @@ def test_classify_image():
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_config(config_filename):
     # create mineral classifier instance
-    mc = mineral.MineralClassification(
-        config_file = config_filename,
-        library_file_name=test.libraryFilenames[0])
+    mc = mineral.MineralClassification()
+        #config_file = config_filename),
+        #library_file_name=test.libraryFilenames[0])
 '''
     # for each of the test images
     for image_file_name in test_classifyImage_testFilenames:
