@@ -95,7 +95,7 @@ calling function but are optionals and may vary from one classifier to another.
 def SAM_pytorch():
         pass
 
-def SAM(image_file_name, classified_file_name, library_file_name,
+def SAM_serial(image_file_name, classified_file_name, library_file_name,
         scores_file_name=None, class_names=None, threshold=0.0,
         in_memory=False, subset_rows=None, subset_cols=None):
     """
