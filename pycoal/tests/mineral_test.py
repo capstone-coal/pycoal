@@ -106,10 +106,11 @@ def test_classify_image():
         assert numpy.array_equal(expected.asarray(), actual.asarray())
         
 # verify that classified images have valid classifications
+@with_setup(None, _test_classify_image_teardown)
 def test_classify_image_config(config_filename):
     # create mineral classifier instance
     mc = mineral.MineralClassification(
-         config_filename,
+        config_file = config_filename,
         library_file_name=test.libraryFilenames[0])
     
     # for each of the test images
@@ -147,16 +148,16 @@ def test_classify_image_config(config_filename):
 def test_classify_image_pytorch():
     # use our test config file with algo set to pytorch
     config = 'tests/test_config_files/config_test.ini'
-    test_classify_image_config(config)
-    test_classify_image_in_memory_config(config)
+    test_classify_image_config(config_filename=config)
+    test_classify_image_in_memory_config(config_filename=config)
 
 @unittest.skip("SAM_joblib not implemented in branch")
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_joblib(config):
     # use our test config file with algo set to joblib
     config = 'tests/test_config_files/config_test_joblib.ini'
-    test_classify_image_config(config)
-    test_classify_image_in_memory_config(config)
+    test_classify_image_config(config_filename=config)
+    test_classify_image_in_memory_config(config_filename=config)
 
     
 # verify classification when loading entire images into memory
@@ -180,6 +181,7 @@ def test_classify_image_in_memory():
         assert numpy.array_equal(expected.asarray(), actual.asarray())
         
 # verify classification when loading entire images into memory
+@with_setup(None, _test_classify_image_teardown)
 def test_classify_image_in_memory_config(config_filename):
     # create mineral classifier instance with image loading enabled
     mc = mineral.MineralClassification(
