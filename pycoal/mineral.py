@@ -72,7 +72,10 @@ def calculate_pixel_confidence_value(pixel, angles_m, resampling_matrix):
 
         # get confidence value of the classified pixel
         confidence_value = angles[class_index]
+
+        # print(confidence_value, class_index)
         return confidence_value, class_index
+    return 0.0,0.0
 
 
 """
@@ -333,8 +336,11 @@ def SAM_joblib(image_file_name, classified_file_name, library_file_name,
         for j in range(n):
             if scores_file_name is not None:
                 scored[i][j] = pixel_confidences[k][0]
-            classified[i][j] = pixel_confidences[k][1] + 1
+            classified[i][j] = pixel_confidences[k][1]
             k += 1
+        
+    classified = classified + 1
+
     
     #zero out values that fall below the threshold
     indices = numpy.where(scored[:][:] <= threshold)
