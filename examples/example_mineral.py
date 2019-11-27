@@ -70,7 +70,7 @@ def run_mineral(input_filename=constants.INPUT_FILENAME,
 
     # path to save classification scores image
     scores_filename = constants.INPUT_NAME + "_scores.hdr"
-
+    
     # create a new mineral classification instance (defaults to SAM algorithm)
     mineral_classification = mineral.MineralClassification(
         library_file_name=library_filename, scores_file_name=scores_filename,
