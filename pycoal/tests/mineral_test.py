@@ -111,6 +111,7 @@ def test_classify_image_dask(config):
 '''
 
 @with_setup(_init_config_parser, _test_classify_image_teardown)
+@unittest.skip("SAM_pytorch not implemented in branch")
 def test_classify_image_pytorch():
     # set our config file parameter ['processing']['impl'] to pytorch
     config['processing']['impl'] = 'pytorch'
@@ -118,6 +119,7 @@ def test_classify_image_pytorch():
     test_classify_image_in_memory()
 
 @with_setup(_init_config_parser, _test_classify_image_teardown)
+@unittest.skip("SAM_joblib not implemented in branch")
 def test_classify_image_joblib(config):
     # set our config file parameter ['processing']['impl'] to joblib
     config['processing']['impl'] = 'joblib'
