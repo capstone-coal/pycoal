@@ -26,7 +26,6 @@ import spectral
 import time
 import fnmatch
 import shutil
-import torch
 import configparser
 import multiprocessing
 from joblib import Parallel, delayed
@@ -73,7 +72,6 @@ def calculate_pixel_confidence_value(pixel, angles_m, resampling_matrix):
         # get confidence value of the classified pixel
         confidence_value = angles[class_index]
 
-        # print(confidence_value, class_index)
         return confidence_value, class_index
     return 0.0,0.0
 
@@ -86,159 +84,9 @@ arguments, specific of each classifier function, will also be passed by the
 calling function but are optionals and may vary from one classifier to another.
 """
 
-
-def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
-                scores_file_name=None, class_names=None, threshold=0.0,
-                in_memory=False, subset_rows=None, subset_cols=None):
-    """
-    Parameter 'scores_file_name' optionally receives the path to where to save
-    an image that holds all the SAM scores yielded for each pixel of the
-    classified image. No score image is create if not provided.
-
-    The optional 'threshold' parameter defines a confidence value between zero
-    and one below which SAM classifications will be discarded, otherwise all
-    classifications will be included.
-
-    In order to improve performance on systems with sufficient memory,
-    enable the optional parameter to load entire images.
-
-    Args:
-        library_file_name (str):            filename of the spectral library
-        image_file_name (str):              filename of the image to be
-                                            classified
-        classified_file_name (str):         filename of the classified image
-        scores_file_name (str, optional):   filename of the image to hold
-                                            each pixel's classification score
-        class_names (str[], optional):      list of classes' names to include
-        threshold (float, optional):        classification threshold
-        in_memory (boolean, optional):      enable loading entire image
-        subset_rows (2-tuple, optional):    range of rows to read (empty
-                                            to read the whole image)
-        subset_cols (2-tuple, optional):    range of columns to read (
-                                            empty to read the whole image)
-
-    Returns:
-        None
-    """
-
-    # load and optionally subset the spectral library
-    library = spectral.open_image(library_file_name)
-    if class_names is not None:
-        library = pycoal.mineral.MineralClassification.subset_spectral_library(
-            library, class_names)
-
-    # open the image
-    image = spectral.open_image(image_file_name)
-    if subset_rows is not None and subset_cols is not None:
-        # Creates list of rows and columns to create subset image from
-        rows = numpy.linspace(
-            subset_rows[0], subset_rows[1],
-            subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
-        cols = numpy.linspace(
-            subset_cols[0], subset_cols[1],
-            subset_cols[1] - subset_cols[0] + 1).astype(numpy.int32)
-
-        # Reads subset of image image into memory
-        data = image.read_subimage(rows, cols)
-
-        # Determines dimensions for subset image
-        m = subset_rows[1] - subset_rows[0] + 1
-        n = subset_cols[1] - subset_cols[0] + 1
-    else:
-        if in_memory:
-            data = image.load()
-        else:
-            data = image.asarray()
-        m = image.shape[0]
-        n = image.shape[1]
-
-    logging.info("Classifying a %iX%i image" % (m, n))
-
-    # define a resampler
-    # TODO detect and scale units
-    # TODO band resampler should do this
-    resampling_matrix = create_resampling_matrix(
-        [x / 1000 for x in image.bands.centers], library.bands.centers)
-    resampling_matrix = torch.from_numpy(resampling_matrix)
-
-    # allocate a zero-initialized MxN array for the classified image
-    classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
-
-    scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
-
-    # universal calculations for angles
-    # Adapted from Spectral library
-    angles_m = numpy.array(library.spectra, dtype=numpy.float64)
-    angles_m /= numpy.sqrt(
-        numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
-    angles_m = torch.from_numpy(angles_m)
-
-    # for each coumn of pixels in the image
-    for x_column in range(m):
-        pixel_data = torch.from_numpy(data[x_column].astype(numpy.float64))
-
-        # Resample the Data
-        resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
-
-        # Set all NaN values to 0
-        resampled_data[resampled_data != resampled_data] = 0
-
-        # calculate spectral angles
-        # Adapted from Spectral library
-        norms = torch.norm(resampled_data, dim=1)
-        dots = (torch.einsum('ki,ji->jk', resampled_data, angles_m) / norms).t()
-        angles = torch.acos(torch.clamp(dots, -1, 1))
-
-        # normalize confidence values from [pi,0] to [0,1]
-        angles = 1 - (angles / math.pi)
-
-        # get index of class with largest confidence value
-        # get confidence value of the classified pixel
-        scored[x_column], classified[x_column] = torch.max(angles, 1)
-        classified[x_column] = classified[x_column] + 1
-
-    # Find indices where the pixel values should be ignored
-    nopixel_indices = numpy.where(
-        numpy.logical_or(
-            numpy.isclose(data[:, :, 0], -0.005), data[:, :, 0] == -50))
-
-    # Set classifid and scored values for ignored pixels to 0
-    classified[nopixel_indices] = 0
-    scored[nopixel_indices] = 0
-
-    # Find indices where the scored values are below threshold
-    below_threshold_indices = numpy.where(scored[:][:] <= threshold)
-
-    # Set classifid and scored values for values below threshold to 0
-    classified[below_threshold_indices] = 0
-    scored[below_threshold_indices] = 0
-
-    # save the classified image to a file
-    spectral.io.envi.save_classification(classified_file_name, classified,
-                                         class_names=['No data'] +
-                                         library.names,
-                                         metadata={'data ignore value': 0,
-                                                   'description': 'COAL ' +
-                                                   pycoal.version + ' '
-                                                   'mineral classified '
-                                                   'image.',
-                                                   'map info':
-                                                       image.metadata.get(
-                                                        'map info')})
-
-    # remove unused classes from the image
-    pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
-
-    if scores_file_name is not None:
-        # save the scored image to a file
-        spectral.io.envi.save_image(scores_file_name, scored,
-                                    dtype=numpy.float64,
-                                    metadata={'data ignore value': -50,
-                                              'description': 'COAL ' +
-                                              pycoal.version + ' mineral '
-                                              'scored image.',
-                                              'map info': image.metadata.get(
-                                                  'map info')})
+# to be merged
+def SAM_pytorch():
+    pass
 
 
 def SAM_joblib(image_file_name, classified_file_name, library_file_name,
@@ -415,20 +263,9 @@ def SAM_serial(image_file_name, classified_file_name, library_file_name,
     # open the image
     image = spectral.open_image(image_file_name)
     if subset_rows is not None and subset_cols is not None:
-        # Creates list of rows and columns to create subset image from
-        rows = numpy.linspace(
-            subset_rows[0], subset_rows[1],
-            subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
-        cols = numpy.linspace(
-            subset_cols[0], subset_cols[1],
-            subset_cols[1] - subset_cols[0] + 1).astype(numpy.int32)
-
-        # Reads subset of image image into memory
-        data = image.read_subimage(rows, cols)
-
-        # Determines dimensions for subset image
-        m = subset_rows[1] - subset_rows[0] + 1
-        n = subset_cols[1] - subset_cols[0] + 1
+        data = SubImage(image, subset_rows, subset_cols)
+        m = subset_rows[1] 
+        n = subset_cols[1]      
     else:
         if in_memory:
             data = image.load()
