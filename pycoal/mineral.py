@@ -98,7 +98,7 @@ def SAM_joblib(image_file_name, classified_file_name, library_file_name,
 
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the
-    classified image. No score image is create if not provided.
+    classified image. No score image is created if not provided.
 
     The optional 'threshold' parameter defines a confidence value between zero
     and one below which SAM classifications will be discarded, otherwise all
