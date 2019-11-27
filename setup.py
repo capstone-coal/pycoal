@@ -67,6 +67,7 @@ setup(author=_author, author_email=_author_email, classifiers=_classifiers,
       description=_description, download_url=_download_url,
       include_package_data=True, install_requires=_requirements,
       keywords=_keywords, license=_license, long_description=_long_description,
-      name=_name, namespace_packages=_namespaces, packages=find_packages(),
+      name=_name, namespace_packages=_namespaces, packages=find_packages(
+        exclude=["examples", "pycoal/tests"]),
       test_suite=_test_suite, url=_url, version=_version, zip_safe=_zip_safe,
       entry_points=_entry_points)

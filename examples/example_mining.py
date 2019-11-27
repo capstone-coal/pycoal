@@ -22,7 +22,7 @@ example_mining provides a CLI which demonstrates how the COAL Mining
 Classification
 API filters mineral classified images to identify specific classes of
 interest,
-by default proxies for coal mining in the USGS Digital Spectral Library 06. 
+by default proxies for coal mining in the USGS Digital Spectral Library 07.
 More reading an this example can be seen at 
 https://capstone-coal.github.io/docs#usage
 
@@ -54,20 +54,18 @@ from pycoal import mining
     # path to save mining classified image
     mining_filename = "ang20150420t182050_corr_v1e_img_class_mining.hdr"
     
-    #Spectral Library Verison Number, Change to 7 if you want to use USGS 
-    Spectral Library Version 7
+    #Spectral Library Version Number - default USGS Spectral Library Version 7
 '''
 
 
 def run_mining(mineral_filename=constants.INPUT_NAME + "_class.hdr",
                mining_filename=constants.INPUT_NAME + "_mining.hdr",
-               spectral_version="6"):
+               spectral_version="7"):
     """Run mining classification.
 
     :param mineral_filename: The name of the mineral file
     :param mining_filename: The name of the mining file
-    :param spectral_version: 6 by default. Use 7 if you want to use USGS
-    Spectral Library Version 7
+    :param spectral_version: version of Spectral library - 7 by default
     """
 
     # create a new mining classification instance
@@ -127,14 +125,13 @@ USAGE
                                  "default: " + constants.INPUT_NAME +
                                  "_class_mining.hdr]")
         parser.add_argument("-v", "--spectral_version",
-                            dest="spectral_version", default='6',
+                            dest="spectral_version", default='7',
                             help="USGS Spectral Library Version Number")
 
         # Process arguments
         args = parser.parse_args(
             ['-mi', constants.INPUT_NAME + "_class.hdr", '-mo',
-             constants.INPUT_NAME + "_class_mining.hdr", '-v', '6'])
-        # args = parser.parse_args()
+             constants.INPUT_NAME + "_class_mining.hdr", '-v', '7'])
 
         mineral_filename = args.input
         mining_filename = args.output

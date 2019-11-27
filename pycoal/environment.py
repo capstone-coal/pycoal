@@ -36,7 +36,7 @@ class EnvironmentalCorrelation:
             "specification: ")
 
     @staticmethod
-    def intersect_proximity(mining_filename, vector_filename, proximity,
+    def intersect_proximity(mining_filename, vector_filenames, proximity,
                             correlated_filename):
         """
         Generate an environmental correlation image containing pixels from the
@@ -45,7 +45,7 @@ class EnvironmentalCorrelation:
 
         Args:
             mining_filename (str):     filename of the mining classified image
-            vector_filename (str):     filename of vector layer
+            vector_filenames (str[]):  filename(s) of vector layer(s)
             proximity (float):         distance in meters
             correlated_filename (str): filename of the correlated image
         """
@@ -53,35 +53,15 @@ class EnvironmentalCorrelation:
         logging.info(
             "Starting Environmental Correlation for mining image '%s', "
             "with vector layer '%s' and proximity distance of '%s' meters.",
-            mining_filename, vector_filename, proximity)
+            mining_filename, vector_filenames, proximity)
         # get path and file names
         output_directory = dirname(abspath(correlated_filename))
         mining_name = splitext(basename(abspath(mining_filename)))[0]
-        vector_name = splitext(basename(abspath(vector_filename)))[0]
 
-        # rasterize the vector features to the same dimensions as the mining
-        # image
-        feature_header_name = output_directory + '/' + mining_name + '_' +\
-            vector_name + '.hdr'
-        EnvironmentalCorrelation.create_empty_copy(mining_filename,
-                                                   feature_header_name)
-        feature_image_name = feature_header_name[:-4] + '.img'
-        EnvironmentalCorrelation.rasterize(vector_filename, feature_image_name)
-
-        # generate a proximity map from the features
-        proximity_header_name = output_directory + '/' + mining_name + '_' +\
-            vector_name + '_proximity.hdr'
-        proximity_image_name = proximity_header_name[:-4] + '.img'
-        EnvironmentalCorrelation.proximity(feature_image_name,
-                                           proximity_image_name)
-
-        # load mining and proximity images and initialize environmental
-        # correlation array
+        # load mining image and initialize environmental correlation array
         mining_image = spectral.open_image(mining_filename)
-        proximity_image = spectral.open_image(proximity_header_name)
         correlated_image = numpy.zeros(shape=mining_image.shape,
                                        dtype=numpy.uint16)
-
         # get average pixel size
         if mining_image.metadata.get('map info')[10][-6:].lower() == 'meters':
             x_pixel_size = float(mining_image.metadata.get('map info')[5])
@@ -90,14 +70,35 @@ class EnvironmentalCorrelation:
         else:
             raise ValueError('Mining image units not in meters.')
 
-        # intersect features within proximity
-        for x in range(mining_image.shape[0]):
-            for y in range(mining_image.shape[1]):
-                if mining_image[x, y, 0] == 1 \
-                        and proximity_image[x, y, 0] * pixel_size <= proximity:
-                    correlated_image[x, y, 0] = mining_image[x, y, 0]
+        for vector_filename in vector_filenames:
+            # rasterize the vector features to the same dimensions as the
+            # mining image
+            vector_name = splitext(basename(abspath(vector_filename)))[0]
+            feature_header_name = output_directory + '/' + mining_name + \
+                '_' + vector_name + '.hdr'
+            EnvironmentalCorrelation.create_empty_copy(mining_filename,
+                                                       feature_header_name)
+            feature_image_name = feature_header_name[:-4] + '.img'
+            EnvironmentalCorrelation.rasterize(vector_filename,
+                                               feature_image_name)
 
-        # save the environmental correlation image
+            # generate a proximity map from the features
+            proximity_header_name = output_directory + '/' + mining_name + \
+                '_' + vector_name + '_proximity.hdr'
+            proximity_image_name = proximity_header_name[:-4] + '.img'
+            EnvironmentalCorrelation.proximity(feature_image_name,
+                                               proximity_image_name)
+            proximity_image = spectral.open_image(proximity_header_name)
+
+            # intersect features within proximity
+            for x in range(mining_image.shape[0]):
+                for y in range(mining_image.shape[1]):
+                    if mining_image[x, y, 0] == 1 \
+                            and proximity_image[x, y, 0] * pixel_size <= proximity:
+                        correlated_image[x, y, 0] = mining_image[x, y, 0]
+
+        # save the environmental correlation image with proximity data
+        # from each type of hydrographic data passed as input
         spectral.io.envi.save_classification(correlated_filename,
                                              correlated_image,
                                              class_names=mining_image.
