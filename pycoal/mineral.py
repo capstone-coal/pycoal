@@ -19,6 +19,7 @@ import sys
 import logging
 import math
 import numpy
+from spectral.io.spyfile import SubImage
 
 import pycoal
 from pycoal.resampler import create_resampling_matrix
