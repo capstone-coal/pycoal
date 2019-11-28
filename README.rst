@@ -92,17 +92,9 @@ Additionally, if you are developing the image and wish to build it locally, you 
 
 ::
 
-	$(boot2docker shellinit | grep export)
 	docker build -t capstonecoal/coal .
 
 **Usage**
-
-Start docker
-
-::
-
-	boot2docker up
-	$(boot2docker shellinit | grep export)
 
 Start up an image and attach to it
 
