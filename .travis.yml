@@ -11,7 +11,7 @@ cache:
 - pip
 before_install:
 - sudo apt-get update
-- sudo apt-get -y install python-dev python-pip libgdal-dev gdal-bin #2.4.2+dfsg-1
+- sudo apt-get -y install python-dev python-pip libgdal-dev gdal-bin #2.4.2+dfsg-1 python-gdal
 - pip install coverage python-coveralls
 install:
 - python setup.py install
