@@ -10,7 +10,7 @@ notifications:
 cache:
 - pip
 before_install:
-- sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
+- sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 - sudo apt-get update
 - sudo apt-get -y install python-dev python-pip libgdal-dev gdal-bin python3-gdal
 - pip install coverage python-coveralls
