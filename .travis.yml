@@ -9,11 +9,13 @@ notifications:
     secure: QmVT4vcgQDGpUHWFsJTYxhvr50srdr+aPpiavmFEwnVG3cq78pX1vTueT/Iy+hV3LFpownYu4cvzKNVw2U9UuHdqnuPdIRp+3ggYuEtHJXyn6mMFR1N52zeDvELmskiOEqgHBrrGuqFTgi67jpnCRTrjebYf2YPEUVHyyI0f5isRCo9/rWeK1uUqlICjPLyu/ixBKxyUShQjg8je9PW/9XdtqdqNipLOC4Ppp3JGh6J4B5hK5g5Z5g6ZGBBbq+H6+Spm/vL5FvL/7QRGWWysWTo8b8d5VThzWaHhDZC6PU32+178z4n6/MyDro5metWhjttcdgzjDRw+MLHtdgtlRwKR72zesM1RdbgfC/Uj3xdI8sZ1d05p5TnAj+YRwJ+Qe2WEgJ5Ypu1d+qJYd4P4uYHuIYnkJLcW8593WUJXwK13hY4AZ3n4nLLrJfiPz+iZnZVBxusPF6lVOsxtA28DeCLpEN4I4ut1EOxLC3sIa6vYF7a6sK2ELl3koLhjxfiTm9klDe4WvYZmh/6ofVbRMYQ/8zZr2aXqaSYf2wqVycHHuXfdB+TlifnL63HJO5PpyTGZSucVj+9X1HsDKpZSfhKBGk4vtKGUP6SLDGC/Py4F4h2dZ9i1tyM0Fr7QkJ138joIna5PWY5ZqzqnnJhqmJ+gju7rPNc4hnHtOpoa7LE=
 cache:
 - pip
-install:
+before_install:
+- sudo add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
 - sudo apt-get update
-- sudo apt-get -y install python-dev python-pip
+- sudo apt-get -y install python-dev python-pip libgdal-dev gdal-bin python-gdal python3-gdal
+- pip install coverage python-coveralls
+install:
 - python setup.py install
-- pip install spectral coverage python-coveralls
 script:
 - nosetests  --with-coverage --cover-package=pycoal -v
 after_success:

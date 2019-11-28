@@ -15,10 +15,8 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 from nose import with_setup
-from unittest import skipIf
 import test
 
-from os import environ
 from os.path import abspath, basename, splitext
 import numpy
 import spectral
@@ -46,7 +44,7 @@ from pycoal import environment
 
 # test files for proximity intersection test
 mining_filename = 'images/ang20150420t182050_corr_v1e_img_class_mining_cut.hdr'
-vector_filename = 'images/NHDFlowline_cut.shp'
+vector_filename = ['images/NHDFlowline_cut.shp']
 proximity = 10.0
 correlated_filename = 'images' \
                       '/ang20150420t182050_corr_v1e_img_class_mining_cut' \
@@ -59,24 +57,23 @@ test_filename = 'images' \
 # remove generated files
 def _test_intersect_proximity_teardown():
     mining_name = splitext(basename(abspath(mining_filename)))[0]
-    vector_name = splitext(basename(abspath(vector_filename)))[0]
-    output_directory = 'images'
-    feature_header_name = output_directory + '/' + mining_name + '_' + \
-        vector_name + '.hdr'
-    feature_image_name = feature_header_name[:-4] + '.img'
-    proximity_header_name = output_directory + '/' + mining_name + '_' + \
-        vector_name + '_proximity.hdr'
-    proximity_image_name = proximity_header_name[:-4] + '.img'
-    test_image_name = test_filename[:-4] + '.img'
-    test.remove_files(
-        [feature_header_name, feature_image_name, proximity_header_name,
-         proximity_image_name, test_filename, test_image_name])
+    for vector_file in vector_filename:
+    	vector_name = splitext(basename(abspath(vector_file)))[0]
+    	output_directory = 'images'
+    	feature_header_name = output_directory + '/' + mining_name + '_' + \
+        	vector_name + '.hdr'
+    	feature_image_name = feature_header_name[:-4] + '.img'
+    	proximity_header_name = output_directory + '/' + mining_name + '_' + \
+        	vector_name + '_proximity.hdr'
+    	proximity_image_name = proximity_header_name[:-4] + '.img'
+    	test_image_name = test_filename[:-4] + '.img'
+    	test.remove_files(
+        	[feature_header_name, feature_image_name, proximity_header_name,
+         	proximity_image_name, test_filename, test_image_name])
 
 
 # verify that proximity intersection produces expected results
 @with_setup(None, _test_intersect_proximity_teardown)
-@skipIf(environ.get('CONTINUOUS_INTEGRATION'),
-        'Skip test because GDAL not installed on server.')
 def test_intersect_proximity():
     ec = environment.EnvironmentalCorrelation()
     ec.intersect_proximity(mining_filename, vector_filename, proximity,

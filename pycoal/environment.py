@@ -178,7 +178,7 @@ class EnvironmentalCorrelation:
         """
         Generate a proximity map from the features.
         N.B. it is essential to have 
-        `GDAL's gdal_proximity.py <http://www.gdal.org/gdal_proximity.html>`_
+        `GDAL's gdal_proximity.py <https://gdal.org/programs/gdal_proximity.html>`_
         available somewhere on the path. If running Mac OSX, this function will
         scan ``/Library/Frameworks/GDAL.framework/.../gdal_proximity.py`` (
         which is where
