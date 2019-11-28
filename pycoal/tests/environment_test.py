@@ -75,8 +75,6 @@ def _test_intersect_proximity_teardown():
 
 # verify that proximity intersection produces expected results
 @with_setup(None, _test_intersect_proximity_teardown)
-@skipIf(environ.get('CONTINUOUS_INTEGRATION'),
-        'Skip test because GDAL not installed on server.')
 def test_intersect_proximity():
     ec = environment.EnvironmentalCorrelation()
     ec.intersect_proximity(mining_filename, vector_filename, proximity,
