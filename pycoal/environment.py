@@ -71,11 +71,9 @@ class EnvironmentalCorrelation:
             raise ValueError('Mining image units not in meters.')
 
         for vector_filename in vector_filenames:
-            logging.info(vector_filenames)
             # rasterize the vector features to the same dimensions as the
             # mining image
             vector_name = splitext(basename(abspath(vector_filename)))[0]
-            logging.info(vector_name)
             feature_header_name = output_directory + '/' + mining_name + \
                 '_' + vector_name + '.hdr'
             EnvironmentalCorrelation.create_empty_copy(mining_filename,
