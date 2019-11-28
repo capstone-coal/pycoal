@@ -15,10 +15,8 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 from nose import with_setup
-from unittest import skipIf
 import test
 
-from os import environ
 from os.path import abspath, basename, splitext
 import numpy
 import spectral
