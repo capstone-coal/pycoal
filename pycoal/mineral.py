@@ -488,22 +488,13 @@ class MineralClassification:
 
         # parse config file
         config = configparser.ConfigParser()
-        if config_file:
-            try:
-                print(os.path.join(os.path.dirname(os.path.abspath(config_file)), config_file))
-                with open(os.path.join(os.path.dirname(os.path.abspath(config_file)), config_file), 'r') as c_file:	            
-                    config.read_file(c_file)
-            except OSError:
-                print("Could not open/read user provided config file: " + config_file)
-                sys.exit()
-        else:
-            try:
-                print(os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.ini"))
-                with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "config.ini"), 'r') as c_file:	            
-                    config.read_file(c_file)
-            except OSError:
-                print("Could not open/read default config file: " + "config.ini")
-                sys.exit()
+        try:
+            print(os.path.abspath(config_file))
+            with open(os.path.abspath(config_file), 'r') as c_file:	            
+                config.read_file(c_file)
+        except OSError:
+            print("Could not open/read user provided config file: " + config_file)
+            sys.exit()
 
         set_algo = None
         set_impl = None
