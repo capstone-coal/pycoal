@@ -52,32 +52,29 @@ def _test_classify_image_teardown():
 def test_config_file_wrong_algo():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no MAS_pytorch function in globals array
-    config = 'tests/test_config_files/config_test_wrong_algo.ini'
+    config = 'test_config_files/config_test_wrong_algo.ini'
     with assert_raises(KeyError):
         _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
-            config_file = config
-            )
+            config_file = config)
 
 @with_setup(None, _test_classify_image_teardown)
 def test_config_file_wrong_impl():
     # create mineral classifier instance, should raise keyerror
     # in __init__ due to no SAM_p function in globals array
-    config = 'tests/test_config_files/config_test_wrong_impl.ini'
+    config = 'test_config_files/config_test_wrong_impl.ini'
     with assert_raises(KeyError):
         _mc = mineral.MineralClassification(
             library_file_name=test.libraryFilenames[0],
-            config_file = config
-            )
+            config_file = config)
     
-    
-
 # verify that classified images have valid classifications
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image():
     # create mineral classifier instance
     mc = mineral.MineralClassification(
-        library_file_name=test.libraryFilenames[0])
+        library_file_name=test.libraryFilenames[0],
+        config_file="test_config_files/config_test.ini")
 
     # for each of the test images
     for image_file_name in test_classifyImage_testFilenames:
@@ -112,7 +109,7 @@ def test_classify_image():
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_pytorch():
     # use our test config file with algo set to pytorch
-    config = 'tests/test_config_files/config_test.ini'
+    config = 'test_config_files/config_test.ini'
     
     # create mineral classifier instance
     mc = mineral.MineralClassification(
@@ -163,15 +160,14 @@ def test_classify_image_pytorch():
         assert numpy.array_equal(expected.asarray(), actual.asarray())
     
 
-@unittest.skip("SAM_joblib not implemented in branch")
 @with_setup(None, _test_classify_image_teardown)
-def test_classify_image_joblib(config):
+def test_classify_image_joblib():
     # use our test config file with algo set to joblib
-    config = 'tests/test_config_files/config_test_joblib.ini'
+    config = 'test_config_files/config_test_joblib.ini'
     
     # create mineral classifier instance
     mc = mineral.MineralClassification(
-        config_file = config,
+        config_file=config,
         library_file_name=test.libraryFilenames[0])
     
     # for each of the test images
@@ -225,7 +221,8 @@ def test_classify_image_joblib(config):
 def test_classify_image_in_memory():
     # create mineral classifier instance with image loading enabled
     mc = mineral.MineralClassification(
-        library_file_name=test.libraryFilenames[0], in_memory=True)
+        library_file_name=test.libraryFilenames[0], in_memory=True,
+        config_file="test_config_files/config_test.ini")
 
     # for each of the test images
     for image_file_name in test_classifyImage_testFilenames:
@@ -263,7 +260,8 @@ def _test_classify_image_threshold_subset_teardown():
 def test_classify_image_threshold():
     # create mineral classification instance with threshold
     mc = mineral.MineralClassification(
-        library_file_name=test.libraryFilenames[0], threshold=0.75)
+        library_file_name=test.libraryFilenames[0], threshold=0.75,
+        config_file="test_config_files/config_test_joblib.ini")
 
     # classify image
     mc.classify_image(test_classifyImage_threshold_subset_imageFilename,
@@ -291,7 +289,8 @@ def test_classify_image_subset():
     # create mineral classification instance with mining subset
     mc = mineral.MineralClassification(
         library_file_name=test.libraryFilenames[0],
-        class_names=mining.PROXY_CLASS_NAMES_USGSV6)
+        class_names=mining.PROXY_CLASS_NAMES_USGSV6,
+        config_file="test_config_files/config_test_joblib.ini")
 
     # classify image
     mc.classify_image(test_classifyImage_threshold_subset_imageFilename,

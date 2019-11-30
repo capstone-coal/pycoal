@@ -20,6 +20,7 @@ import logging
 import math
 import numpy
 from spectral.io.spyfile import SubImage
+from spectral.graphics.graphics import view_cube
 
 import pycoal
 from pycoal.resampler import create_resampling_matrix
@@ -463,13 +464,15 @@ def avngDNN_serial(image_file_name, classified_file_name, model_file_name,
 
 class MineralClassification:
 
-    def __init__(self, algorithm=SAM_pytorch, config_file='config.ini', **kwargs):
+    def __init__(self, algorithm=SAM_pytorch, config_file=None, **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral
-        library
-        in ENVI format such as the `USGS Digital Spectral Library 06
-        <https://speclab.cr.usgs.gov/spectral.lib06/>`_ or the `ASTER Spectral
-        Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ converted with
+        library in ENVI format such as the `USGS Digital Spectral Library 06
+        <https://speclab.cr.usgs.gov/spectral.lib06/>`_, `USGS Digital
+        Spectral Library version 7
+        <https://crustal.usgs.gov/speclab/QueryAll07a.php>`_ or the 
+        `ASTER Spectral Library Version 2.0
+        <https://asterweb.jpl.nasa.gov/>`_ converted with
         ``pycoal.mineral.AsterConversion.convert()``.
 
         If provided, the optional class name parameter will initialize the
@@ -485,14 +488,13 @@ class MineralClassification:
 
         # parse config file
         config = configparser.ConfigParser()
-        
         try:
-            with open(os.path.join(os.path.dirname(__file__),  config_file)) as c_file:	            
+            with open(os.path.abspath(config_file), 'r') as c_file:	            
                 config.read_file(c_file)
         except OSError:
-            print("Could not open/read config file" + config_file)
+            print("Could not open/read user provided config file: " + config_file)
             sys.exit()
- 
+
         set_algo = None
         set_impl = None
         self.algorithm = algorithm
@@ -686,6 +688,36 @@ class MineralClassification:
         h, m = divmod(m, 60)
         logging.info(
             "Completed RGB image generation. Time elapsed: '%d:%02d:%02d'" % (
+                h, m, s))
+
+    @staticmethod
+    def to_hypercube(image_file_name):
+        """
+        Generate a three-band hypercube from an AVIRIS image.
+        Args:
+            image_file_name (str):     filename of the source image
+
+        Returns:
+            None
+        """
+
+        start = time.time()
+        logging.info(
+            "Starting generation of hypercube from input file: '%s'" % (
+                image_file_name))
+
+        # # open the image
+        image = spectral.open_image(image_file_name)
+
+        #view the hypercube
+        view_cube(image, bands=[29, 19, 9], title="Hypercube representation of %s" % os.path.basename(image_file_name))
+        
+        end = time.time()
+        seconds_elapsed = end - start
+        m, s = divmod(seconds_elapsed, 60)
+        h, m = divmod(m, 60)
+        logging.info(
+            "Completed hypercube generation. Time elapsed: '%d:%02d:%02d'" % (
                 h, m, s))
 
     @staticmethod
