@@ -489,7 +489,6 @@ class MineralClassification:
         # parse config file
         config = configparser.ConfigParser()
         try:
-            print(os.path.abspath(config_file))
             with open(os.path.abspath(config_file), 'r') as c_file:	            
                 config.read_file(c_file)
         except OSError:
