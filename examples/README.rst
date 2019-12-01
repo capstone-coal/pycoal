@@ -35,6 +35,16 @@ The `National Hydrography Dataset <https://nhd.usgs.gov/NHD_High_Resolution.html
 
 	wget -m "ftp://rockyftp.cr.usgs.gov/vdelivery/Datasets/Staged/Hydrography/NHD/State/HighResolution/Shape/NHD_H_New_Mexico_Shape.zip" && unzip rockyftp.cr.usgs.gov/vdelivery/Datasets/Staged/Hydrography/NHD/State/HighResolution/Shape/NHD_H_New_Mexico_Shape.zip
 
+Modifying Constants - Using a Different Hyperspectral Image, Hydrography Dataset, or Spectral Version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The constants.py file in this directory provides constants shared by all
+examples. It is recommended to use this file when changing the image that is
+classified because changing it once in constants.py will allow mineral,
+mining, and environment algorithms to all use the same file name.
+Additionally, you can switch between using Spectral Library version 6 or 7
+in constants.py, as well as setting the option to only classify a subset of
+an image (see comments in constants.py for more info).
+
 
 Mineral Classification
 ----------------------
