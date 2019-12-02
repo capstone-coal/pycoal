@@ -24,6 +24,7 @@ from spectral.graphics.graphics import view_cube
 
 import pycoal
 from pycoal.resampler import create_resampling_matrix
+from pycoal import parallel
 import spectral
 import time
 import fnmatch
@@ -86,9 +87,95 @@ arguments, specific of each classifier function, will also be passed by the
 calling function but are optionals and may vary from one classifier to another.
 """
 
-# to be merged
-def SAM_pytorch():
-    pass
+def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
+                scores_file_name=None, class_names=None, threshold=0.0,
+                in_memory=False, subset_rows=None, subset_cols=None):
+
+    # load and optionally subset the spectral library
+    library = spectral.open_image(library_file_name)
+    if class_names is not None:
+        library = pycoal.mineral.MineralClassification.subset_spectral_library(
+            library, class_names)
+
+    # open the image
+    image = spectral.open_image(image_file_name)
+    if subset_rows is not None and subset_cols is not None:
+        data = SubImage(image, subset_rows, subset_cols)
+        m = subset_rows[1] 
+        n = subset_cols[1]      
+    else:
+        if in_memory:
+            data = image.load()
+        else:
+            data = image.asarray()
+        m = image.shape[0]
+        n = image.shape[1]
+
+    logging.info("Classifying a %iX%i image" % (m, n))
+
+    # define a resampler
+    # TODO detect and scale units
+    # TODO band resampler should do this
+    resampling_matrix = create_resampling_matrix(
+        [x / 1000 for x in image.bands.centers], library.bands.centers)
+
+    # turn the data object into a tensor
+    data = numpy.array(data)
+    # float 64
+    data = data.astype(numpy.dtype('f8'))
+    data = torch.from_numpy(data)
+    # allocate a zero-initialized MxN array for the classified image
+    classified = torch.zeros(shape=(m, n), dtype=numpy.uint16)
+    scored = torch.zeros(shape=(m, n), dtype=numpy.float64)
+
+    # universal calculations for angles
+    # Adapted from Spectral library
+    ang_m = numpy.array(library.spectra, dtype=numpy.float64)
+    ang_m /= numpy.sqrt(numpy.einsum('ij,ij->i', ang_m, ang_m))[:, numpy.newaxis]
+
+    # Create data loader class that will return range of data to model
+    # dataSet = ImageDataSet(m, x, data, classified, scored)
+    
+    classified, scored = parallel.data_parallel(resampling_matrix, data, classified, scored)
+
+    classified = classified + 1
+
+    # Turns variables back to numpy
+    classified = classified.numpy()
+    scored = scored.numpy()
+
+    indices = numpy.where(scored[:][:] <= threshold)
+
+    classified[indices] = 0
+    scored[indices] = 0
+
+    # save the classified image to a file
+    spectral.io.envi.save_classification(classified_file_name, classified,
+                                         class_names=['No data'] +
+                                         library.names,
+                                         metadata={'data ignore value': 0,
+                                                   'description': 'COAL ' +
+                                                   pycoal.version + ' '
+                                                   'mineral classified '
+                                                   'image.',
+                                                   'map info':
+                                                       image.metadata.get(
+                                                        'map info')})
+
+    # remove unused classes from the image
+    pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
+
+    if scores_file_name is not None:
+        # save the scored image to a file
+        spectral.io.envi.save_image(scores_file_name, scored,
+                                    dtype=numpy.float64,
+                                    metadata={'data ignore value': -50,
+                                              'description': 'COAL ' +
+                                              pycoal.version + ' mineral '
+                                              'scored image.',
+                                              'map info': image.metadata.get(
+                                                  'map info')})
+
 
 
 def SAM_joblib(image_file_name, classified_file_name, library_file_name,
