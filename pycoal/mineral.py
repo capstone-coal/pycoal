@@ -362,7 +362,7 @@ def calculate_pixel_confidence_value(pixel, angles_m, resampling_matrix):
     return 0.0,0.0
 
 
-def avngDNN_serial(image_file_name, classified_file_name, model_file_name,
+def avngDNN(image_file_name, classified_file_name, model_file_name,
                     class_names=None, scores_file_name=None, in_memory=False):
     """
     This callback function takes a Keras model, trained to classify pixels
