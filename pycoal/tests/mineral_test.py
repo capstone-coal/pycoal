@@ -105,11 +105,10 @@ def test_classify_image():
         
 # verify that classified images have valid classifications when using config file
 # three basic tests w/ diff parallel methods and loading image in mem
-@unittest.skip("SAM_pytorch not implemented in branch")
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_pytorch():
     # use our test config file with algo set to pytorch
-    config = 'test_config_files/config_test.ini'
+    config = 'test_config_files/config_test_pytorch.ini'
     
     # create mineral classifier instance
     mc = mineral.MineralClassification(

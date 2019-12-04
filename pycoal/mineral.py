@@ -507,8 +507,11 @@ class MineralClassification:
         # use the user's chosen implementation
         try:
             self.impl = config['processing']['impl']
+            if self.impl not in ('serial', 'pytorch', 'joblib'):
+                raise KeyError(
+                    "Processing implementation must be one of 'serial', 'pytorch' or 'joblib'")
         except KeyError:
-            raise KeyError('Implementation not set in config file')
+            raise KeyError('Processing implementation not set in config file')
         
         
         if None not in (set_algo, self.impl):
