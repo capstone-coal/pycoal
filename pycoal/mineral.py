@@ -32,6 +32,7 @@ import torch
 import configparser
 import multiprocessing
 from joblib import Parallel, delayed
+import tqdm
 
 
 """
@@ -197,11 +198,11 @@ def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
         None
     """
 
-    angles_m = torch,from_numpy(angles_m)
+    angles_m = torch.from_numpy(angles_m)
     resampling_matrix = torch.from_numpy(resampling_matrix)
 
     # for each coumn of pixels in the image
-    for x_column in range(m):
+    for x_column in tqdm.tqdm(range(m)):
         pixel_data = torch.from_numpy(data[x_column].astype(numpy.float64))
 
         # Resample the Data
@@ -254,11 +255,11 @@ def joblib_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
     pixel_confidences = numpy.array(Parallel(n_jobs=num_cores)(delayed(
                                 calculate_pixel_confidence_value)(data[x, y],
                                 angles_m, resampling_matrix)
-                                for x in range(m) for y in range(n)))
+                                for x in tqdm.tqdm(range(m)) for y in range(n)))
 
     # convert output to matrices
     k = 0
-    for i in range(m):
+    for i in tqdm.tqdm(range(m)):
         for j in range(n):
             if scores_file_name is not None:
                 scored[i][j] = pixel_confidences[k][0]
@@ -283,7 +284,7 @@ def serial_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
         None
     """
     # for each pixel in the image
-    for x in range(m):
+    for x in tqdm.tqdm(range(m)):
 
         for y in range(n):
 
@@ -302,7 +303,7 @@ def serial_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
                 # calculate spectral angles
                 # Adapted from Spectral library
                 norms = numpy.sqrt(numpy.einsum('i,i->', resample_data, resample_data))
-                dots = numpy.einsum('i,ji->j', resample_data, ang_m)
+                dots = numpy.einsum('i,ji->j', resample_data, angles_m)
                 dots = numpy.clip(dots / norms, -1, 1)
                 angles = numpy.arccos(dots)
 

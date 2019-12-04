@@ -35,7 +35,7 @@ _classifiers = ['Environment :: Console', 'Intended Audience :: Developers',
 _description = 'COAL mining library for AVIRIS data.'
 _download_url = 'http://pypi.python.org/pypi/pycoal/'
 _requirements = ["numpy", "spectral", "guzzle_sphinx_theme", "joblib", "psutil", 
-                 "wxpython", "pyopengl", "torch"]
+                 "wxpython", "pyopengl", "torch", "tqdm"]
 _keywords = ['spectroscopy', 'aviris', 'aviris-ng', 'mining', 'minerals']
 _license = 'GNU GENERAL PUBLIC LICENSE, Version 2'
 _long_description = 'A python suite for the identification and ' \
