@@ -51,6 +51,7 @@ RUN apt-get update && \
 		libgdal-dev \
 		libgeos-dev \
 		libgsl0-dev \
+                libgtk-3-dev \
 		libopenscenegraph-3.4-dev \
 		libosgearth-dev \
 		libpq-dev \

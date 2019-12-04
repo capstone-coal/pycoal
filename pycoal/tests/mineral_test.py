@@ -23,7 +23,6 @@ import os
 import numpy
 import spectral
 import pycoal
-import unittest
 from pycoal import conversion
 from pycoal import mineral
 from pycoal import mining
@@ -34,7 +33,6 @@ from pycoal import mining
 #                            metadata=image.metadata)
 
 # test files for classifyImage tests
-# TODO test AVIRIS-C
 test_classifyImage_testFilenames = [
     "images/ang20140912t192359_corr_v1c_img_400-410_10-20.hdr",
     "images/ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr",
@@ -105,11 +103,10 @@ def test_classify_image():
         
 # verify that classified images have valid classifications when using config file
 # three basic tests w/ diff parallel methods and loading image in mem
-@unittest.skip("SAM_pytorch not implemented in branch")
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image_pytorch():
     # use our test config file with algo set to pytorch
-    config = 'test_config_files/config_test.ini'
+    config = 'test_config_files/config_test_pytorch.ini'
     
     # create mineral classifier instance
     mc = mineral.MineralClassification(
@@ -144,7 +141,7 @@ def test_classify_image_pytorch():
         
     # create mineral classifier instance with image loading enabled
     mc = mineral.MineralClassification(
-         config_filename=config, library_file_name=test.libraryFilenames[0], in_memory=True)
+         config_file=config, library_file_name=test.libraryFilenames[0], in_memory=True)
 
     # for each of the test images
     for image_file_name in test_classifyImage_testFilenames:
@@ -438,7 +435,6 @@ def _test_to_rgb_no_data_teardown():
 
 
 # verify that AVIRIS-NG images with no data pixels are converted to RGB
-# TODO test AVIRIS-C
 @with_setup(None, _test_to_rgb_no_data_teardown)
 def test_to_rgb_no_data():
     mineral.MineralClassification.to_rgb(test_toRGB_noData_imageFilename,
