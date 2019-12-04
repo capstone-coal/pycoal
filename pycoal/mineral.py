@@ -179,7 +179,7 @@ def SAM(image_file_name, classified_file_name, method, library_file_name,
                                                   'map info')})
 
 
-def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, m, _):
+def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, M, _):
     """
     pyTorch Implementation of SAM algorithm
 
@@ -200,7 +200,7 @@ def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, m, _):
     resampling_matrix = torch.from_numpy(resampling_matrix)
 
     # for each coumn of pixels in the image
-    for x_column in tqdm.tqdm(range(m)):
+    for x_column in tqdm.tqdm(range(M)):
         pixel_data = torch.from_numpy(data[x_column].astype(numpy.float64))
 
         # Resample the Data
@@ -232,7 +232,7 @@ def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, m, _):
     scored[nopixel_indices] = 0
 
 
-def joblib_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
+def joblib_SAM(data, angles_m, resampling_matrix, classified, scored, M, N):
     """
     joblib Implementation of SAM algorithm
 
@@ -250,10 +250,10 @@ def joblib_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
     """
     num_cores = multiprocessing.cpu_count()
 
-    pixel_confidences = numpy.array(Parallel(n_jobs=num_cores)(delayed(
-                                    calculate_pixel_confidence_value)(data[x, y],
-                                    angles_m, resampling_matrix)
-                                    for x in tqdm.tqdm(range(m)) for y in range(n)))
+    pixel_confidences = numpy.array(
+        Parallel(n_jobs=num_cores)(delayed(calculate_pixel_confidence_value)(
+        data[x, y], angles_m, resampling_matrix)
+        for x in tqdm.tqdm(range(M)) for y in range(N)))
 
     # convert output to matrices
     k = 0
@@ -264,7 +264,7 @@ def joblib_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
             k += 1
 
 
-def serial_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
+def serial_SAM(data, angles_m, resampling_matrix, classified, scored, M, N):
     """
     serial Implementation of SAM algorithm
 
@@ -281,9 +281,9 @@ def serial_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
         None
     """
     # for each pixel in the image
-    for x in tqdm.tqdm(range(m)):
+    for x in tqdm.tqdm(range(M)):
 
-        for y in range(n):
+        for y in range(N):
 
             # read the pixel from the file
             pixel = data[x, y]
