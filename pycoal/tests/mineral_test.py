@@ -141,7 +141,7 @@ def test_classify_image_pytorch():
         
     # create mineral classifier instance with image loading enabled
     mc = mineral.MineralClassification(
-         config_filename=config, library_file_name=test.libraryFilenames[0], in_memory=True)
+         config_file=config, library_file_name=test.libraryFilenames[0], in_memory=True)
 
     # for each of the test images
     for image_file_name in test_classifyImage_testFilenames:
