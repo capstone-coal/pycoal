@@ -15,9 +15,12 @@
 # Floor, Boston, MA 02110-1301, USA.
 
 import os
+import sys
 import logging
 import math
 import numpy
+from spectral.io.spyfile import SubImage
+from spectral.graphics.graphics import view_cube
 
 import pycoal
 from pycoal.resampler import create_resampling_matrix
@@ -27,62 +30,55 @@ import fnmatch
 import shutil
 import torch
 import configparser
-import errno
 import multiprocessing
 from joblib import Parallel, delayed
+import tqdm
 
 
-def calculate_pixel_confidence_value(pixel, angles_m, threshold,
-                                     resample, scores_file_name):
+def calculate_pixel_confidence_value(pixel, angles_m, resampling_matrix):
     """
-    Calculate the confidence score for a pixel
+    Calculate the confidence score and class index for a pixel
     Is run in parallel on CPU through joblib
 
     Args:
-        pixel (int[]):              numpy memmap of pixel's values
-        angles_m (numpy array):     universal calculated angles
-        threshold (float):          classification threshold
-        resample (BandResampler):   defined resampler for bands
-        scores_file_name (str):     filename of the image to hold
-                                    each pixel's classification score
+        pixel (int[]):                      numpy memmap of pixel's values
+        angles_m (numpy array):             universal calculated angles
+        resampling_matrix (numpy array):    resampling matrix to convert spectra 
+                                            from one band discretization to another
 
     Returns:
-        confidence value (float)
+        pixel confidence value (float):     confidence value of the classified pixel
+        pixel class index (float):          index of class with largest confidence value    
 
     """
 
-    # if it is not a no data pixel
     if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
-        # resample the pixel ignoring NaNs from target bands that don't overlap
-        resampled_pixel = numpy.nan_to_num(resample(pixel))
-        # calculate spectral angles
+
+        # resample the pixel ignoring NaNs from target bands that
+        # don't overlap
+        # TODO fix spectral library so that bands are in order
+        resample_data = numpy.einsum('ij,j->i', resampling_matrix, pixel)
+        resample_data = numpy.nan_to_num(resample_data)
+
         # calculate spectral angles
         # Adapted from Spectral library
-        resampled_data = resampled_pixel[numpy.newaxis, numpy.newaxis, ...]
-        norms = numpy.sqrt(numpy.einsum('ijk,ijk->ij', resampled_data, resampled_data))
-        dots = numpy.einsum('ijk,mk->ijm', resampled_data, angles_m)
-        dots = numpy.clip(dots / norms[:, :, numpy.newaxis], -1, 1)
+        norms = numpy.sqrt(numpy.einsum('i,i->', resample_data, resample_data))
+        dots = numpy.einsum('i,ji->j', resample_data, angles_m)
+        dots = numpy.clip(dots / norms, -1, 1)
         angles = numpy.arccos(dots)
 
         # normalize confidence values from [pi,0] to [0,1]
-        angles[0, 0, :] = 1 - angles[0, 0, :] / math.pi 
+        angles = 1 - angles / math.pi
 
-        # get index of class with largest confidence value
-        index_of_max = numpy.argmax(angles)
+         # get index of class with largest confidence value
+        class_index = numpy.argmax(angles)
 
         # get confidence value of the classified pixel
-        score = angles[0, 0, index_of_max]
+        confidence_value = angles[class_index]
 
-        # classify pixel if confidence above threshold
-        if score > threshold:
+        return confidence_value, class_index
+    return 0.0,0.0
 
-            # index from one (after zero for no data)
-            classified_value = index_of_max + 1
-            if scores_file_name is not None:
-                # store score value
-                return score, classified_value
-            return 0.0, classified_value
-    return 0.0, 0
 
 """
 Classifier callbacks functions must have at least the following args: library,
@@ -97,9 +93,11 @@ def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
                 scores_file_name=None, class_names=None, threshold=0.0,
                 in_memory=False, subset_rows=None, subset_cols=None):
     """
+    Implementation of SAM algorithm using joblib library to parallelize on CPUx
+
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the
-    classified image. No score image is create if not provided.
+    classified image. No score image is created if not provided.
 
     The optional 'threshold' parameter defines a confidence value between zero
     and one below which SAM classifications will be discarded, otherwise all
@@ -180,7 +178,7 @@ def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
     angles_m = torch.from_numpy(angles_m)
 
     # for each coumn of pixels in the image
-    for x_column in range(m):
+    for x_column in tqdm.tqdm(range(m)):
         pixel_data = torch.from_numpy(data[x_column].astype(numpy.float64))
 
         # Resample the Data
@@ -317,14 +315,13 @@ def SAM_joblib(image_file_name, classified_file_name, library_file_name,
     # define a resampler
     # TODO detect and scale units
     # TODO band resampler should do this
-    resample = spectral.BandResampler([x / 1000 for x in image.bands.centers],
-                                      library.bands.centers)
+    resampling_matrix = create_resampling_matrix(
+        [x / 1000 for x in image.bands.centers], library.bands.centers)
+
     # allocate a zero-initialized MxN array for the classified image
     classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
-    
-    if scores_file_name is not None:
-        # allocate a zero-initialized MxN array for the scores image
-        scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
+
+    scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
     # universal calculations for angles
     # Adapted from Spectral library
     angles_m = numpy.array(library.spectra, dtype=numpy.float64)
@@ -333,10 +330,10 @@ def SAM_joblib(image_file_name, classified_file_name, library_file_name,
     num_cores = multiprocessing.cpu_count()
     pixel_confidences = numpy.array(Parallel(n_jobs=num_cores)(delayed(
                                 calculate_pixel_confidence_value)(data[x, y],
-                                angles_m, threshold, resample, scores_file_name)
+                                angles_m, resampling_matrix)
                                 for x in range(m) for y in range(n)))
 
-    # puts it all in one single array, need to make 2d array
+    # convert output to matrices
     k = 0
     for i in range(m):
         for j in range(n):
@@ -344,6 +341,152 @@ def SAM_joblib(image_file_name, classified_file_name, library_file_name,
                 scored[i][j] = pixel_confidences[k][0]
             classified[i][j] = pixel_confidences[k][1]
             k += 1
+        
+    classified = classified + 1
+
+    
+    #zero out values that fall below the threshold
+    indices = numpy.where(scored[:][:] <= threshold)
+
+    classified[indices] = 0
+    scored[indices] = 0
+
+    # save the classified image to a file
+    spectral.io.envi.save_classification(classified_file_name, classified,
+                                         class_names=['No data'] +
+                                         library.names,
+                                         metadata={'data ignore value': 0,
+                                                   'description': 'COAL ' +
+                                                   pycoal.version + ' '
+                                                   'mineral classified '
+                                                   'image.',
+                                                   'map info':
+                                                       image.metadata.get(
+                                                        'map info')})
+
+    # remove unused classes from the image
+    pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
+
+    if scores_file_name is not None:
+        # save the scored image to a file
+        spectral.io.envi.save_image(scores_file_name, scored,
+                                    dtype=numpy.float64,
+                                    metadata={'data ignore value': -50,
+                                              'description': 'COAL ' +
+                                              pycoal.version + ' mineral '
+                                              'scored image.',
+                                              'map info': image.metadata.get(
+                                                  'map info')})
+
+
+def SAM_serial(image_file_name, classified_file_name, library_file_name,
+                scores_file_name=None, class_names=None, threshold=0.0,
+                in_memory=False, subset_rows=None, subset_cols=None):
+    """
+    Parameter 'scores_file_name' optionally receives the path to where to save
+    an image that holds all the SAM scores yielded for each pixel of the
+    classified image. No score image is create if not provided.
+    The optional 'threshold' parameter defines a confidence value between zero
+    and one below which SAM classifications will be discarded, otherwise all
+    classifications will be included.
+    In order to improve performance on systems with sufficient memory,
+    enable the optional parameter to load entire images.
+    Args:
+        library_file_name (str):            filename of the spectral library
+        image_file_name (str):              filename of the image to be
+                                            classified
+        classified_file_name (str):         filename of the classified image
+        scores_file_name (str, optional):   filename of the image to hold
+                                            each pixel's classification score
+        class_names (str[], optional):      list of classes' names to include
+        threshold (float, optional):        classification threshold
+        in_memory (boolean, optional):      enable loading entire image
+        subset_rows (2-tuple, optional):    range of rows to read (empty
+                                            to read the whole image)
+        subset_cols (2-tuple, optional):    range of columns to read (
+                                            empty to read the whole image)
+    Returns:
+        None
+    """
+
+    # load and optionally subset the spectral library
+    library = spectral.open_image(library_file_name)
+    if class_names is not None:
+        library = pycoal.mineral.MineralClassification.subset_spectral_library(
+            library, class_names)
+
+    # open the image
+    image = spectral.open_image(image_file_name)
+    if subset_rows is not None and subset_cols is not None:
+        data = SubImage(image, subset_rows, subset_cols)
+        m = subset_rows[1] 
+        n = subset_cols[1]      
+    else:
+        if in_memory:
+            data = image.load()
+        else:
+            data = image.asarray()
+        m = image.shape[0]
+        n = image.shape[1]
+
+    logging.info("Classifying a %iX%i image" % (m, n))
+
+    # define a resampler
+    # TODO detect and scale units
+    # TODO band resampler should do this
+    resampling_matrix = create_resampling_matrix(
+        [x / 1000 for x in image.bands.centers], library.bands.centers)
+
+    # allocate a zero-initialized MxN array for the classified image
+    classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
+
+    scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
+
+    # universal calculations for angles
+    # Adapted from Spectral library
+    ang_m = numpy.array(library.spectra, dtype=numpy.float64)
+    ang_m /= numpy.sqrt(numpy.einsum('ij,ij->i', ang_m, ang_m))[:, numpy.newaxis]
+
+    # for each pixel in the image
+    for x in range(m):
+
+        for y in range(n):
+
+            # read the pixel from the file
+            pixel = data[x, y]
+
+            # if it is not a no data pixel
+            if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
+
+                # resample the pixel ignoring NaNs from target bands that
+                # don't overlap
+                # TODO fix spectral library so that bands are in order
+                resample_data = numpy.einsum('ij,j->i', resampling_matrix, pixel)
+                resample_data = numpy.nan_to_num(resample_data)
+
+                # calculate spectral angles
+                # Adapted from Spectral library
+                norms = numpy.sqrt(numpy.einsum('i,i->', resample_data, resample_data))
+                dots = numpy.einsum('i,ji->j', resample_data, ang_m)
+                dots = numpy.clip(dots / norms, -1, 1)
+                angles = numpy.arccos(dots)
+
+                # normalize confidence values from [pi,0] to [0,1]
+                angles = 1 - angles / math.pi
+
+                # get index of class with largest confidence value
+                classified[x, y] = numpy.argmax(angles)
+
+                # get confidence value of the classified pixel
+                scored[x, y] = angles[classified[x, y]]
+
+    classified = classified + 1
+
+    indices = numpy.where(scored[:][:] <= threshold)
+
+    classified[indices] = 0
+    scored[indices] = 0
+
     # save the classified image to a file
     spectral.io.envi.save_classification(classified_file_name, classified,
                                          class_names=['No data'] +
@@ -519,6 +662,7 @@ def SAM_serial(image_file_name, classified_file_name, library_file_name,
                                                   'map info')})
 
 
+
 def avngDNN_serial(image_file_name, classified_file_name, model_file_name,
                     class_names=None, scores_file_name=None, in_memory=False):
     """
@@ -621,13 +765,15 @@ def avngDNN_serial(image_file_name, classified_file_name, model_file_name,
 
 class MineralClassification:
 
-    def __init__(self, algorithm=SAM_pytorch, **kwargs):
+    def __init__(self, algorithm=SAM_pytorch, config_file=None, **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral
-        library
-        in ENVI format such as the `USGS Digital Spectral Library 06
-        <https://speclab.cr.usgs.gov/spectral.lib06/>`_ or the `ASTER Spectral
-        Library Version 2.0 <https://asterweb.jpl.nasa.gov/>`_ converted with
+        library in ENVI format such as the `USGS Digital Spectral Library 06
+        <https://speclab.cr.usgs.gov/spectral.lib06/>`_, `USGS Digital
+        Spectral Library version 7
+        <https://crustal.usgs.gov/speclab/QueryAll07a.php>`_ or the 
+        `ASTER Spectral Library Version 2.0
+        <https://asterweb.jpl.nasa.gov/>`_ converted with
         ``pycoal.mineral.AsterConversion.convert()``.
 
         If provided, the optional class name parameter will initialize the
@@ -636,17 +782,20 @@ class MineralClassification:
 
         Args:
             algorithm (function, optional): the classifier callback
+            config_file: the file name of the configuration file with 
+            appropriate parameters to be parsed
             **kwargs: arguments that will be passed to the chosen classifier
         """
 
         # parse config file
         config = configparser.ConfigParser()
-        
         try:
-            with open('../pycoal/config.ini') as config_file:
-                config.read_file(config_file)
-        except IOError:
-            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), 'config.ini')
+
+            with open(os.path.abspath(config_file), 'r') as c_file:	            
+                config.read_file(c_file)
+        except OSError:
+            print("Could not open/read user provided config file: " + config_file)
+            sys.exit()
 
         set_algo = None
         set_impl = None
@@ -844,6 +993,36 @@ class MineralClassification:
                 h, m, s))
 
     @staticmethod
+    def to_hypercube(image_file_name):
+        """
+        Generate a three-band hypercube from an AVIRIS image.
+        Args:
+            image_file_name (str):     filename of the source image
+
+        Returns:
+            None
+        """
+
+        start = time.time()
+        logging.info(
+            "Starting generation of hypercube from input file: '%s'" % (
+                image_file_name))
+
+        # # open the image
+        image = spectral.open_image(image_file_name)
+
+        #view the hypercube
+        view_cube(image, bands=[29, 19, 9], title="Hypercube representation of %s" % os.path.basename(image_file_name))
+        
+        end = time.time()
+        seconds_elapsed = end - start
+        m, s = divmod(seconds_elapsed, 60)
+        h, m = divmod(m, 60)
+        logging.info(
+            "Completed hypercube generation. Time elapsed: '%d:%02d:%02d'" % (
+                h, m, s))
+
+    @staticmethod
     def subset_spectral_library(spectral_library, class_names):
 
         # adapted from https://git.io/v9ThM
@@ -976,7 +1155,6 @@ class SpectalToAsterFileFormat:
             for line_count, _ in enumerate(input_file):
                 pass
 
-        input_file = open(library_filename, 'r')
         # Read Name of Spectra on first line of the file
         spectra_line = input_file.readline()
         spectra_name = spectra_line[23:]
@@ -997,53 +1175,49 @@ class SpectalToAsterFileFormat:
         # Write new file in the form of an ASTER .spectrum.txt file while
         # using stored
         # Spectra Name and stored Spectra Wavelength values`
-        input_file = open(library_filename, 'w')
-        input_file.write('Name:')
-        input_file.write(spectra_name)
-        input_file.write('Type:\n')
-        input_file.write('Class:\n')
-        input_file.write('Subclass:\n')
-        input_file.write('Particle Size:  Unknown\n')
-        input_file.write('Sample No.:  0000000000\n')
-        input_file.write('Owner:\n')
-        input_file.write('Wavelength Range:  ALL\n')
-        input_file.write(
-            'Origin: Spectra obtained from the Noncoventional Exploitation '
-            'Factors\n')
-        input_file.write(
-            'Data System of the National Photographic Interpretation '
-            'Center.\n')
-        input_file.write(
-            'Description:  Gray and black construction asphalt.  The sample '
-            'was\n')
-        input_file.write(
-            'soiled and weathered, with some limestone and quartz aggregate\n')
-        input_file.write('showing.\n')
-        input_file.write('\n')
-        input_file.write('\n')
-        input_file.write('\n')
-        input_file.write('Measurement:  Unknown\n')
-        input_file.write('First Column:  X\n')
-        input_file.write('Second Column: Y\n')
-        input_file.write('X Units:  Wavelength (micrometers)\n')
-        input_file.write('Y Units:  Reflectance (percent)\n')
-        input_file.write('First X Value:\n')
-        input_file.write('Last X Value:\n')
-        input_file.write('Number of X Values:\n')
-        input_file.write('Additional Information:\n')
-        input_file.write('\n')
-        j = 0
-        spectra_values_file.close()
-        # Read in values saved in SpectraValues.txt and output them to the
-        # library_filename
-        spectra_values_file = open('SpectraValues.txt', 'r')
-        while (j < line_count):
-            spectra_wave_length = spectra_values_file.readline()
-            input_file.write(spectra_wave_length)
-            j = j + 1
-        # Close all open files
-        input_file.close()
-        spectra_values_file.close()
+        with open(library_filename, 'w') as input_file:
+            input_file.write('Name:')
+            input_file.write(spectra_name)
+            input_file.write('Type:\n')
+            input_file.write('Class:\n')
+            input_file.write('Subclass:\n')
+            input_file.write('Particle Size:  Unknown\n')
+            input_file.write('Sample No.:  0000000000\n')
+            input_file.write('Owner:\n')
+            input_file.write('Wavelength Range:  ALL\n')
+            input_file.write(
+                'Origin: Spectra obtained from the Noncoventional Exploitation '
+                'Factors\n')
+            input_file.write(
+                'Data System of the National Photographic Interpretation '
+                'Center.\n')
+            input_file.write(
+                'Description:  Gray and black construction asphalt.  The sample '
+                'was\n')
+            input_file.write(
+                'soiled and weathered, with some limestone and quartz aggregate\n')
+            input_file.write('showing.\n')
+            input_file.write('\n')
+            input_file.write('\n')
+            input_file.write('\n')
+            input_file.write('Measurement:  Unknown\n')
+            input_file.write('First Column:  X\n')
+            input_file.write('Second Column: Y\n')
+            input_file.write('X Units:  Wavelength (micrometers)\n')
+            input_file.write('Y Units:  Reflectance (percent)\n')
+            input_file.write('First X Value:\n')
+            input_file.write('Last X Value:\n')
+            input_file.write('Number of X Values:\n')
+            input_file.write('Additional Information:\n')
+            input_file.write('\n')
+            j = 0
+            # Read in values saved in SpectraValues.txt and output them to the
+            # library_filename
+            with open('SpectraValues.txt', 'r') as spectra_values_file:
+                while (j < line_count):
+                    spectra_wave_length = spectra_values_file.readline()
+                    input_file.write(spectra_wave_length)
+                    j = j + 1
         # Rename library_filename to match ASTER .spectrum.txt file format
         os.rename(library_filename, library_filename + '.spectrum.txt')
         # Remove temporary file for storing wavelength data

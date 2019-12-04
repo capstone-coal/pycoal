@@ -57,6 +57,15 @@ LIBRARY_FILENAME = "../pycoal/tests/" + LIBRARY_FILENAME_7
 # Set to None to classify the entire image.
 # Only applies to example_mineral.py
 # For reference, the small image has the shape 931X339 (931 rows and 339
-# columns)
-MINERAL_SUBSET_ROWS = None #[0, 75]
-MINERAL_SUBSET_COLS = None #[0, 75]
+# columns). This would translate to [0, 931] rows and [0, 339] columns below
+MINERAL_SUBSET_ROWS = None
+MINERAL_SUBSET_COLS = None
+
+# Paths to the flowlines of streams and whatever other hydrography data
+# should be correlated with a mining classified image.
+# Note that the path should be relative to where you're running the
+# examples from. These defaults assume that you're running
+# `python3 example_environment.py` from the root project directory.
+ENVIRONMENT_VECTOR_PATHS = ["pycoal/tests/images/NHDFlowline_cut.shp",
+                            "pycoal/tests/images/GRanD_dams_v1_1.shp",
+                            "pycoal/tests/images/GRanD_reservoirs_v1_1.shp"]

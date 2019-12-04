@@ -23,7 +23,7 @@ import os
 import numpy
 import spectral
 import pycoal
-import configparser
+import unittest
 from pycoal import conversion
 from pycoal import mineral
 from pycoal import mining
@@ -48,28 +48,33 @@ def _test_classify_image_teardown():
                           f[:-4] + '_class_test.img' for f in
                           test_classifyImage_testFilenames])
 
-# initialize config parser, create config file programmatically
-def _init_config_parser():
-    config = configparser.ConfigParser()
-    config['processing'] = {'algo': 'SAM', 'impl': 'pytorch'}
-    return config
+@with_setup(None, _test_classify_image_teardown)
+def test_config_file_wrong_algo():
+    # create mineral classifier instance, should raise keyerror
+    # in __init__ due to no MAS_pytorch function in globals array
+    config = 'test_config_files/config_test_wrong_algo.ini'
+    with assert_raises(KeyError):
+        _mc = mineral.MineralClassification(
+            library_file_name=test.libraryFilenames[0],
+            config_file = config)
 
-def _init_config_parser_wrong_algo():
-    config = configparser.ConfigParser()
-    config['processing'] = {'algo': 'MAS', 'impl': 'pytorch'}
-    return config
-
-def _init_config_parser_wrong_impl():
-    config = configparser.ConfigParser()
-    config['processing'] = {'algo': 'SAM', 'impl': 'p'}
-    return config
-
+@with_setup(None, _test_classify_image_teardown)
+def test_config_file_wrong_impl():
+    # create mineral classifier instance, should raise keyerror
+    # in __init__ due to no SAM_p function in globals array
+    config = 'test_config_files/config_test_wrong_impl.ini'
+    with assert_raises(KeyError):
+        _mc = mineral.MineralClassification(
+            library_file_name=test.libraryFilenames[0],
+            config_file = config)
+    
 # verify that classified images have valid classifications
 @with_setup(None, _test_classify_image_teardown)
 def test_classify_image():
     # create mineral classifier instance
     mc = mineral.MineralClassification(
-        library_file_name=test.libraryFilenames[0])
+        library_file_name=test.libraryFilenames[0],
+        config_file="test_config_files/config_test.ini")
 
     # for each of the test images
     for image_file_name in test_classifyImage_testFilenames:
@@ -96,41 +101,50 @@ def test_classify_image():
 
         # verify that every pixel has the same classification
         assert numpy.array_equal(expected.asarray(), actual.asarray())
-
+        
+        
 # verify that classified images have valid classifications when using config file
 # three basic tests w/ diff parallel methods and loading image in mem
-
-# currently dask not supported in config file
-'''
-@with_setup(_init_config_parser, _test_classify_image_teardown)
-def test_classify_image_dask(config):
-    # set our config file parameter ['processing']['impl'] to 'dask'
-    config['processing']['impl'] = 'dask'
-    test_classify_image()
-    test_classify_image_in_memory()
-'''
-
-@with_setup(_init_config_parser, _test_classify_image_teardown)
-def test_classify_image_pytorch():
-    # set our config file parameter ['processing']['impl'] to pytorch
-    config['processing']['impl'] = 'pytorch'
-    test_classify_image()
-    test_classify_image_in_memory()
-
-@with_setup(_init_config_parser, _test_classify_image_teardown)
-def test_classify_image_joblib(config):
-    # set our config file parameter ['processing']['impl'] to joblib
-    config['processing']['impl'] = 'joblib'
-    test_classify_image()
-    test_classify_image_in_memory()
-
-    
-# verify classification when loading entire images into memory
+@unittest.skip("SAM_pytorch not implemented in branch")
 @with_setup(None, _test_classify_image_teardown)
-def test_classify_image_in_memory():
+def test_classify_image_pytorch():
+    # use our test config file with algo set to pytorch
+    config = 'test_config_files/config_test.ini'
+    
+    # create mineral classifier instance
+    mc = mineral.MineralClassification(
+        config_file = config,
+        library_file_name=test.libraryFilenames[0])
+    
+    # for each of the test images
+    for image_file_name in test_classifyImage_testFilenames:
+        # classify the test image
+        classified_file_name = image_file_name[:-4] + "_class_test.hdr"
+        mc.classify_image(image_file_name, classified_file_name)
+        actual = spectral.open_image(classified_file_name)
+
+        # classified image for comparison
+        expected = spectral.open_image(image_file_name[:-4] + "_class.hdr")
+
+        # validate metadata
+        assert actual.metadata.get(
+            u'description') == 'COAL ' + pycoal.version + ' mineral ' \
+                                                          'classified image.'
+        assert expected.metadata.get(u'file type') == actual.metadata.get(
+            u'file type')
+        assert expected.metadata.get(u'map info') == actual.metadata.get(
+            u'map info')
+        assert expected.metadata.get(u'class names') == actual.metadata.get(
+            u'class names')
+        assert expected.metadata.get(u'classes') == actual.metadata.get(
+            u'classes')
+
+        # verify that every pixel has the same classification
+        assert numpy.array_equal(expected.asarray(), actual.asarray())
+        
     # create mineral classifier instance with image loading enabled
     mc = mineral.MineralClassification(
-        library_file_name=test.libraryFilenames[0], in_memory=True)
+         config_filename=config, library_file_name=test.libraryFilenames[0], in_memory=True)
 
     # for each of the test images
     for image_file_name in test_classifyImage_testFilenames:
@@ -144,7 +158,84 @@ def test_classify_image_in_memory():
 
         # verify that every pixel has the same classification
         assert numpy.array_equal(expected.asarray(), actual.asarray())
+    
 
+@with_setup(None, _test_classify_image_teardown)
+def test_classify_image_joblib():
+    # use our test config file with algo set to joblib
+    config = 'test_config_files/config_test_joblib.ini'
+    
+    # create mineral classifier instance
+    mc = mineral.MineralClassification(
+        config_file=config,
+        library_file_name=test.libraryFilenames[0])
+    
+    # for each of the test images
+    for image_file_name in test_classifyImage_testFilenames:
+        # classify the test image
+        classified_file_name = image_file_name[:-4] + "_class_test.hdr"
+        mc.classify_image(image_file_name, classified_file_name)
+        actual = spectral.open_image(classified_file_name)
+
+        # classified image for comparison
+        expected = spectral.open_image(image_file_name[:-4] + "_class.hdr")
+
+        # validate metadata
+        assert actual.metadata.get(
+            u'description') == 'COAL ' + pycoal.version + ' mineral ' \
+                                                          'classified image.'
+        assert expected.metadata.get(u'file type') == actual.metadata.get(
+            u'file type')
+        assert expected.metadata.get(u'map info') == actual.metadata.get(
+            u'map info')
+        assert expected.metadata.get(u'class names') == actual.metadata.get(
+            u'class names')
+        assert expected.metadata.get(u'classes') == actual.metadata.get(
+            u'classes')
+
+        # verify that every pixel has the same classification
+        assert numpy.array_equal(expected.asarray(), actual.asarray())
+        
+    # create mineral classifier instance with image loading enabled
+    mc = mineral.MineralClassification(
+         config_filename=config, library_file_name=test.libraryFilenames[0], in_memory=True)
+
+    # for each of the test images
+    for image_file_name in test_classifyImage_testFilenames:
+        # classify the test image
+        classified_file_name = image_file_name[:-4] + "_class_test.hdr"
+        mc.classify_image(image_file_name, classified_file_name)
+        actual = spectral.open_image(classified_file_name)
+
+        # classified image for comparison
+        expected = spectral.open_image(image_file_name[:-4] + "_class.hdr")
+
+        # verify that every pixel has the same classification
+        assert numpy.array_equal(expected.asarray(), actual.asarray())
+        
+    
+
+    
+# verify classification when loading entire images into memory
+@with_setup(None, _test_classify_image_teardown)
+def test_classify_image_in_memory():
+    # create mineral classifier instance with image loading enabled
+    mc = mineral.MineralClassification(
+        library_file_name=test.libraryFilenames[0], in_memory=True,
+        config_file="test_config_files/config_test.ini")
+
+    # for each of the test images
+    for image_file_name in test_classifyImage_testFilenames:
+        # classify the test image
+        classified_file_name = image_file_name[:-4] + "_class_test.hdr"
+        mc.classify_image(image_file_name, classified_file_name)
+        actual = spectral.open_image(classified_file_name)
+
+        # classified image for comparison
+        expected = spectral.open_image(image_file_name[:-4] + "_class.hdr")
+
+        # verify that every pixel has the same classification
+        assert numpy.array_equal(expected.asarray(), actual.asarray())
 
 # test files for classify image threshold and subset tests
 test_classifyImage_threshold_subset_imageFilename = \
@@ -169,7 +260,8 @@ def _test_classify_image_threshold_subset_teardown():
 def test_classify_image_threshold():
     # create mineral classification instance with threshold
     mc = mineral.MineralClassification(
-        library_file_name=test.libraryFilenames[0], threshold=0.75)
+        library_file_name=test.libraryFilenames[0], threshold=0.75,
+        config_file="test_config_files/config_test_joblib.ini")
 
     # classify image
     mc.classify_image(test_classifyImage_threshold_subset_imageFilename,
@@ -197,7 +289,8 @@ def test_classify_image_subset():
     # create mineral classification instance with mining subset
     mc = mineral.MineralClassification(
         library_file_name=test.libraryFilenames[0],
-        class_names=mining.PROXY_CLASS_NAMES_USGSV6)
+        class_names=mining.PROXY_CLASS_NAMES_USGSV6,
+        config_file="test_config_files/config_test_joblib.ini")
 
     # classify image
     mc.classify_image(test_classifyImage_threshold_subset_imageFilename,

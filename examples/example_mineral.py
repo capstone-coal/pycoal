@@ -70,12 +70,13 @@ def run_mineral(input_filename=constants.INPUT_FILENAME,
 
     # path to save classification scores image
     scores_filename = constants.INPUT_NAME + "_scores.hdr"
-
+    
     # create a new mineral classification instance (defaults to SAM algorithm)
     mineral_classification = mineral.MineralClassification(
         library_file_name=library_filename, scores_file_name=scores_filename,
         subset_rows=constants.MINERAL_SUBSET_ROWS,
-        subset_cols=constants.MINERAL_SUBSET_COLS)
+        subset_cols=constants.MINERAL_SUBSET_COLS,
+        config_file="../pycoal/config.ini")
 
     # generate a georeferenced visible-light image
     mineral_classification.to_rgb(input_filename, rgb_filename)

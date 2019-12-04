@@ -29,6 +29,11 @@ def remove_files(list_of_file_names):
 # file names of USGS Digital Spectral Library 06 in ENVI format
 libraryFilenames = ["s06av95a_envi.hdr", "s06av95a_envi.sli"]
 
+# file names of USGS Digital Spectral Library 07 in ENVI format
+# TODO: Use these in tests
+libraryFilenamesV7 = ["s07_AV95_envi.hdr", "s07_AV95_envi.sli"]
+
+
 
 # set up test module before running tests
 def setup_module():

@@ -34,30 +34,36 @@ The `National Hydrography Dataset <https://nhd.usgs.gov/NHD_High_Resolution.html
 ::
 
 	wget -m "ftp://rockyftp.cr.usgs.gov/vdelivery/Datasets/Staged/Hydrography/NHD/State/HighResolution/Shape/NHD_H_New_Mexico_Shape.zip" && unzip rockyftp.cr.usgs.gov/vdelivery/Datasets/Staged/Hydrography/NHD/State/HighResolution/Shape/NHD_H_New_Mexico_Shape.zip
-	
-Anaconda3
------
 
-In order to get the examples to run 
-You must download Anaconda3 and in Anaconda3\\anaconda\\Lib\\site-packages\\spectral\\io\\envi.py
-You may need to change line 387 of envi.py, if you have an older version than 5.1 of Anaconda3 installed
-From
+Modifying Constants - Using a Different Hyperspectral Image, Hydrography Dataset, or Spectral Version
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The constants.py file in this directory provides constants shared by all
+examples. It is recommended to use this file when changing the image that is
+classified because changing it once in constants.py will allow mineral,
+mining, and environment algorithms to all use the same file name.
+Additionally, you can switch between using Spectral Library version 6 or 7
+in constants.py, as well as setting the option to only classify a subset of
+an image (see comments in constants.py for more info).
 
-::
-
-	h['bbl'] = [int(b) for b in h['bbl']]
-	
-To
-
-::
-
-	h['bbl'] = [int(float(b)) for b in h['bbl']]
-	
-More information on this here `issue <https://github.com/spectralpython/spectral/issues/67>`__
 
 Mineral Classification
 ----------------------
 The `Mineral Classification API <http://pycoal.readthedocs.io/en/latest/mineral.html>`__ provides methods for generating visible-light and mineral classified images. Mineral classification can take hours to days depending on the size of the spectral library and the available computing resources, so running a script in the background is recommended.
+
+**N.B.** To generate a Hypercube for any given scene, you need to run something similar to the following
+
+:: 
+
+  ipython --pylab=WX
+  
+  from pycoal import mineral
+  
+  mineral_classification = mineral.MineralClassification(library_file_name="../pycoal/tests/s07_AV95_envi.hdr", scores_file_name="../pycoal/tests/images/ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr_scores.hdr", subset_rows=None, subset_cols=None)
+
+  mineral_classification.to_hypercube("/Users/lmcgibbn/Downloads/pycoal/pycoal/tests/images/ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr")
+
+You will then be able to view an interactive hypercube.
+
 
 Command Line Interface
 ^^^^^^^^^^^^^^^^^^^^^^

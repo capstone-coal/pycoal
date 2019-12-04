@@ -48,11 +48,11 @@ import pycoal
 from pycoal import environment
 
 
-def run_environment(mining_filename, vector_filename, correlation_filename):
+def run_environment(mining_filename, vector_filenames, correlation_filename):
     """Run environment correlation.
 
-    :param mining_filename: Input mining classified file to be processed
-    :param vector_filename: Path to hydrography data
+    :param mining_filename:      Input mining classified file to be processed
+    :param vector_filenames:     Path(s) to hydrography data
     :param correlation_filename: Output environmental correlation image
     """
 
@@ -60,9 +60,10 @@ def run_environment(mining_filename, vector_filename, correlation_filename):
     environmental_correlation = environment.EnvironmentalCorrelation()
 
     # generate an environmental correlation image of mining
-    # pixels within 10 meters of a stream
+    # pixels within 10 meters of a stream/dam/reservoir
     environmental_correlation.intersect_proximity(mining_filename,
-                                                  vector_filename, 10.0,
+                                                  vector_filenames,
+                                                  10.0,
                                                   correlation_filename)
 
 
@@ -109,29 +110,31 @@ USAGE
                             help="Input mining classified file to be "
                                  "processed [default: " +
                                  constants.INPUT_NAME + "_class_mining.hdr]")
-        parser.add_argument("-hy", "--hydrography", dest="vector_filename",
-                            default='Shape/NHDFlowline.shp',
-                            help="Path to hydrography data [default: "
-                                 "Shape/NHDFlowline.shp]")
+        parser.add_argument("-hy", "--hydrography", dest="vector_filenames",
+                            default=constants.ENVIRONMENT_VECTOR_PATHS,
+                            help="Paths array to hydrography data [default: "
+                                 "[pycoal/tests/images/NHDFlowline_cut.shp]]")
         parser.add_argument("-e", "--environment", dest="correlation_filename",
                             default=constants.INPUT_NAME +
-                                  "_class_mining_NHDFlowline_correlation.hdr",
+                                  "_class_mining_environmental_correlation.hdr",
                             help="Output environmental correlation image ["
                                  "default: " + constants.INPUT_NAME +
-                                 "_class_mining_NHDFlowline_correlation.hdr]")
+                                 "_class_mining_environmental_correlation.hdr]")
 
         # Process arguments
         args = parser.parse_args(
             ['-m', constants.INPUT_NAME + "_class_mining.hdr", '-hy',
-             'Shape/NHDFlowline.shp', '-e',
+             constants.ENVIRONMENT_VECTOR_PATHS, '-e',
              constants.INPUT_NAME +
-             "_class_mining_NHDFlowline_correlation.hdr"])
+             "_class_mining_environmental_correlation.hdr"])
 
         mining_filename = args.mining_filename
-        vector_filename = args.vector_filename
+        vector_filenames = args.vector_filenames
         correlation_filename = args.correlation_filename
 
-        run_environment(mining_filename, vector_filename, correlation_filename)
+        run_environment(mining_filename,
+                        vector_filenames,
+                        correlation_filename)
 
     except KeyboardInterrupt:
         return 0

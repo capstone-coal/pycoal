@@ -74,6 +74,7 @@ RUN apt-get update && \
 		python-sip-dev \
 		qgis \
 		qgis-plugin-grass \
+		software-properties-common \
 		txt2tags \
 		wget \
 		xauth \
@@ -87,8 +88,8 @@ RUN echo "deb-src http://qgis.org/debian jessie main" >> /etc/apt/sources.list
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-key 073D307A618E5811
 # dput breaks Docker build
 RUN printf "Package: dput\nPin: origin \"\"\nPin-Priority: -1" >> /etc/apt/preferences
-#RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
-RUN apt-get install gdal-bin #2.4.2+dfsg-1
+RUN add-apt-repository -y ppa:ubuntugis/ubuntugis-unstable
+RUN apt-get install -y gdal-bin python-gdal python3-gdal
 
 # Download GDAL
 #ENV GDAL_VERSION 3.0.1

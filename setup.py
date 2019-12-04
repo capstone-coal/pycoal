@@ -34,8 +34,8 @@ _classifiers = ['Environment :: Console', 'Intended Audience :: Developers',
                 'Modules', ]
 _description = 'COAL mining library for AVIRIS data.'
 _download_url = 'http://pypi.python.org/pypi/pycoal/'
-_requirements = ["numpy", "spectral", "guzzle_sphinx_theme", "joblib", "psutil",
-                 "torch"]
+_requirements = ["numpy", "spectral", "guzzle_sphinx_theme", "joblib", "psutil", 
+                 "wxpython", "pyopengl", "torch"]
 _keywords = ['spectroscopy', 'aviris', 'aviris-ng', 'mining', 'minerals']
 _license = 'GNU GENERAL PUBLIC LICENSE, Version 2'
 _long_description = 'A python suite for the identification and ' \
@@ -68,6 +68,7 @@ setup(author=_author, author_email=_author_email, classifiers=_classifiers,
       description=_description, download_url=_download_url,
       include_package_data=True, install_requires=_requirements,
       keywords=_keywords, license=_license, long_description=_long_description,
-      name=_name, namespace_packages=_namespaces, packages=find_packages(),
+      name=_name, namespace_packages=_namespaces, packages=find_packages(
+        exclude=["examples", "pycoal/tests"]),
       test_suite=_test_suite, url=_url, version=_version, zip_safe=_zip_safe,
       entry_points=_entry_points)
