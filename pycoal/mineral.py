@@ -19,7 +19,6 @@ import sys
 import logging
 import math
 import numpy
-from spectral.io.spyfile import SubImage
 from spectral.graphics.graphics import view_cube
 
 import pycoal
@@ -48,7 +47,7 @@ def SAM(image_file_name, classified_file_name, method, library_file_name,
                 scores_file_name=None, class_names=None, threshold=0.0,
                 in_memory=False, subset_rows=None, subset_cols=None):
     """
-    Implementation of SAM algorithm 
+    Implementation of SAM algorithm
 
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the
@@ -65,7 +64,7 @@ def SAM(image_file_name, classified_file_name, method, library_file_name,
         library_file_name (str):            filename of the spectral library
         image_file_name (str):              filename of the image to be
                                             classified
-        method:                             which processing method to use 
+        method:                             which processing method to use
         classified_file_name (str):         filename of the classified image
         scores_file_name (str, optional):   filename of the image to hold
                                             each pixel's classification score
@@ -134,7 +133,7 @@ def SAM(image_file_name, classified_file_name, method, library_file_name,
     algorithm = globals()[method + "_SAM"]
     algorithm(data, angles_m, resampling_matrix, classified, scored, m, n)
 
-    classified = classified + 1;
+    classified = classified + 1
 
     # Find indices where the pixel values should be ignored
     nopixel_indices = numpy.where(
@@ -180,15 +179,14 @@ def SAM(image_file_name, classified_file_name, method, library_file_name,
                                                   'map info')})
 
 
-
-def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
+def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, m, _):
     """
-    pyTorch Implementation of SAM algorithm 
+    pyTorch Implementation of SAM algorithm
 
     Args:
         data:                               data from hyperspectral image
         angles_m (numpy array):             processed angles from library
-        resampling_matrix (numpy array):    matrix used to resample pixels 
+        resampling_matrix (numpy array):    matrix used to resample pixels
         classified (numpy.zeros):           m by n numpy array of zeros
         scored (snumpy.zeros):              m by n numpy array of zeros
         m (int):                            number of columns
@@ -236,12 +234,12 @@ def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
 
 def joblib_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
     """
-    joblib Implementation of SAM algorithm 
+    joblib Implementation of SAM algorithm
 
     Args:
         data:                               data from hyperspectral image
         angles_m (numpy array):             processed angles from library
-        resampling_matrix (numpy array):    matrix used to resample pixels 
+        resampling_matrix (numpy array):    matrix used to resample pixels
         classified (numpy.zeros):           m by n numpy array of zeros
         scored (snumpy.zeros):              m by n numpy array of zeros
         m (int):                            number of columns
@@ -253,28 +251,27 @@ def joblib_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
     num_cores = multiprocessing.cpu_count()
 
     pixel_confidences = numpy.array(Parallel(n_jobs=num_cores)(delayed(
-                                calculate_pixel_confidence_value)(data[x, y],
-                                angles_m, resampling_matrix)
-                                for x in tqdm.tqdm(range(m)) for y in range(n)))
+                                    calculate_pixel_confidence_value)(data[x, y],
+                                    angles_m, resampling_matrix)
+                                    for x in tqdm.tqdm(range(m)) for y in range(n)))
 
     # convert output to matrices
     k = 0
     for i in tqdm.tqdm(range(m)):
         for j in range(n):
-            if scores_file_name is not None:
-                scored[i][j] = pixel_confidences[k][0]
+            scored[i][j] = pixel_confidences[k][0]
             classified[i][j] = pixel_confidences[k][1]
             k += 1
-    
+
 
 def serial_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
     """
-    serial Implementation of SAM algorithm 
+    serial Implementation of SAM algorithm
 
     Args:
         data:                               data from hyperspectral image
         angles_m (numpy array):             processed angles from library
-        resampling_matrix (numpy array):    matrix used to resample pixels 
+        resampling_matrix (numpy array):    matrix used to resample pixels
         classified (numpy.zeros):           m by n numpy array of zeros
         scored (snumpy.zeros):              m by n numpy array of zeros
         m (int):                            number of columns
@@ -325,12 +322,13 @@ def calculate_pixel_confidence_value(pixel, angles_m, resampling_matrix):
     Args:
         pixel (int[]):                      numpy memmap of pixel's values
         angles_m (numpy array):             universal calculated angles
-        resampling_matrix (numpy array):    resampling matrix to convert spectra 
+        resampling_matrix (numpy array):    resampling matrix to convert spectra
                                             from one band discretization to another
 
     Returns:
         pixel confidence value (float):     confidence value of the classified pixel
-        pixel class index (float):          index of class with largest confidence value    
+        pixel class index (float):          index of class with largest confidence 
+                                            value
 
     """
 
@@ -352,14 +350,14 @@ def calculate_pixel_confidence_value(pixel, angles_m, resampling_matrix):
         # normalize confidence values from [pi,0] to [0,1]
         angles = 1 - angles / math.pi
 
-         # get index of class with largest confidence value
+        # get index of class with largest confidence value
         class_index = numpy.argmax(angles)
 
         # get confidence value of the classified pixel
         confidence_value = angles[class_index]
 
         return confidence_value, class_index
-    return 0.0,0.0
+    return 0.0, 0.0
 
 
 def avngDNN(image_file_name, classified_file_name, model_file_name,
