@@ -43,7 +43,7 @@ calling function but are optionals and may vary from one classifier to another.
 """
 
 
-def SAM(image_file_name, classified_file_name, method, library_file_name,
+def SAM(image_file_name, classified_file_name, method, library_file_name, # skipcq: PYL-C0103
                 scores_file_name=None, class_names=None, threshold=0.0,
                 in_memory=False, subset_rows=None, subset_cols=None):
     """
@@ -206,7 +206,7 @@ def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, num_colum
         resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
 
         # Set all NaN values to 0
-        resampled_data[resampled_data != resampled_data] = 0
+        resampled_data[resampled_data != resampled_data] = 0 # skipcq: PYL-R0124
 
         # calculate spectral angles
         # Adapted from Spectral library
@@ -231,7 +231,8 @@ def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, num_colum
     scored[nopixel_indices] = 0
 
 
-def joblib_SAM(data, angles_m, resampling_matrix, classified, scored, num_columns, num_rows):
+def joblib_SAM(data, angles_m, resampling_matrix, classified,
+                    scored, num_columns, num_rows):
     """
     joblib Implementation of SAM algorithm
 
@@ -264,7 +265,8 @@ def joblib_SAM(data, angles_m, resampling_matrix, classified, scored, num_column
             k += 1
 
 
-def serial_SAM(data, angles_m, resampling_matrix, classified, scored, num_columns, num_rows):
+def serial_SAM(data, angles_m, resampling_matrix, classified,
+                    scored, num_columns, num_rows):
     """
     serial Implementation of SAM algorithm
 
@@ -508,8 +510,8 @@ class MineralClassification:
             self.impl = config['processing']['impl']
             if self.impl not in ('serial', 'pytorch', 'joblib'):
                 raise KeyError(
-                    """Processing implementation must be one 
-                    of 'serial', 'pytorch' or 'joblib'""")
+                    """Processing implementation must be one
+                     of 'serial', 'pytorch' or 'joblib'""")
         except KeyError:
             raise KeyError('Processing implementation not set in config file')
         
