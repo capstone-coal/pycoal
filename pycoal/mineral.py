@@ -114,8 +114,7 @@ def SAM(image_file_name, classified_file_name, method, library_file_name,
     logging.info("Classifying a %iX%i image" % (m, n))
 
     # define a resampler
-    # TODO detect and scale units
-    # TODO band resampler should do this
+    # https://github.com/capstone-coal/pycoal/issues/205
     resampling_matrix = create_resampling_matrix(
         [x / 1000 for x in image.bands.centers], library.bands.centers)
 
@@ -509,7 +508,8 @@ class MineralClassification:
             self.impl = config['processing']['impl']
             if self.impl not in ('serial', 'pytorch', 'joblib'):
                 raise KeyError(
-                    "Processing implementation must be one of 'serial', 'pytorch' or 'joblib'")
+                    """Processing implementation must be one 
+                    of 'serial', 'pytorch' or 'joblib'""")
         except KeyError:
             raise KeyError('Processing implementation not set in config file')
         

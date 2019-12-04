@@ -23,7 +23,6 @@ import os
 import numpy
 import spectral
 import pycoal
-import unittest
 from pycoal import conversion
 from pycoal import mineral
 from pycoal import mining
@@ -34,7 +33,6 @@ from pycoal import mining
 #                            metadata=image.metadata)
 
 # test files for classifyImage tests
-# TODO test AVIRIS-C
 test_classifyImage_testFilenames = [
     "images/ang20140912t192359_corr_v1c_img_400-410_10-20.hdr",
     "images/ang20140912t192359_corr_v1c_img_2580-2590_540-550.hdr",
@@ -437,7 +435,6 @@ def _test_to_rgb_no_data_teardown():
 
 
 # verify that AVIRIS-NG images with no data pixels are converted to RGB
-# TODO test AVIRIS-C
 @with_setup(None, _test_to_rgb_no_data_teardown)
 def test_to_rgb_no_data():
     mineral.MineralClassification.to_rgb(test_toRGB_noData_imageFilename,
