@@ -32,52 +32,6 @@ import torch
 import configparser
 import multiprocessing
 from joblib import Parallel, delayed
-import tqdm
-
-
-def calculate_pixel_confidence_value(pixel, angles_m, resampling_matrix):
-    """
-    Calculate the confidence score and class index for a pixel
-    Is run in parallel on CPU through joblib
-
-    Args:
-        pixel (int[]):                      numpy memmap of pixel's values
-        angles_m (numpy array):             universal calculated angles
-        resampling_matrix (numpy array):    resampling matrix to convert spectra 
-                                            from one band discretization to another
-
-    Returns:
-        pixel confidence value (float):     confidence value of the classified pixel
-        pixel class index (float):          index of class with largest confidence value    
-
-    """
-
-    if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
-
-        # resample the pixel ignoring NaNs from target bands that
-        # don't overlap
-        # TODO fix spectral library so that bands are in order
-        resample_data = numpy.einsum('ij,j->i', resampling_matrix, pixel)
-        resample_data = numpy.nan_to_num(resample_data)
-
-        # calculate spectral angles
-        # Adapted from Spectral library
-        norms = numpy.sqrt(numpy.einsum('i,i->', resample_data, resample_data))
-        dots = numpy.einsum('i,ji->j', resample_data, angles_m)
-        dots = numpy.clip(dots / norms, -1, 1)
-        angles = numpy.arccos(dots)
-
-        # normalize confidence values from [pi,0] to [0,1]
-        angles = 1 - angles / math.pi
-
-         # get index of class with largest confidence value
-        class_index = numpy.argmax(angles)
-
-        # get confidence value of the classified pixel
-        confidence_value = angles[class_index]
-
-        return confidence_value, class_index
-    return 0.0,0.0
 
 
 """
@@ -89,11 +43,11 @@ calling function but are optionals and may vary from one classifier to another.
 """
 
 
-def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
+def SAM(image_file_name, classified_file_name, method, library_file_name,
                 scores_file_name=None, class_names=None, threshold=0.0,
                 in_memory=False, subset_rows=None, subset_cols=None):
     """
-    Implementation of SAM algorithm using joblib library to parallelize on CPUx
+    Implementation of SAM algorithm 
 
     Parameter 'scores_file_name' optionally receives the path to where to save
     an image that holds all the SAM scores yielded for each pixel of the
@@ -110,6 +64,7 @@ def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
         library_file_name (str):            filename of the spectral library
         image_file_name (str):              filename of the image to be
                                             classified
+        method:                             which processing method to use 
         classified_file_name (str):         filename of the classified image
         scores_file_name (str, optional):   filename of the image to hold
                                             each pixel's classification score
@@ -163,7 +118,6 @@ def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
     # TODO band resampler should do this
     resampling_matrix = create_resampling_matrix(
         [x / 1000 for x in image.bands.centers], library.bands.centers)
-    resampling_matrix = torch.from_numpy(resampling_matrix)
 
     # allocate a zero-initialized MxN array for the classified image
     classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
@@ -175,31 +129,11 @@ def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
     angles_m = numpy.array(library.spectra, dtype=numpy.float64)
     angles_m /= numpy.sqrt(
         numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
-    angles_m = torch.from_numpy(angles_m)
 
-    # for each coumn of pixels in the image
-    for x_column in tqdm.tqdm(range(m)):
-        pixel_data = torch.from_numpy(data[x_column].astype(numpy.float64))
+    algorithm = globals()[method + "_SAM"]
+    algorithm(data, angles_m, resampling_matrix, classified, scored, m, n)
 
-        # Resample the Data
-        resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
-
-        # Set all NaN values to 0
-        resampled_data[resampled_data != resampled_data] = 0
-
-        # calculate spectral angles
-        # Adapted from Spectral library
-        norms = torch.norm(resampled_data, dim=1)
-        dots = (torch.einsum('ki,ji->jk', resampled_data, angles_m) / norms).t()
-        angles = torch.acos(torch.clamp(dots, -1, 1))
-
-        # normalize confidence values from [pi,0] to [0,1]
-        angles = 1 - (angles / math.pi)
-
-        # get index of class with largest confidence value
-        # get confidence value of the classified pixel
-        scored[x_column], classified[x_column] = torch.max(angles, 1)
-        classified[x_column] = classified[x_column] + 1
+    classified = classified + 1;
 
     # Find indices where the pixel values should be ignored
     nopixel_indices = numpy.where(
@@ -245,89 +179,78 @@ def SAM_pytorch(image_file_name, classified_file_name, library_file_name,
                                                   'map info')})
 
 
-def SAM_joblib(image_file_name, classified_file_name, library_file_name,
-                scores_file_name=None, class_names=None, threshold=0.0,
-                in_memory=False, subset_rows=None, subset_cols=None):
+
+def pytorch_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
     """
-    Parameter 'scores_file_name' optionally receives the path to where to save
-    an image that holds all the SAM scores yielded for each pixel of the
-    classified image. No score image is create if not provided.
-
-    The optional 'threshold' parameter defines a confidence value between zero
-    and one below which SAM classifications will be discarded, otherwise all
-    classifications will be included.
-
-    In order to improve performance on systems with sufficient memory,
-    enable the optional parameter to load entire images.
+    pyTorch Implementation of SAM algorithm 
 
     Args:
-        library_file_name (str):            filename of the spectral library
-        image_file_name (str):              filename of the image to be
-                                            classified
-        classified_file_name (str):         filename of the classified image
-        scores_file_name (str, optional):   filename of the image to hold
-                                            each pixel's classification score
-        class_names (str[], optional):      list of classes' names to include
-        threshold (float, optional):        classification threshold
-        in_memory (boolean, optional):      enable loading entire image
-        subset_rows (2-tuple, optional):    range of rows to read (empty
-                                            to read the whole image)
-        subset_cols (2-tuple, optional):    range of columns to read (
-                                            empty to read the whole image)
+        data:                               data from hyperspectral image
+        angles_m (numpy array):             processed angles from library
+        resampling_matrix (numpy array):    matrix used to resample pixels 
+        classified (numpy.zeros):           m by n numpy array of zeros
+        scored (snumpy.zeros):              m by n numpy array of zeros
+        m (int):                            number of columns
+        n (int):                            number of rows
 
     Returns:
         None
     """
 
-    # load and optionally subset the spectral library
-    library = spectral.open_image(library_file_name)
-    if class_names is not None:
-        library = pycoal.mineral.MineralClassification.subset_spectral_library(
-            library, class_names)
+    angles_m = torch,from_numpy(angles_m)
+    resampling_matrix = torch.from_numpy(resampling_matrix)
 
-    # open the image
-    image = spectral.open_image(image_file_name)
-    if subset_rows is not None and subset_cols is not None:
-        # Creates list of rows and columns to create subset image from
-        rows = numpy.linspace(
-            subset_rows[0], subset_rows[1],
-            subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
-        cols = numpy.linspace(
-            subset_cols[0], subset_cols[1],
-            subset_cols[1] - subset_cols[0] + 1).astype(numpy.int32)
+    # for each coumn of pixels in the image
+    for x_column in range(m):
+        pixel_data = torch.from_numpy(data[x_column].astype(numpy.float64))
 
-        # Reads subset of image image into memory
-        data = image.read_subimage(rows, cols)
+        # Resample the Data
+        resampled_data = torch.einsum('ij,kj->ki', resampling_matrix, pixel_data)
 
-        # Determines dimensions for subset image
-        m = subset_rows[1] - subset_rows[0] + 1
-        n = subset_cols[1] - subset_cols[0] + 1
-    else:
-        if in_memory:
-            data = image.load()
-        else:
-            data = image.asarray()
-        m = image.shape[0]
-        n = image.shape[1]
+        # Set all NaN values to 0
+        resampled_data[resampled_data != resampled_data] = 0
 
-    logging.info("Classifying a %iX%i image" % (m, n))
+        # calculate spectral angles
+        # Adapted from Spectral library
+        norms = torch.norm(resampled_data, dim=1)
+        dots = (torch.einsum('ki,ji->jk', resampled_data, angles_m) / norms).t()
+        angles = torch.acos(torch.clamp(dots, -1, 1))
 
-    # define a resampler
-    # TODO detect and scale units
-    # TODO band resampler should do this
-    resampling_matrix = create_resampling_matrix(
-        [x / 1000 for x in image.bands.centers], library.bands.centers)
+        # normalize confidence values from [pi,0] to [0,1]
+        angles = 1 - (angles / math.pi)
 
-    # allocate a zero-initialized MxN array for the classified image
-    classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
+        # get index of class with largest confidence value
+        # get confidence value of the classified pixel
+        scored[x_column], classified[x_column] = torch.max(angles, 1)
 
-    scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
-    # universal calculations for angles
-    # Adapted from Spectral library
-    angles_m = numpy.array(library.spectra, dtype=numpy.float64)
-    angles_m /= numpy.sqrt(numpy.einsum('ij,ij->i', angles_m, angles_m))[:, numpy.newaxis]
+    # Find indices where the pixel values should be ignored
+    nopixel_indices = numpy.where(
+        numpy.logical_or(
+            numpy.isclose(data[:, :, 0], -0.005), data[:, :, 0] == -50))
 
+    # Set classifid and scored values for ignored pixels to 0
+    classified[nopixel_indices] = 0
+    scored[nopixel_indices] = 0
+
+
+def joblib_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
+    """
+    joblib Implementation of SAM algorithm 
+
+    Args:
+        data:                               data from hyperspectral image
+        angles_m (numpy array):             processed angles from library
+        resampling_matrix (numpy array):    matrix used to resample pixels 
+        classified (numpy.zeros):           m by n numpy array of zeros
+        scored (snumpy.zeros):              m by n numpy array of zeros
+        m (int):                            number of columns
+        n (int):                            number of rows
+
+    Returns:
+        None
+    """
     num_cores = multiprocessing.cpu_count()
+
     pixel_confidences = numpy.array(Parallel(n_jobs=num_cores)(delayed(
                                 calculate_pixel_confidence_value)(data[x, y],
                                 angles_m, resampling_matrix)
@@ -341,123 +264,24 @@ def SAM_joblib(image_file_name, classified_file_name, library_file_name,
                 scored[i][j] = pixel_confidences[k][0]
             classified[i][j] = pixel_confidences[k][1]
             k += 1
-        
-    classified = classified + 1
-
     
-    #zero out values that fall below the threshold
-    indices = numpy.where(scored[:][:] <= threshold)
 
-    classified[indices] = 0
-    scored[indices] = 0
-
-    # save the classified image to a file
-    spectral.io.envi.save_classification(classified_file_name, classified,
-                                         class_names=['No data'] +
-                                         library.names,
-                                         metadata={'data ignore value': 0,
-                                                   'description': 'COAL ' +
-                                                   pycoal.version + ' '
-                                                   'mineral classified '
-                                                   'image.',
-                                                   'map info':
-                                                       image.metadata.get(
-                                                        'map info')})
-
-    # remove unused classes from the image
-    pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
-
-    if scores_file_name is not None:
-        # save the scored image to a file
-        spectral.io.envi.save_image(scores_file_name, scored,
-                                    dtype=numpy.float64,
-                                    metadata={'data ignore value': -50,
-                                              'description': 'COAL ' +
-                                              pycoal.version + ' mineral '
-                                              'scored image.',
-                                              'map info': image.metadata.get(
-                                                  'map info')})
-
-
-def SAM_serial(image_file_name, classified_file_name, library_file_name,
-                scores_file_name=None, class_names=None, threshold=0.0,
-                in_memory=False, subset_rows=None, subset_cols=None):
+def serial_SAM(data, angles_m, resampling_matrix, classified, scored, m, n):
     """
-    Parameter 'scores_file_name' optionally receives the path to where to save
-    an image that holds all the SAM scores yielded for each pixel of the
-    classified image. No score image is create if not provided.
-    The optional 'threshold' parameter defines a confidence value between zero
-    and one below which SAM classifications will be discarded, otherwise all
-    classifications will be included.
-    In order to improve performance on systems with sufficient memory,
-    enable the optional parameter to load entire images.
+    serial Implementation of SAM algorithm 
+
     Args:
-        library_file_name (str):            filename of the spectral library
-        image_file_name (str):              filename of the image to be
-                                            classified
-        classified_file_name (str):         filename of the classified image
-        scores_file_name (str, optional):   filename of the image to hold
-                                            each pixel's classification score
-        class_names (str[], optional):      list of classes' names to include
-        threshold (float, optional):        classification threshold
-        in_memory (boolean, optional):      enable loading entire image
-        subset_rows (2-tuple, optional):    range of rows to read (empty
-                                            to read the whole image)
-        subset_cols (2-tuple, optional):    range of columns to read (
-                                            empty to read the whole image)
+        data:                               data from hyperspectral image
+        angles_m (numpy array):             processed angles from library
+        resampling_matrix (numpy array):    matrix used to resample pixels 
+        classified (numpy.zeros):           m by n numpy array of zeros
+        scored (snumpy.zeros):              m by n numpy array of zeros
+        m (int):                            number of columns
+        n (int):                            number of rows
+
     Returns:
         None
     """
-
-    # load and optionally subset the spectral library
-    library = spectral.open_image(library_file_name)
-    if class_names is not None:
-        library = pycoal.mineral.MineralClassification.subset_spectral_library(
-            library, class_names)
-
-    # open the image
-    image = spectral.open_image(image_file_name)
-    if subset_rows is not None and subset_cols is not None:
-        # Creates list of rows and columns to create subset image from
-        rows = numpy.linspace(
-            subset_rows[0], subset_rows[1],
-            subset_rows[1] - subset_rows[0] + 1).astype(numpy.int32)
-        cols = numpy.linspace(
-            subset_cols[0], subset_cols[1],
-            subset_cols[1] - subset_cols[0] + 1).astype(numpy.int32)
-
-        # Reads subset of image image into memory
-        data = image.read_subimage(rows, cols)
-
-        # Determines dimensions for subset image
-        m = subset_rows[1] - subset_rows[0] + 1
-        n = subset_cols[1] - subset_cols[0] + 1
-    else:
-        if in_memory:
-            data = image.load()
-        else:
-            data = image.asarray()
-        m = image.shape[0]
-        n = image.shape[1]
-
-    logging.info("Classifying a %iX%i image" % (m, n))
-
-    # define a resampler
-    # TODO detect and scale units
-    # TODO band resampler should do this
-    resampling_matrix = create_resampling_matrix(
-        [x / 1000 for x in image.bands.centers], library.bands.centers)
-
-    # allocate a zero-initialized MxN array for the classified image
-    classified = numpy.zeros(shape=(m, n), dtype=numpy.uint16)
-
-    scored = numpy.zeros(shape=(m, n), dtype=numpy.float64)
-
-    # universal calculations for angles
-    # Adapted from Spectral library
-    ang_m = numpy.array(library.spectra, dtype=numpy.float64)
-    ang_m /= numpy.sqrt(numpy.einsum('ij,ij->i', ang_m, ang_m))[:, numpy.newaxis]
-
     # for each pixel in the image
     for x in range(m):
 
@@ -491,40 +315,50 @@ def SAM_serial(image_file_name, classified_file_name, library_file_name,
                 # get confidence value of the classified pixel
                 scored[x, y] = angles[classified[x, y]]
 
-    classified = classified + 1
 
-    indices = numpy.where(scored[:][:] <= threshold)
+def calculate_pixel_confidence_value(pixel, angles_m, resampling_matrix):
+    """
+    Calculate the confidence score and class index for a pixel
+    Is run in parallel on CPU through joblib
 
-    classified[indices] = 0
-    scored[indices] = 0
+    Args:
+        pixel (int[]):                      numpy memmap of pixel's values
+        angles_m (numpy array):             universal calculated angles
+        resampling_matrix (numpy array):    resampling matrix to convert spectra 
+                                            from one band discretization to another
 
-    # save the classified image to a file
-    spectral.io.envi.save_classification(classified_file_name, classified,
-                                         class_names=['No data'] +
-                                         library.names,
-                                         metadata={'data ignore value': 0,
-                                                   'description': 'COAL ' +
-                                                   pycoal.version + ' '
-                                                   'mineral classified '
-                                                   'image.',
-                                                   'map info':
-                                                       image.metadata.get(
-                                                        'map info')})
+    Returns:
+        pixel confidence value (float):     confidence value of the classified pixel
+        pixel class index (float):          index of class with largest confidence value    
 
-    # remove unused classes from the image
-    pycoal.mineral.MineralClassification.filter_classes(classified_file_name)
+    """
 
-    if scores_file_name is not None:
-        # save the scored image to a file
-        spectral.io.envi.save_image(scores_file_name, scored,
-                                    dtype=numpy.float64,
-                                    metadata={'data ignore value': -50,
-                                              'description': 'COAL ' +
-                                              pycoal.version + ' mineral '
-                                              'scored image.',
-                                              'map info': image.metadata.get(
-                                                  'map info')})
+    if not numpy.isclose(pixel[0], -0.005) and not pixel[0] == -50:
 
+        # resample the pixel ignoring NaNs from target bands that
+        # don't overlap
+        # TODO fix spectral library so that bands are in order
+        resample_data = numpy.einsum('ij,j->i', resampling_matrix, pixel)
+        resample_data = numpy.nan_to_num(resample_data)
+
+        # calculate spectral angles
+        # Adapted from Spectral library
+        norms = numpy.sqrt(numpy.einsum('i,i->', resample_data, resample_data))
+        dots = numpy.einsum('i,ji->j', resample_data, angles_m)
+        dots = numpy.clip(dots / norms, -1, 1)
+        angles = numpy.arccos(dots)
+
+        # normalize confidence values from [pi,0] to [0,1]
+        angles = 1 - angles / math.pi
+
+         # get index of class with largest confidence value
+        class_index = numpy.argmax(angles)
+
+        # get confidence value of the classified pixel
+        confidence_value = angles[class_index]
+
+        return confidence_value, class_index
+    return 0.0,0.0
 
 
 def avngDNN_serial(image_file_name, classified_file_name, model_file_name,
@@ -629,7 +463,7 @@ def avngDNN_serial(image_file_name, classified_file_name, model_file_name,
 
 class MineralClassification:
 
-    def __init__(self, algorithm=SAM_pytorch, config_file=None, **kwargs):
+    def __init__(self, algorithm=SAM, config_file=None, **kwargs):
         """
         Construct a new ``MineralClassification`` object with a spectral
         library in ENVI format such as the `USGS Digital Spectral Library 06
@@ -662,9 +496,8 @@ class MineralClassification:
             sys.exit()
 
         set_algo = None
-        set_impl = None
         self.algorithm = algorithm
-        
+        self.impl = "pytorch"
         # use the user's chosen classifier
         try:
             set_algo = config['processing']['algo']
@@ -673,14 +506,14 @@ class MineralClassification:
         
         # use the user's chosen implementation
         try:
-            set_impl = config['processing']['impl']
+            self.impl = config['processing']['impl']
         except KeyError:
             raise KeyError('Implementation not set in config file')
         
         
-        if None not in (set_algo, set_impl):
+        if None not in (set_algo, self.impl):
             try:
-                self.algorithm = globals()[set_algo + "_" + set_impl]
+                self.algorithm = globals()[set_algo]
             except KeyError:
                 raise KeyError('Algorithm or implementation set incorrectly in config file')
                 
@@ -710,7 +543,7 @@ class MineralClassification:
 
         # run the classifier callback expanding self.args to fulfill the
         # specific args of the function
-        self.algorithm(image_file_name, classified_file_name, **self.args)
+        self.algorithm(image_file_name, classified_file_name, self.impl, **self.args)
 
         end = time.time()
         seconds_elapsed = end - start
