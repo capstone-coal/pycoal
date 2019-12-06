@@ -14,6 +14,7 @@ name = 'python'
 enabled = true
 runtime_version = '3.x.x'
 
+[[analyzers]]
 name = "docker"
 enabled = true
 
