@@ -1,0 +1,16 @@
+ENVI
+description = {
+  COAL 0.5.2 mineral classified image.}
+samples = 10
+lines = 10
+bands = 1
+header offset = 0
+file type = ENVI Classification
+data type = 12
+interleave = bip
+byte order = 0
+map info = { UTM , 1.000 , 1.000 , 277811.628 , 4483607.425 , 3.1000000000e+00 , 3.1000000000e+00 , 13 , North , WGS-84 , units=Meters , rotation=53.00000000 }
+data ignore value = 0
+class names = { No data }
+classes = 1
+class lookup = { 0 , 0 , 0 }

@@ -13,3 +13,16 @@ exclude_patterns = [
 name = 'python'
 enabled = true
 runtime_version = '3.x.x'
+
+[[analyzers]]
+name = "docker"
+enabled = true
+
+  [analyzers.meta]
+  dockerfile_paths = [
+    "Dockerfile"
+  ]
+
+  trusted_registries = [
+    "docker.io"
+  ]
